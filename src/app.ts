@@ -1,12 +1,14 @@
 import express from 'express'
 import { createDB } from './modules/common/db'
-import { RoutesList } from './modules/common/routes'
+import { initRoutes, RoutesList } from './modules/common/routes'
 
 export const app = express()
 export const db = createDB()
 
 const parseBodyMiddleware = express.json()
 app.use(parseBodyMiddleware)
+
+initRoutes()
 
 app.get(RoutesList.BASE, (req, res) => {
   res.send('Welcome to JoymeStudios Blogs App!')
