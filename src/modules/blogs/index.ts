@@ -1,7 +1,7 @@
 import { blogsRouter } from './router/blogsRouter'
-import { BlogsViewModel } from './model/BlogsViewModel'
+import { BlogViewModel } from './model/BlogViewModel'
 
 export {
-  BlogsViewModel,
+  BlogViewModel,
   blogsRouter,
 }

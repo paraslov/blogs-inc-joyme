@@ -1,8 +1,8 @@
-import { BlogsViewModel } from '../../../modules/blogs'
+import { BlogViewModel } from '../../../modules/blogs'
 import { testBlog } from '../../../modules/blogs/mocks/blogsMock'
 
 type DbType = {
-  blogs: BlogsViewModel[],
+  blogs: BlogViewModel[],
   posts: any,
 }
 
