@@ -1,7 +1,7 @@
-import { app, db } from '../../../app'
-import { testBlog } from '../../common/db'
-import { RoutesList } from '../../common/routes'
+import { app, db } from '../../../app/app'
+import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
+import { testBlog } from '../mocks/blogsMock'
 const supertest = require('supertest')
 
 const request = supertest(app)
