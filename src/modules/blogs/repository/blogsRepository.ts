@@ -18,4 +18,13 @@ export const blogsRepository = {
     db.blogs.push(newBlog)
     return newBlog
   },
+  async updateBlog(blogId: string, payload: BlogInputModel) {
+    const foundBlog = await this.getBlogById(blogId)
+
+    if (!foundBlog) return false
+
+    db.blogs = db.blogs.map((blog) => blog.id === blogId ? {...blog, ...payload} : blog)
+
+    return true
+  }
 }
