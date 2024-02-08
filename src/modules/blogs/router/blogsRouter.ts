@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
 import { blogsRepository } from '../repository/blogsRepository'
 import { HttpStatusCode } from '../../common/enums'
-import { RequestBody } from '../../common/types/RequestGenericTypes'
+import { RequestBody, RequestParams, RequestParamsBody } from '../../common/types/RequestGenericTypes'
 import { BlogInputModel } from '../model/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
@@ -34,4 +34,21 @@ blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: Request
   const newBlog = await blogsRepository.createNewBlog(newBlogData)
 
   res.status(HttpStatusCode.CREATED_201).send(newBlog)
+})
+
+blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) => {
+  const updateBlogData: BlogInputModel = {
+    name: req.body.name,
+    description: req.body.description,
+    websiteUrl: req.body.websiteUrl,
+  }
+
+  const isBlogUpdated = await blogsRepository.updateBlog(req.params.blogId, updateBlogData)
+
+  if (!isBlogUpdated) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    return
+  }
+
+  res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })

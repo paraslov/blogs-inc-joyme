@@ -13,3 +13,9 @@ export const testBlogInput: BlogInputModel = {
   description: 'New blog description',
   websiteUrl: 'https://new-site-url.com/',
 }
+
+export const testUpdateBlogInput: BlogInputModel = {
+  name: 'Upd blog name',
+  description: 'Update blog description',
+  websiteUrl: 'https://update-site-url.com/',
+}
