@@ -1,7 +1,7 @@
 import { app, db } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
-import { testBlog, testBlogInput } from '../mocks/blogsMock'
+import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/tests/blogsTestManager'
 const supertest = require('supertest')
 
@@ -96,5 +96,41 @@ describe('/blogs route tests:', () => {
     await blogsTestManager.createPost()
 
     await request.get(`${RoutesList.BLOGS}/someId`).expect(HttpStatusCode.NOT_FOUND_404)
+  })
+
+  it('PUT /blogs success', async () => {
+    const createdBlog = await blogsTestManager.createPost()
+
+    await request.put(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
+      .auth('admin', 'password')
+      .send(testUpdateBlogInput)
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    expect(db.blogs[0].name).toBe(testUpdateBlogInput.name)
+    expect(db.blogs[0].id).toBe(createdBlog.body.id)
+    expect(db.blogs[0].websiteUrl).not.toBe(testBlog.websiteUrl)
+  })
+
+  it('PUT /blogs failed::unauthorized', async () => {
+    const createdBlog = await blogsTestManager.createPost()
+
+    await request.put(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
+      .auth('failed', 'password')
+      .send(testUpdateBlogInput)
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+
+    expect(db.blogs[0].name).toBe(testBlogInput.name)
+  })
+
+  it('PUT /blogs failed::notFound', async () => {
+    await blogsTestManager.createPost()
+
+    await request.put(`${RoutesList.BLOGS}/someId`)
+      .auth('admin', 'password')
+      .send(testUpdateBlogInput)
+      .expect(HttpStatusCode.NOT_FOUND_404)
+
+    expect(db.blogs[0].name).toBe(testBlogInput.name)
+    expect(db.blogs[0].websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
   })
 })
