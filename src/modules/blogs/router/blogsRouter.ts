@@ -14,6 +14,17 @@ blogsRouter.get('/', async (req, res) => {
   res.status(HttpStatusCode.OK_200).send(blogs)
 })
 
+blogsRouter.get('/:blogId', async (req, res) => {
+  const foundBlogById = await blogsRepository.getBlogById(req.params.blogId)
+
+  if (!foundBlogById) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    return
+  }
+
+  res.status(HttpStatusCode.OK_200).send(foundBlogById)
+})
+
 blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: RequestBody<BlogInputModel>, res: Response) => {
   const newBlogData: BlogInputModel = {
     name: req.body.name,
