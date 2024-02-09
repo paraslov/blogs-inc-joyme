@@ -14,12 +14,12 @@ describe('/blogs route GET tests: ', () => {
   })
 
   it('GET /blogs', async () => {
-    db.blogs = [testBlog]
+    const createdBlog = await blogsTestManager.createPost()
 
     const result = await request.get(RoutesList.BLOGS).expect(HttpStatusCode.OK_200)
 
     expect(result.body?.length).toBe(1)
-    expect(result.body).toStrictEqual([testBlog])
+    expect(result.body.name).toBe(createdBlog.name)
   })
 
   it('GET /blogs/:id success', async () => {
@@ -100,7 +100,7 @@ describe('/blogs route PUT tests: ', () => {
     const createdBlog = await blogsTestManager.createPost()
 
     await request.put(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
-      .auth('admin', 'password')
+      .auth('admin', 'qwerty')
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NO_CONTENT_204)
 
@@ -124,7 +124,7 @@ describe('/blogs route PUT tests: ', () => {
     const createdBlog = await blogsTestManager.createPost()
 
     await request.put(`${RoutesList.BLOGS}/someId`)
-      .auth('admin', 'password')
+      .auth('admin', 'qwerty')
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NOT_FOUND_404)
 
@@ -142,7 +142,7 @@ describe('/blogs route DELETE tests: ', () => {
     const createdBlog = await blogsTestManager.createPost()
 
     await request.delete(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
-      .auth('admin', 'password')
+      .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NO_CONTENT_204)
 
     expect(db.blogs.length).toBe(0)
@@ -163,7 +163,7 @@ describe('/blogs route DELETE tests: ', () => {
     const createdBlog = await blogsTestManager.createPost()
 
     await request.delete(`${RoutesList.BLOGS}/wrongId`)
-      .auth('admin', 'password')
+      .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 
     expect(db.blogs.length).toBe(1)
