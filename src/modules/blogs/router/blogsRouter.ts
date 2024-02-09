@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
 import { blogsRepository } from '../repository/blogsRepository'
 import { HttpStatusCode } from '../../common/enums'
-import { RequestBody, RequestParams, RequestParamsBody } from '../../common/types/RequestGenericTypes'
+import { RequestBody, RequestParamsBody } from '../../common/types/RequestGenericTypes'
 import { BlogInputModel } from '../model/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
@@ -46,6 +46,17 @@ blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: R
   const isBlogUpdated = await blogsRepository.updateBlog(req.params.blogId, updateBlogData)
 
   if (!isBlogUpdated) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    return
+  }
+
+  res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})
+
+blogsRouter.delete('/:blogId', authMiddleware, async (req, res) => {
+  const isDeleted = await blogsRepository.deleteBlog(req.params.blogId)
+
+  if (!isDeleted) {
     res.sendStatus(HttpStatusCode.NOT_FOUND_404)
     return
   }
