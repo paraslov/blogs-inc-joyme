@@ -52,3 +52,14 @@ blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: R
 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
+
+blogsRouter.delete('/:blogId', authMiddleware, async (req, res) => {
+  const isDeleted = await blogsRepository.deleteBlog(req.params.blogId)
+
+  if (!isDeleted) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    return
+  }
+
+  res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})

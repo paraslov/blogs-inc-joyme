@@ -123,14 +123,46 @@ describe('/blogs route tests:', () => {
   })
 
   it('PUT /blogs failed::notFound', async () => {
-    await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createPost()
 
     await request.put(`${RoutesList.BLOGS}/someId`)
       .auth('admin', 'password')
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    expect(db.blogs[0].name).toBe(testBlogInput.name)
+    expect(db.blogs[0].name).toBe(createdBlog.body.name)
     expect(db.blogs[0].websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
+  })
+
+  it('DELETE /blogs/:id success', async () => {
+    const createdBlog = await blogsTestManager.createPost()
+
+    await request.delete(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
+      .auth('admin', 'password')
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    expect(db.blogs.length).toBe(0)
+  })
+
+  it('DELETE /blogs/:id failed::notAuthorized', async () => {
+    const createdBlog = await blogsTestManager.createPost()
+
+    await request.delete(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
+      .auth('failed', 'password')
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+
+    expect(db.blogs.length).toBe(1)
+    expect(db.blogs[0].name).toBe(createdBlog.body.name)
+  })
+
+  it('DELETE /blogs/:id failed::notFound', async () => {
+    const createdBlog = await blogsTestManager.createPost()
+
+    await request.delete(`${RoutesList.BLOGS}/wrongId`)
+      .auth('admin', 'password')
+      .expect(HttpStatusCode.NOT_FOUND_404)
+
+    expect(db.blogs.length).toBe(1)
+    expect(db.blogs[0].name).toBe(createdBlog.body.name)
   })
 })
