@@ -11,7 +11,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   const authBase64 = req.headers.authorization.split(' ')?.[1]
   const [login, password] = Buffer.from(authBase64, 'base64')?.toString('ascii')?.split(':') || []
 
-  if (login !== 'admin' && password !== 'qwerty') {
+  if (login !== 'admin' || password !== 'qwerty') {
     res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
 
     return
