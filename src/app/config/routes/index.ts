@@ -1,6 +1,7 @@
-import { blogsRouter } from '../../../modules/blogs'
 import { app } from '../../app'
 import { testingRouter } from '../../../modules/common/testing'
+import { blogsRouter } from '../../../modules/blogs'
+import { postsRouter } from '../../../modules/posts'
 
 const RoutesList = {
   BASE: '/',
@@ -12,6 +13,7 @@ const RoutesList = {
 
 function initRoutes() {
   app.use(RoutesList.BLOGS, blogsRouter)
+  app.use(RoutesList.POSTS, postsRouter)
   app.use(RoutesList.TESTING, testingRouter)
 
   app.get(RoutesList.BASE, (req, res) => {
