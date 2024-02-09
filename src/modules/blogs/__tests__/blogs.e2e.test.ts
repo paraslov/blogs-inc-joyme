@@ -50,6 +50,8 @@ describe('/blogs route POST tests: ', () => {
 
   it('POST /blogs failed::unauthorized', async () => {
     await blogsTestManager.createPost({ user: 'wrong', password: 'auth', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+    await blogsTestManager.createPost({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+    await blogsTestManager.createPost({ user: 'wrongUser', password: 'qwerty', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
 
     expect(db.blogs.length).toBe(0)
   })
