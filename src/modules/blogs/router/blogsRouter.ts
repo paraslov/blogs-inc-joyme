@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
 import { blogsRepository } from '../repository/blogsRepository'
 import { HttpStatusCode } from '../../common/enums'
-import { RequestBody, RequestParams, RequestParamsBody } from '../../common/types/RequestGenericTypes'
+import { RequestBody, RequestParamsBody } from '../../common/types/RequestGenericTypes'
 import { BlogInputModel } from '../model/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'

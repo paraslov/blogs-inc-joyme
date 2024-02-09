@@ -3,11 +3,12 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/tests/blogsTestManager'
+
 const supertest = require('supertest')
 
 const request = supertest(app)
 
-describe('/blogs route tests:', () => {
+describe('/blogs route GET tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -19,67 +20,6 @@ describe('/blogs route tests:', () => {
 
     expect(result.body?.length).toBe(1)
     expect(result.body).toStrictEqual([testBlog])
-  })
-
-  it('POST /blogs success', async () => {
-    await blogsTestManager.createPost({ shouldExpect: true })
-  })
-
-  it('POST /blogs failed::unauthorized', async () => {
-    await request.post(RoutesList.BLOGS)
-      .auth('failed', 'password')
-      .send(testBlogInput)
-      .expect(HttpStatusCode.UNAUTHORIZED_401)
-
-    expect(db.blogs.length).toBe(0)
-  })
-
-  it('POST /blogs failed::name:notString', async () => {
-    const res = await request.post(RoutesList.BLOGS)
-      .auth('admin', 'qwerty')
-      .send({...testBlogInput, name: null})
-      .expect(HttpStatusCode.BAD_REQUEST_400)
-
-    expect(res.body.errorsMessages.length).toBe(1)
-    expect(res.body.errorsMessages[0].field).toBe('name')
-    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
-    expect(db.blogs.length).toBe(0)
-  })
-
-  it('POST /blogs failed::name:tooLong', async () => {
-    const res = await request.post(RoutesList.BLOGS)
-      .auth('admin', 'qwerty')
-      .send({...testBlogInput, name: '1234567890123456'})
-      .expect(HttpStatusCode.BAD_REQUEST_400)
-
-    expect(res.body.errorsMessages.length).toBe(1)
-    expect(res.body.errorsMessages[0].field).toBe('name')
-    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
-    expect(db.blogs.length).toBe(0)
-  })
-
-  it('POST /blogs failed::description:emptyString', async () => {
-    const res = await request.post(RoutesList.BLOGS)
-      .auth('admin', 'qwerty')
-      .send({...testBlogInput, description: ''})
-      .expect(HttpStatusCode.BAD_REQUEST_400)
-
-    expect(res.body.errorsMessages.length).toBe(1)
-    expect(res.body.errorsMessages[0].field).toBe('description')
-    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
-    expect(db.blogs.length).toBe(0)
-  })
-
-  it('POST /blogs failed::websiteUrl:incorrectUrl', async () => {
-    const res = await request.post(RoutesList.BLOGS)
-      .auth('admin', 'qwerty')
-      .send({...testBlogInput, websiteUrl: 'https//my-website.top'})
-      .expect(HttpStatusCode.BAD_REQUEST_400)
-
-    expect(res.body.errorsMessages.length).toBe(1)
-    expect(res.body.errorsMessages[0].field).toBe('websiteUrl')
-    expect(res.body.errorsMessages[0].message).toBe('Must be a valid URL')
-    expect(db.blogs.length).toBe(0)
   })
 
   it('GET /blogs/:id success', async () => {
@@ -96,6 +36,62 @@ describe('/blogs route tests:', () => {
     await blogsTestManager.createPost()
 
     await request.get(`${RoutesList.BLOGS}/someId`).expect(HttpStatusCode.NOT_FOUND_404)
+  })
+})
+
+describe('/blogs route POST tests: ', () => {
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
+  })
+
+  it('POST /blogs success', async () => {
+    await blogsTestManager.createPost({ shouldExpect: true })
+  })
+
+  it('POST /blogs failed::unauthorized', async () => {
+    await blogsTestManager.createPost({ user: 'wrong', password: 'auth', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+
+    expect(db.blogs.length).toBe(0)
+  })
+
+  it('POST /blogs failed::name:notString', async () => {
+    await blogsTestManager.createPost({
+      shouldExpect: true,
+      checkedData: { field: 'name', value: null },
+      expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
+    })
+  })
+
+  it('POST /blogs failed::name:tooLong', async () => {
+    await blogsTestManager.createPost({
+      shouldExpect: true,
+      checkedData: { field: 'name', value: '1234567890123456'},
+      expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
+    })
+  })
+
+  it('POST /blogs failed::description:emptyString', async () => {
+    await blogsTestManager.createPost({
+      shouldExpect: true,
+      checkedData: { field: 'description', value: ''},
+      expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
+    })
+  })
+
+  it('POST /blogs failed::websiteUrl:incorrectUrl', async () => {
+    const res = await blogsTestManager.createPost({
+      shouldExpect: true,
+      checkedData: { field: 'websiteUrl', value: 'https//my-website.top'},
+      expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
+    })
+
+    expect(res.body.errorsMessages[0].message).toBe('Must be a valid URL')
+  })
+})
+
+describe('/blogs route PUT tests: ', () => {
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
   })
 
   it('PUT /blogs success', async () => {
@@ -132,6 +128,12 @@ describe('/blogs route tests:', () => {
 
     expect(db.blogs[0].name).toBe(createdBlog.body.name)
     expect(db.blogs[0].websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
+  })
+})
+
+describe('/blogs route DELETE tests: ', () => {
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
   })
 
   it('DELETE /blogs/:id success', async () => {
