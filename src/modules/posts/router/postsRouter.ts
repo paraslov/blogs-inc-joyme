@@ -14,6 +14,18 @@ postsRouter.get('/', async (req, res) => {
   res.status(HttpStatusCode.OK_200).send(posts)
 })
 
+postsRouter.get('/:postId', async (req, res) => {
+  const foundPost = await postsRepository.getPostById(req.params.postId)
+
+  if (!foundPost) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+
+    return
+  }
+
+  res.status(HttpStatusCode.OK_200).send(foundPost)
+})
+
 postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: RequestBody<PostInputModel>, res: Response) => {
   const payload: PostInputModel = {
     title: req.body.title,
