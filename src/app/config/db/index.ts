@@ -1,5 +1,5 @@
 import { BlogViewModel } from '../../../modules/blogs'
-import { testBlog } from '../../../modules/blogs/mocks/blogsMock'
+import { testBlog } from '../../../modules/blogs'
 import { testPost } from '../../../modules/posts/mocks/postsMock'
 
 type DbType = {

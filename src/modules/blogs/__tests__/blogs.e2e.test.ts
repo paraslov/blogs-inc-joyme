@@ -2,7 +2,7 @@ import { app, db } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
-import { blogsTestManager } from '../utils/tests/blogsTestManager'
+import { blogsTestManager } from '../utils/testing/blogsTestManager'
 
 const supertest = require('supertest')
 
@@ -14,7 +14,7 @@ describe('/blogs route GET tests: ', () => {
   })
 
   it('GET /blogs', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     const result = await request.get(RoutesList.BLOGS).expect(HttpStatusCode.OK_200)
 
@@ -23,7 +23,7 @@ describe('/blogs route GET tests: ', () => {
   })
 
   it('GET /blogs/:id success', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     const result = await request.get(`${RoutesList.BLOGS}/${createdBlog.body.id}`).expect(HttpStatusCode.OK_200)
 
@@ -33,7 +33,7 @@ describe('/blogs route GET tests: ', () => {
   })
 
   it('GET /blogs/:id 404 not found', async () => {
-    await blogsTestManager.createPost()
+    await blogsTestManager.createBlog()
 
     await request.get(`${RoutesList.BLOGS}/someId`).expect(HttpStatusCode.NOT_FOUND_404)
   })
@@ -45,19 +45,19 @@ describe('/blogs route POST tests: ', () => {
   })
 
   it('POST /blogs success', async () => {
-    await blogsTestManager.createPost({ shouldExpect: true })
+    await blogsTestManager.createBlog({ shouldExpect: true })
   })
 
   it('POST /blogs failed::unauthorized', async () => {
-    await blogsTestManager.createPost({ user: 'wrong', password: 'auth', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
-    await blogsTestManager.createPost({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
-    await blogsTestManager.createPost({ user: 'wrongUser', password: 'qwerty', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+    await blogsTestManager.createBlog({ user: 'wrong', password: 'auth', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+    await blogsTestManager.createBlog({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
+    await blogsTestManager.createBlog({ user: 'wrongUser', password: 'qwerty', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
 
     expect(db.blogs.length).toBe(0)
   })
 
   it('POST /blogs failed::name:notString', async () => {
-    await blogsTestManager.createPost({
+    await blogsTestManager.createBlog({
       shouldExpect: true,
       checkedData: { field: 'name', value: null },
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -65,7 +65,7 @@ describe('/blogs route POST tests: ', () => {
   })
 
   it('POST /blogs failed::name:tooLong', async () => {
-    await blogsTestManager.createPost({
+    await blogsTestManager.createBlog({
       shouldExpect: true,
       checkedData: { field: 'name', value: '1234567890123456'},
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -73,7 +73,7 @@ describe('/blogs route POST tests: ', () => {
   })
 
   it('POST /blogs failed::description:emptyString', async () => {
-    await blogsTestManager.createPost({
+    await blogsTestManager.createBlog({
       shouldExpect: true,
       checkedData: { field: 'description', value: ''},
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -81,7 +81,7 @@ describe('/blogs route POST tests: ', () => {
   })
 
   it('POST /blogs failed::websiteUrl:incorrectUrl', async () => {
-    const res = await blogsTestManager.createPost({
+    const res = await blogsTestManager.createBlog({
       shouldExpect: true,
       checkedData: { field: 'websiteUrl', value: 'https//my-website.top'},
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -97,7 +97,7 @@ describe('/blogs route PUT tests: ', () => {
   })
 
   it('PUT /blogs success', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.put(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
       .auth('admin', 'qwerty')
@@ -110,7 +110,7 @@ describe('/blogs route PUT tests: ', () => {
   })
 
   it('PUT /blogs failed::unauthorized', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.put(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
       .auth('failed', 'password')
@@ -121,7 +121,7 @@ describe('/blogs route PUT tests: ', () => {
   })
 
   it('PUT /blogs failed::notFound', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.put(`${RoutesList.BLOGS}/someId`)
       .auth('admin', 'qwerty')
@@ -139,7 +139,7 @@ describe('/blogs route DELETE tests: ', () => {
   })
 
   it('DELETE /blogs/:id success', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.delete(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
       .auth('admin', 'qwerty')
@@ -149,7 +149,7 @@ describe('/blogs route DELETE tests: ', () => {
   })
 
   it('DELETE /blogs/:id failed::notAuthorized', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.delete(`${RoutesList.BLOGS}/${createdBlog.body.id}`)
       .auth('failed', 'password')
@@ -160,7 +160,7 @@ describe('/blogs route DELETE tests: ', () => {
   })
 
   it('DELETE /blogs/:id failed::notFound', async () => {
-    const createdBlog = await blogsTestManager.createPost()
+    const createdBlog = await blogsTestManager.createBlog()
 
     await request.delete(`${RoutesList.BLOGS}/wrongId`)
       .auth('admin', 'qwerty')
