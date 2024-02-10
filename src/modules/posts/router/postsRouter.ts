@@ -15,7 +15,20 @@ postsRouter.get('/', async (req, res) => {
 })
 
 postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: RequestBody<PostInputModel>, res: Response) => {
-  const posts = await postsRepository.getAllPosts()
+  const payload: PostInputModel = {
+    title: req.body.title,
+    shortDescription: req.body.shortDescription,
+    content: req.body.content,
+    blogId: req.body.blogId,
+  }
 
-  res.status(HttpStatusCode.OK_200).send(posts)
+  const createdPost = await postsRepository.createPost(payload)
+
+  if (!createdPost) {
+    res.sendStatus(HttpStatusCode.BAD_REQUEST_400)
+
+    return
+  }
+
+  res.status(HttpStatusCode.CREATED_201).send(createdPost)
 })

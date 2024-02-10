@@ -28,10 +28,11 @@ describe('/posts route POST tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
-  //
-  // it('POST /posts success', async () => {
-  //   await postsTestManager.createPost()
-  // })
+
+  it('POST /posts success', async () => {
+    db.blogs = [testBlog]
+    await postsTestManager.createPost({ shouldExpect: true })
+  })
 
   it('POST /posts failed::auth', async () => {
     await postsTestManager.createPost({

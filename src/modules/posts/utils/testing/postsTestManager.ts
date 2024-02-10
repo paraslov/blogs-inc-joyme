@@ -36,7 +36,6 @@ class PostsTestManager {
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
-      console.log('@> errors: ', result.body.errorsMessages)
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)
       expect(result.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
