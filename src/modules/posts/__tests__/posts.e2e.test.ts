@@ -129,6 +129,12 @@ describe('/posts PUT route tests: ', () => {
       .expect(HttpStatusCode.UNAUTHORIZED_401)
   })
 
+  it('PUT /posts failed::unauthorized:Bearer', async () => {
+    await request.put(`${RoutesList.POSTS}/${testBlog.id}`)
+      .send('admin', 'qwerty', { type: "bearer" })
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+  })
+
   it('PUT /posts failed::titleLength', async () => {
     const createdPost = await postsTestManager.createPost()
     const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
