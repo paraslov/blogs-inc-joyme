@@ -7,6 +7,9 @@ export const postsRepository = {
   async getAllPosts() {
     return db.posts
   },
+  async getPostById(postId: string) {
+    return db.posts.find((post) => post.id === postId)
+  },
   async createPost(payload: PostInputModel) {
     const blogData = await blogsRepository.getBlogById(payload.blogId)
 

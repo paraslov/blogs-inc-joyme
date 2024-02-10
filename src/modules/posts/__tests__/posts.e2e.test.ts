@@ -1,7 +1,6 @@
 import { app, db } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
-import { testPost } from '../mocks/postsMock'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
 
@@ -12,15 +11,31 @@ const request = supertest(app)
 describe('/posts route GET tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
+    db.blogs.push(testBlog)
   })
 
   it('GET /posts success', async () => {
-    db.posts = [testPost]
+    const createdPost = await postsTestManager.createPost()
     const result = await request.get(RoutesList.POSTS).expect(HttpStatusCode.OK_200)
 
     expect(result.body?.length).toBe(1)
-    expect(result.body[0].blogId).toBe(testPost.blogId)
-    expect(result.body[0].title).toBe(testPost.title)
+    expect(result.body[0].blogId).toBe(createdPost.body.blogId)
+    expect(result.body[0].title).toBe(createdPost.body.title)
+  })
+
+  it('GET /posts/:id success', async () => {
+    const createdPost = await postsTestManager.createPost()
+    const result = await request.get(`${RoutesList.POSTS}/${createdPost.body.id}`).expect(HttpStatusCode.OK_200)
+
+    expect(result.body.id).toStrictEqual(expect.any(String))
+    expect(result.body.title).toBe(createdPost.body.title)
+    expect(result.body.blogId).toBe(createdPost.body.blogId)
+    expect(result.body.blogName).toBe(createdPost.body.blogName)
+  })
+
+  it('GET /posts/:id not found', async () => {
+    await postsTestManager.createPost()
+    await request.get(`${RoutesList.POSTS}/wrongId`).expect(HttpStatusCode.NOT_FOUND_404)
   })
 })
 

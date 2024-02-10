@@ -18,8 +18,8 @@ describe('/blogs route GET tests: ', () => {
 
     const result = await request.get(RoutesList.BLOGS).expect(HttpStatusCode.OK_200)
 
-    expect(result.body?.length).toBe(1)
-    expect(result.body.name).toBe(createdBlog.name)
+    expect(result.body.length).toBe(1)
+    expect(result.body[0].name).toBe(createdBlog.body.name)
   })
 
   it('GET /blogs/:id success', async () => {

@@ -11,8 +11,8 @@ export const testPost: PostViewModel = {
 }
 
 export const testPostInput: PostInputModel = {
-  title: 'Updated JS in 2024',
-  shortDescription: 'Updated Talk about new in JS',
-  content: 'Updated VERY VERY LONG CONTENT HERE',
+  title: 'New post JS in 2024',
+  shortDescription: 'New post Talk about new in JS',
+  content: 'New post VERY VERY LONG CONTENT HERE',
   blogId: '666777',
 }
