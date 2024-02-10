@@ -41,5 +41,14 @@ export const postsRepository = {
     updatingPost.blogName = blogData.name
 
     return true
+  },
+  async deletePostById(postId: string) {
+    const deletingPost = await this.getPostById(postId)
+
+    if (!deletingPost) return false
+
+    db.posts = db.posts.filter((post) => post.id !== postId)
+
+    return true
   }
 }
