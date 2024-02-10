@@ -1,10 +1,11 @@
 import { BlogViewModel } from '../../../modules/blogs'
+import { PostViewModel } from '../../../modules/posts'
 import { testBlog } from '../../../modules/blogs'
 import { testPost } from '../../../modules/posts/mocks/postsMock'
 
 type DbType = {
   blogs: BlogViewModel[],
-  posts: any,
+  posts: PostViewModel[],
 }
 
 const createDB = (): DbType => {
