@@ -8,7 +8,7 @@ const supertest = require('supertest')
 const request = supertest(app)
 
 class BlogsTestManager {
-  async createPost(payload: {
+  async createBlog(payload: {
     shouldExpect?: boolean
     user?: string
     password?: string
