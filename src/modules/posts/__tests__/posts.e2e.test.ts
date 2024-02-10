@@ -3,6 +3,7 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
+import { testPost, testPostInput } from '../mocks/postsMock'
 
 const supertest = require('supertest')
 
@@ -42,10 +43,10 @@ describe('/posts route GET tests: ', () => {
 describe('/posts route POST tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
+    db.blogs = [testBlog]
   })
 
   it('POST /posts success', async () => {
-    db.blogs = [testBlog]
     await postsTestManager.createPost({ shouldExpect: true })
   })
 
@@ -66,7 +67,6 @@ describe('/posts route POST tests: ', () => {
   })
 
   it('POST /posts failed::title', async () => {
-    db.blogs = [testBlog]
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -80,7 +80,6 @@ describe('/posts route POST tests: ', () => {
   })
 
   it('POST /posts failed::shortDescription', async () => {
-    db.blogs = [testBlog]
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -89,7 +88,6 @@ describe('/posts route POST tests: ', () => {
   })
 
   it('POST /posts failed::content', async () => {
-    db.blogs = [testBlog]
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -98,7 +96,6 @@ describe('/posts route POST tests: ', () => {
   })
 
   it('POST /posts failed::blogId', async () => {
-    db.blogs = [testBlog]
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
@@ -109,5 +106,62 @@ describe('/posts route POST tests: ', () => {
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
       checkedData: { field: 'blogId', value: null }
     })
+  })
+})
+
+describe('/posts PUT route tests: ', () => {
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
+    db.blogs = [testBlog]
+  })
+
+  it('PUT /posts success', async () => {
+    const createdPost = await postsTestManager.createPost()
+    await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
+      .auth('admin', 'qwerty')
+      .send(testPostInput)
+      .expect(HttpStatusCode.NO_CONTENT_204)
+  })
+
+  it('PUT /posts failed::unauthorized', async () => {
+    await request.put(`${RoutesList.POSTS}/${testBlog.id}`)
+      .send('wrong', 'auth')
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+  })
+
+  it('PUT /posts failed::titleLength', async () => {
+    const createdPost = await postsTestManager.createPost()
+    const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
+      .auth('admin', 'qwerty')
+      .send({ ...testPostInput, title: '1234567890123456789012345678901' })
+      .expect(HttpStatusCode.BAD_REQUEST_400)
+
+    expect(res.body.errorsMessages.length).toBe(1)
+    expect(res.body.errorsMessages[0].field).toBe('title')
+    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
+  })
+
+  it('PUT /posts failed::blogId', async () => {
+    const createdPost = await postsTestManager.createPost()
+    const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
+      .auth('admin', 'qwerty')
+      .send({ ...testPostInput, blogId: '000000' })
+      .expect(HttpStatusCode.BAD_REQUEST_400)
+
+    expect(res.body.errorsMessages.length).toBe(1)
+    expect(res.body.errorsMessages[0].field).toBe('blogId')
+    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
+  })
+
+  it('PUT /posts failed::content', async () => {
+    const createdPost = await postsTestManager.createPost()
+    const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
+      .auth('admin', 'qwerty')
+      .send({ ...testPostInput, content: null })
+      .expect(HttpStatusCode.BAD_REQUEST_400)
+
+    expect(res.body.errorsMessages.length).toBe(1)
+    expect(res.body.errorsMessages[0].field).toBe('content')
+    expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
   })
 })
