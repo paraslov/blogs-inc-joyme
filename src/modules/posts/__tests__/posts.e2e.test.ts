@@ -3,7 +3,7 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
-import { testPost, testPostInput } from '../mocks/postsMock'
+import { testPostInput } from '../mocks/postsMock'
 
 const supertest = require('supertest')
 
@@ -163,5 +163,42 @@ describe('/posts PUT route tests: ', () => {
     expect(res.body.errorsMessages.length).toBe(1)
     expect(res.body.errorsMessages[0].field).toBe('content')
     expect(res.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
+  })
+})
+
+describe('/posts DELETE tests: ', () => {
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
+    db.blogs = [testBlog]
+  })
+
+  it('DELETE /posts success: ', async () => {
+    const createdPosts = await postsTestManager.createPost()
+
+    await request.delete(`${RoutesList.POSTS}/${createdPosts.body.id}`)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    expect(db.posts.length).toBe(0)
+  })
+
+  it('DELETE /posts failed::unauthorized: ', async () => {
+    const createdPosts = await postsTestManager.createPost()
+
+    await request.delete(`${RoutesList.POSTS}/${createdPosts.body.id}`)
+      .auth('wrong', 'auth')
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+
+    expect(db.posts.length).toBe(1)
+  })
+
+  it('DELETE /posts failed::notFoundPostId: ', async () => {
+    await postsTestManager.createPost()
+
+    await request.delete(`${RoutesList.POSTS}/wrongId`)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.NOT_FOUND_404)
+
+    expect(db.posts.length).toBe(1)
   })
 })
