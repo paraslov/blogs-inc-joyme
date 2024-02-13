@@ -1,14 +1,14 @@
-import { db } from '../../../app/app'
 import { blogsRepository } from '../../blogs'
 import { PostInputModel } from '../model/PostInputModel'
 import { PostViewModel } from '../model/PostViewModel'
+import { postsCollection } from '../../../app/config/db'
 
 export const postsRepository = {
   async getAllPosts() {
-    return db.posts
+    return postsCollection.find({}).toArray()
   },
   async getPostById(postId: string) {
-    return db.posts.find((post) => post.id === postId)
+    return postsCollection.findOne({ id: postId })
   },
   async createPost(payload: PostInputModel) {
     const blogData = await blogsRepository.getBlogById(payload.blogId)
@@ -16,39 +16,36 @@ export const postsRepository = {
     if (!blogData) return false
 
     const createdPost: PostViewModel = {
-      id: String(new Date()),
+      id: String(Date.now()),
       title: payload.title,
       shortDescription: payload.shortDescription,
       content: payload.content,
       blogId: payload.blogId,
-      blogName: blogData?.name,
+      blogName: blogData.name,
+      createdAt: new Date().toISOString(),
     }
 
-    db.posts.push(createdPost)
+    await postsCollection.insertOne(createdPost)
 
     return createdPost
   },
   async updatePost(payload: PostInputModel, postId: string) {
-    const blogData = await blogsRepository.getBlogById(payload.blogId)
-    const updatingPost = await this.getPostById(postId)
+    const foundBlog = await blogsRepository.getBlogById(payload.blogId)
 
-    if (!updatingPost || !blogData) return false
+    if (!foundBlog) return false
 
-    updatingPost.blogId = payload.blogId
-    updatingPost.title = payload.title
-    updatingPost.shortDescription = payload.shortDescription
-    updatingPost.content = payload.content
-    updatingPost.blogName = blogData.name
+    const updateResult = await postsCollection.updateOne({ id: postId }, { $set: {
+        title: payload.title,
+        shortDescription: payload.shortDescription,
+        content: payload.content,
+        blogId: payload.blogId,
+      }})
 
-    return true
+    return Boolean(updateResult.matchedCount)
   },
   async deletePostById(postId: string) {
-    const deletingPost = await this.getPostById(postId)
+    const deleteResult = await postsCollection.deleteOne({ id: postId })
 
-    if (!deletingPost) return false
-
-    db.posts = db.posts.filter((post) => post.id !== postId)
-
-    return true
+    return Boolean(deleteResult.deletedCount)
   }
 }

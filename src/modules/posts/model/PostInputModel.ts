@@ -2,17 +2,17 @@ export type PostInputModel = {
   /**
    * maxLength: 30
    */
-  title: string,
+  title: string
   /**
    * maxLength: 100
    */
-  shortDescription: string,
+  shortDescription: string
   /**
    * maxLength: 1000
    */
-  content: string,
+  content: string
   /**
    * should be an existing blog id
    */
-  blogId: string,
+  blogId: string
 }

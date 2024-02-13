@@ -1,39 +1,37 @@
-import { db } from '../../../app/app'
 import { BlogInputModel } from '../model/BlogInputModel'
 import { BlogViewModel } from '../model/BlogViewModel'
+import { blogsCollection } from '../../../app/config/db'
 
 export const blogsRepository = {
   async getAllBlogs() {
-    return db.blogs
+    return blogsCollection.find({}).toArray()
   },
   async getBlogById(blogId: string) {
-    return db.blogs.find((blog) => blog.id === blogId)
+    return blogsCollection.findOne({ id: blogId})
   },
   async createNewBlog(payload: BlogInputModel): Promise<BlogViewModel> {
     const newBlog = {
-      id: String(new Date()),
+      id: String(Date.now()),
+      isMembership: false,
+      createdDate: new Date().toISOString(),
       ...payload,
     }
 
-    db.blogs.push(newBlog)
+    await blogsCollection.insertOne(newBlog)
     return newBlog
   },
   async updateBlog(blogId: string, payload: BlogInputModel) {
-    const foundBlog = await this.getBlogById(blogId)
+    const updateResult = await blogsCollection.updateOne({ id: blogId }, { $set: {
+        name: payload.name,
+        description: payload.description,
+        websiteUrl: payload.websiteUrl,
+      }})
 
-    if (!foundBlog) return false
-
-    db.blogs = db.blogs.map((blog) => blog.id === blogId ? {...blog, ...payload} : blog)
-
-    return true
+    return Boolean(updateResult.matchedCount)
   },
   async deleteBlog(blogId: string) {
-    const foundBlog = await this.getBlogById(blogId)
+    const deleteResult = await blogsCollection.deleteOne({ id: blogId })
 
-    if (!foundBlog) return false
-
-    db.blogs = db.blogs.filter((blog) => blog.id !== blogId)
-
-    return true
+    return Boolean(deleteResult.deletedCount)
   }
 }

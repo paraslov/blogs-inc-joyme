@@ -1,8 +1,9 @@
-import { app, db } from '../../../app/app'
+import { app } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
+import { blogsCollection } from '../../../app/config/db'
 
 const supertest = require('supertest')
 
@@ -53,7 +54,9 @@ describe('/blogs route POST tests: ', () => {
     await blogsTestManager.createBlog({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
     await blogsTestManager.createBlog({ user: 'wrongUser', password: 'qwerty', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
 
-    expect(db.blogs.length).toBe(0)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs.length).toBe(0)
   })
 
   it('POST /blogs failed::name:notString', async () => {
@@ -104,9 +107,11 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    expect(db.blogs[0].name).toBe(testUpdateBlogInput.name)
-    expect(db.blogs[0].id).toBe(createdBlog.body.id)
-    expect(db.blogs[0].websiteUrl).not.toBe(testBlog.websiteUrl)
+    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+
+    expect(blog?.name).toBe(testUpdateBlogInput.name)
+    expect(blog?.id).toBe(createdBlog.body.id)
+    expect(blog?.websiteUrl).not.toBe(testBlog.websiteUrl)
   })
 
   it('PUT /blogs failed::unauthorized', async () => {
@@ -117,7 +122,9 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    expect(db.blogs[0].name).toBe(testBlogInput.name)
+    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+
+    expect(blog?.name).toBe(testBlogInput.name)
   })
 
   it('PUT /blogs failed::notFound', async () => {
@@ -128,8 +135,10 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    expect(db.blogs[0].name).toBe(createdBlog.body.name)
-    expect(db.blogs[0].websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
+    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+
+    expect(blog?.name).toBe(createdBlog.body.name)
+    expect(blog?.websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
   })
 })
 
@@ -145,7 +154,9 @@ describe('/blogs route DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    expect(db.blogs.length).toBe(0)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs.length).toBe(0)
   })
 
   it('DELETE /blogs/:id failed::notAuthorized', async () => {
@@ -155,18 +166,20 @@ describe('/blogs route DELETE tests: ', () => {
       .auth('failed', 'password')
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    expect(db.blogs.length).toBe(1)
-    expect(db.blogs[0].name).toBe(createdBlog.body.name)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs.length).toBe(1)
   })
 
   it('DELETE /blogs/:id failed::notFound', async () => {
-    const createdBlog = await blogsTestManager.createBlog()
+    await blogsTestManager.createBlog()
 
     await request.delete(`${RoutesList.BLOGS}/wrongId`)
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    expect(db.blogs.length).toBe(1)
-    expect(db.blogs[0].name).toBe(createdBlog.body.name)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs.length).toBe(1)
   })
 })

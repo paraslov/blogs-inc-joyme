@@ -1,7 +1,8 @@
 import { RoutesList } from '../../../../app/config/routes'
 import { testBlogInput } from '../../mocks/blogsMock'
 import { HttpStatusCode } from '../../../common/enums'
-import { app, db } from '../../../../app/app'
+import { app } from '../../../../app/app'
+import { blogsCollection } from '../../../../app/config/db'
 
 const supertest = require('supertest')
 
@@ -29,17 +30,21 @@ class BlogsTestManager {
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
+      const blogFromDb = await blogsCollection.findOne({ id: result.body.id })
+
       expect(result.body.name).toBe(testBlogInput.name)
       expect(result.body.websiteUrl).toBe(testBlogInput.websiteUrl)
-      expect(db.blogs[0].description).toStrictEqual(testBlogInput.description)
-      expect(db.blogs[0].id).toStrictEqual(expect.any(String))
+      expect(blogFromDb?.description).toStrictEqual(testBlogInput.description)
+      expect(blogFromDb?.id).toStrictEqual(expect.any(String))
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
+      const blogsFromDb = await blogsCollection.find({}).toArray()
+
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)
       expect(result.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
-      expect(db.blogs.length).toBe(0)
+      expect(blogsFromDb.length).toBe(0)
     }
 
     return result

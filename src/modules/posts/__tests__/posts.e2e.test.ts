@@ -1,9 +1,10 @@
-import { app, db } from '../../../app/app'
+import { app } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
 import { testPostInput } from '../mocks/postsMock'
+import { postsCollection } from '../../../app/config/db'
 
 const supertest = require('supertest')
 
@@ -12,7 +13,6 @@ const request = supertest(app)
 describe('/posts route GET tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
-    db.blogs.push(testBlog)
   })
 
   it('GET /posts success', async () => {
@@ -43,7 +43,6 @@ describe('/posts route GET tests: ', () => {
 describe('/posts route POST tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
-    db.blogs = [testBlog]
   })
 
   it('POST /posts success', async () => {
@@ -70,12 +69,12 @@ describe('/posts route POST tests: ', () => {
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
-      checkedData: { field: 'title', value: null }
+      checkedData: { field: 'title', value: '1234567890123456789012345678901' },
     })
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
-      checkedData: { field: 'title', value: '1234567890123456789012345678901' }
+      checkedData: { field: 'title', value: null },
     })
   })
 
@@ -83,7 +82,7 @@ describe('/posts route POST tests: ', () => {
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
-      checkedData: { field: 'shortDescription', value: '' }
+      checkedData: { field: 'shortDescription', value: '' },
     })
   })
 
@@ -91,7 +90,7 @@ describe('/posts route POST tests: ', () => {
     await postsTestManager.createPost({
       shouldExpect: true,
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
-      checkedData: { field: 'content', value: 123 }
+      checkedData: { field: 'content', value: 123 },
     })
   })
 
@@ -112,14 +111,13 @@ describe('/posts route POST tests: ', () => {
 describe('/posts PUT route tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
-    db.blogs = [testBlog]
   })
 
   it('PUT /posts success', async () => {
     const createdPost = await postsTestManager.createPost()
     await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
       .auth('admin', 'qwerty')
-      .send(testPostInput)
+      .send({ ...testPostInput, blogId: createdPost.body.blogId })
       .expect(HttpStatusCode.NO_CONTENT_204)
   })
 
@@ -139,7 +137,7 @@ describe('/posts PUT route tests: ', () => {
     const createdPost = await postsTestManager.createPost()
     const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
       .auth('admin', 'qwerty')
-      .send({ ...testPostInput, title: '1234567890123456789012345678901' })
+      .send({ ...testPostInput, title: '1234567890123456789012345678901', blogId: createdPost.body.blogId })
       .expect(HttpStatusCode.BAD_REQUEST_400)
 
     expect(res.body.errorsMessages.length).toBe(1)
@@ -163,7 +161,7 @@ describe('/posts PUT route tests: ', () => {
     const createdPost = await postsTestManager.createPost()
     const res = await request.put(`${RoutesList.POSTS}/${createdPost.body.id}`)
       .auth('admin', 'qwerty')
-      .send({ ...testPostInput, content: null })
+      .send({ ...testPostInput, content: null, blogId: createdPost.body.blogId })
       .expect(HttpStatusCode.BAD_REQUEST_400)
 
     expect(res.body.errorsMessages.length).toBe(1)
@@ -175,7 +173,6 @@ describe('/posts PUT route tests: ', () => {
 describe('/posts DELETE tests: ', () => {
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
-    db.blogs = [testBlog]
   })
 
   it('DELETE /posts success: ', async () => {
@@ -185,7 +182,9 @@ describe('/posts DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    expect(db.posts.length).toBe(0)
+    const posts = await postsCollection.find({}).toArray()
+
+    expect(posts.length).toBe(0)
   })
 
   it('DELETE /posts failed::unauthorized: ', async () => {
@@ -195,7 +194,9 @@ describe('/posts DELETE tests: ', () => {
       .auth('wrong', 'auth')
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    expect(db.posts.length).toBe(1)
+    const posts = await postsCollection.find({}).toArray()
+
+    expect(posts.length).toBe(1)
   })
 
   it('DELETE /posts failed::notFoundPostId: ', async () => {
@@ -205,6 +206,9 @@ describe('/posts DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    expect(db.posts.length).toBe(1)
+    const posts = await postsCollection.find({}).toArray()
+
+    expect(posts.length).toBe(1)
+
   })
 })
