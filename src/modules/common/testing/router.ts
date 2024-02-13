@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { db } from '../../../app/app'
 import { HttpStatusCode } from '../enums'
 import { blogsCollection, postsCollection } from '../../../app/config/db'
 

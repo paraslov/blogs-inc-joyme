@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "yarn nodemon --inspect dist/index.js",
     "watch": "tsc -w",
-    "test:e2e": "jest -i"
+    "test:e2e": "jest -i --detectOpenHandles"
   },
   "dependencies": {
     "dotenv": "^16.4.2",

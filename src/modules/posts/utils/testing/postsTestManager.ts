@@ -1,7 +1,9 @@
 import { RoutesList } from '../../../../app/config/routes'
 import { HttpStatusCode } from '../../../common/enums'
-import { app, db } from '../../../../app/app'
+import { app } from '../../../../app/app'
 import { testPostInput } from '../../mocks/postsMock'
+import { postsCollection } from '../../../../app/config/db'
+import { blogsTestManager } from '../../../blogs/utils/testing/blogsTestManager'
 
 const supertest = require('supertest')
 
@@ -9,6 +11,7 @@ const request = supertest(app)
 
 class PostsTestManager {
   async createPost(payload: {
+    blogId?: string
     shouldExpect?: boolean
     user?: string
     password?: string
@@ -23,23 +26,31 @@ class PostsTestManager {
       checkedData,
     } = payload
 
+    const createdBlog = await blogsTestManager.createBlog()
+
     const result = await request.post(RoutesList.POSTS)
       .auth(user, password)
-      .send(checkedData ? { ...testPostInput, [checkedData.field]: checkedData.value } : testPostInput)
+      .send(checkedData
+        ? { ...testPostInput, blogId: createdBlog.body.id, [checkedData.field]: checkedData.value }
+        : { ...testPostInput, blogId: createdBlog.body.id })
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
+      const post = await postsCollection.findOne({ id: result.body.id })
+
       expect(result.body.title).toBe(testPostInput.title)
-      expect(result.body.blogId).toBe(testPostInput.blogId)
-      expect(db.posts[0].shortDescription).toStrictEqual(testPostInput.shortDescription)
-      expect(db.posts[0].id).toStrictEqual(expect.any(String))
+      expect(result.body.blogId).toBe(createdBlog.body.id)
+      expect(post?.shortDescription).toStrictEqual(testPostInput.shortDescription)
+      expect(post?.id).toStrictEqual(expect.any(String))
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
+      const posts = await postsCollection.find({}).toArray()
+
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)
       expect(result.body.errorsMessages[0].message).toStrictEqual(expect.any(String))
-      expect(db.posts.length).toBe(0)
+      expect(posts.length).toBe(0)
     }
 
     return result
