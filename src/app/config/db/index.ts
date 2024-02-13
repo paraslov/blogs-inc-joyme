@@ -42,4 +42,5 @@ async function runDb() {
 export {
   runDb,
   blogsCollection,
+  postsCollection,
 }
