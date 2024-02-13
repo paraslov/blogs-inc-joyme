@@ -16,12 +16,13 @@ export const postsRepository = {
     if (!blogData) return false
 
     const createdPost: PostViewModel = {
-      id: String(new Date()),
+      id: String(Date.now()),
       title: payload.title,
       shortDescription: payload.shortDescription,
       content: payload.content,
       blogId: payload.blogId,
       blogName: blogData?.name,
+      createdAt: new Date().toISOString(),
     }
 
     db.posts.push(createdPost)

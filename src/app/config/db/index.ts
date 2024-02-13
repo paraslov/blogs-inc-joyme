@@ -1,9 +1,11 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
+import { BlogViewModel } from '../../../modules/blogs'
+import { PostViewModel } from '../../../modules/posts'
+import { Collections } from './config'
 
 
 const uri = process.env.MONGO_URI
-
 if (!uri) {
   throw new Error('!!! MONGODB_URI not found')
 }
@@ -17,8 +19,10 @@ const client = new MongoClient(uri, {
 });
 
 const db = client.db(process.env.MONGO_DB_NAME)
+const blogsCollection = db.collection<BlogViewModel>(Collections.BLOGS)
+const postsCollection = db.collection<PostViewModel>(Collections.POSTS)
 
-export async function runDb() {
+async function runDb() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect()
@@ -33,4 +37,9 @@ export async function runDb() {
     console.log('DB work is finished successfully')
     await client.close();
   }
+}
+
+export {
+  runDb,
+  blogsCollection,
 }

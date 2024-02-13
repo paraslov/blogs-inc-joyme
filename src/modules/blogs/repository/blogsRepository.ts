@@ -11,7 +11,9 @@ export const blogsRepository = {
   },
   async createNewBlog(payload: BlogInputModel): Promise<BlogViewModel> {
     const newBlog = {
-      id: String(new Date()),
+      id: String(Date.now()),
+      isMembership: false,
+      createdDate: new Date().toISOString(),
       ...payload,
     }
 
