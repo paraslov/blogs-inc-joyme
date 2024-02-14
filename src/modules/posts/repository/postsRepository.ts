@@ -39,7 +39,9 @@ export const postsRepository = {
         shortDescription: payload.shortDescription,
         content: payload.content,
         blogId: payload.blogId,
-      }})
+      },
+      $project: { _id: 0 },
+    })
 
     return Boolean(updateResult.matchedCount)
   },

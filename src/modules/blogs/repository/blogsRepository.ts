@@ -13,7 +13,7 @@ export const blogsRepository = {
     const newBlog = {
       id: String(Date.now()),
       isMembership: false,
-      createdDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       ...payload,
     }
 
@@ -25,7 +25,9 @@ export const blogsRepository = {
         name: payload.name,
         description: payload.description,
         websiteUrl: payload.websiteUrl,
-      }})
+      },
+      $project: { _id: 0 },
+    })
 
     return Boolean(updateResult.matchedCount)
   },
