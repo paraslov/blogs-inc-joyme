@@ -13,7 +13,7 @@ export const blogsRepository = {
     const newBlog = {
       id: String(Date.now()),
       isMembership: false,
-      createdDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       ...payload,
     }
 
