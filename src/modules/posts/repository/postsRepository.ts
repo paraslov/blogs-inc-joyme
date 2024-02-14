@@ -5,10 +5,10 @@ import { postsCollection } from '../../../app/config/db'
 
 export const postsRepository = {
   async getAllPosts() {
-    return postsCollection.find({}).toArray()
+    return postsCollection.find({}).project({ _id: 0 }).toArray()
   },
   async getPostById(postId: string) {
-    return postsCollection.findOne({ id: postId })
+    return postsCollection.findOne({ id: postId }, { projection: { _id: 0 }})
   },
   async createPost(payload: PostInputModel) {
     const blogData = await blogsRepository.getBlogById(payload.blogId)
