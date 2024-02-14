@@ -25,7 +25,7 @@ export const postsRepository = {
       createdAt: new Date().toISOString(),
     }
 
-    await postsCollection.insertOne(createdPost)
+    await postsCollection.insertOne({ ...createdPost })
 
     return createdPost
   },
