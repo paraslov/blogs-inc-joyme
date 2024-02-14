@@ -4,10 +4,10 @@ import { blogsCollection } from '../../../app/config/db'
 
 export const blogsRepository = {
   async getAllBlogs() {
-    return blogsCollection.find({}).toArray()
+    return blogsCollection.find({}).project({ _id: 0 }).toArray()
   },
   async getBlogById(blogId: string) {
-    return blogsCollection.findOne({ id: blogId})
+    return blogsCollection.findOne({ id: blogId }, { projection: { _id: 0 } })
   },
   async createNewBlog(payload: BlogInputModel): Promise<BlogViewModel> {
     const newBlog = {
