@@ -25,7 +25,9 @@ export const blogsRepository = {
         name: payload.name,
         description: payload.description,
         websiteUrl: payload.websiteUrl,
-      }})
+      },
+      $project: { _id: 0 },
+    })
 
     return Boolean(updateResult.matchedCount)
   },
