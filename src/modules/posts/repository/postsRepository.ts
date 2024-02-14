@@ -25,7 +25,7 @@ export const postsRepository = {
       createdAt: new Date().toISOString(),
     }
 
-    await postsCollection.insertOne(createdPost)
+    await postsCollection.insertOne({ ...createdPost })
 
     return createdPost
   },
@@ -39,9 +39,7 @@ export const postsRepository = {
         shortDescription: payload.shortDescription,
         content: payload.content,
         blogId: payload.blogId,
-      },
-      $project: { _id: 0 },
-    })
+      }})
 
     return Boolean(updateResult.matchedCount)
   },

@@ -17,7 +17,7 @@ export const blogsRepository = {
       ...payload,
     }
 
-    await blogsCollection.insertOne(newBlog)
+    await blogsCollection.insertOne({ ...newBlog })
     return newBlog
   },
   async updateBlog(blogId: string, payload: BlogInputModel) {
@@ -25,9 +25,7 @@ export const blogsRepository = {
         name: payload.name,
         description: payload.description,
         websiteUrl: payload.websiteUrl,
-      },
-      $project: { _id: 0 },
-    })
+      }})
 
     return Boolean(updateResult.matchedCount)
   },
