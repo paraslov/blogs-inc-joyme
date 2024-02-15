@@ -35,6 +35,14 @@ async function runDb() {
   }
 }
 
+const cleanup = async (event: any) => {
+  await client.close()
+  process.exit()
+}
+
+process.on('SIGINT', cleanup)
+process.on('SIGTERM', cleanup)
+
 export {
   runDb,
   blogsCollection,

@@ -1,0 +1,31 @@
+name: build, lint, unit, ui
+run-name: test
+on:
+  push:
+    branches: '**'
+  pull_request:
+    branches: 'master'
+jobs:
+  Pipeline:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 20.x ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Starting Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: install modules
+        run: yarn install
+      - name: build production dist
+        run: yarn tsc
+        if: always()
+      - name: run app
+        run: node dist/index.js
+        if: always()
+      - name: run e2e tests
+        run: yarn test:e2e
+        if: always()
