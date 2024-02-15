@@ -19,12 +19,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Echo GitHub secret
-        run: echo "My GitHub secret is ${{ secrets.MONGO_URI }}"
-      - name: Echo var secret
-        run: echo "My GitHub var is ${{ vars.BOLT }}"
-      - name: Echo var2 secret
-        run: echo "My GitHub var2 is ${{ vars.BOLT_DVA }}"
       - name: Starting Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
