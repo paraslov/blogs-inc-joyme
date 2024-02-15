@@ -4,13 +4,20 @@ import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
 import { testPostInput } from '../mocks/postsMock'
-import { postsCollection } from '../../../app/config/db'
+import { client, postsCollection } from '../../../app/config/db'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
 
 describe('/posts route GET tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -41,6 +48,13 @@ describe('/posts route GET tests: ', () => {
 })
 
 describe('/posts route POST tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -109,6 +123,13 @@ describe('/posts route POST tests: ', () => {
 })
 
 describe('/posts PUT route tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -171,6 +192,13 @@ describe('/posts PUT route tests: ', () => {
 })
 
 describe('/posts DELETE tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })

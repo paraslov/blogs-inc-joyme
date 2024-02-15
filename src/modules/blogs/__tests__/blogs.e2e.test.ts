@@ -3,13 +3,20 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
-import { blogsCollection } from '../../../app/config/db'
+import { blogsCollection, client } from '../../../app/config/db'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
 
-describe('/blogs route GET tests: ', () => {
+describe('/blogs route GET tests: ',() => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -41,6 +48,13 @@ describe('/blogs route GET tests: ', () => {
 })
 
 describe('/blogs route POST tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -95,6 +109,13 @@ describe('/blogs route POST tests: ', () => {
 })
 
 describe('/blogs route PUT tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
@@ -143,6 +164,13 @@ describe('/blogs route PUT tests: ', () => {
 })
 
 describe('/blogs route DELETE tests: ', () => {
+  beforeAll(async ()=> {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
   })
