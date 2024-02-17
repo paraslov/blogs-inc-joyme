@@ -1,7 +1,8 @@
-import { blogsRepository } from '../../../blogs'
+import { blogsQueryRepository } from '../../../blogs'
 import { PostInputModel } from '../types/PostInputModel'
 import { PostViewModel } from '../types/PostViewModel'
 import { postsCollection } from '../../../../app/config/db'
+import { ObjectId } from 'mongodb'
 
 export const postsRepository = {
   async getAllPosts() {
@@ -11,7 +12,7 @@ export const postsRepository = {
     return postsCollection.findOne({ id: postId }, { projection: { _id: 0 }})
   },
   async createPost(payload: PostInputModel) {
-    const blogData = await blogsRepository.getBlogById(payload.blogId)
+    const blogData = await blogsQueryRepository.getBlogById(new ObjectId(payload.blogId))
 
     if (!blogData) return false
 
@@ -30,7 +31,7 @@ export const postsRepository = {
     return createdPost
   },
   async updatePost(payload: PostInputModel, postId: string) {
-    const foundBlog = await blogsRepository.getBlogById(payload.blogId)
+    const foundBlog = await blogsQueryRepository.getBlogById(new ObjectId(payload.blogId))
 
     if (!foundBlog) return false
 

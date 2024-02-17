@@ -1,7 +1,7 @@
 import { app } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
-import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
+import { testBlog, testBlogInput, testUpdateBlogInput, wrongBLogId } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
 import { blogsCollection, client } from '../../../app/config/db'
 
@@ -43,7 +43,7 @@ describe('/blogs route GET tests: ',() => {
   it('GET /blogs/:id 404 not found', async () => {
     await blogsTestManager.createBlog()
 
-    await request.get(`${RoutesList.BLOGS}/someId`).expect(HttpStatusCode.NOT_FOUND_404)
+    await request.get(`${RoutesList.BLOGS}/${wrongBLogId}`).expect(HttpStatusCode.NOT_FOUND_404)
   })
 })
 
@@ -131,7 +131,7 @@ describe('/blogs route PUT tests: ', () => {
     const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
 
     expect(blog?.name).toBe(testUpdateBlogInput.name)
-    expect(blog?.id).toBe(createdBlog.body.id)
+    expect(blog?._id.toString()).toBe(createdBlog.body.id)
     expect(blog?.websiteUrl).not.toBe(testBlog.websiteUrl)
   })
 

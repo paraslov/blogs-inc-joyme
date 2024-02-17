@@ -1,6 +1,6 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
-import { BlogViewModel } from '../../../modules/blogs'
+import { BlogDbModel } from '../../../modules/blogs'
 import { PostViewModel } from '../../../modules/posts'
 import { Collections } from './config'
 
@@ -19,7 +19,7 @@ export const client = new MongoClient(uri, {
 });
 
 const db = client.db(process.env.MONGO_DB_NAME)
-const blogsCollection = db.collection<BlogViewModel>(Collections.BLOGS)
+const blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
 const postsCollection = db.collection<PostViewModel>(Collections.POSTS)
 
 async function runDb() {
