@@ -10,7 +10,7 @@ if (!uri) {
   throw new Error('!!! MONGODB_URI not found')
 }
 
-const client = new MongoClient(uri, {
+export const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -34,6 +34,14 @@ async function runDb() {
     console.log('DB work is finished successfully')
   }
 }
+
+const cleanup = async (event: any) => {
+  await client.close()
+  process.exit()
+}
+
+process.on('SIGINT', cleanup)
+process.on('SIGTERM', cleanup)
 
 export {
   runDb,
