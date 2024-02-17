@@ -1,5 +1,5 @@
-import { BlogViewModel } from '../model/BlogViewModel'
-import { BlogInputModel } from '../model/BlogInputModel'
+import { BlogViewModel } from '../model/types/BlogViewModel'
+import { BlogInputModel } from '../model/types/BlogInputModel'
 
 export const testBlog: BlogViewModel = {
   id: '666777',

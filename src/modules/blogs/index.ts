@@ -1,6 +1,6 @@
 import { blogsRouter } from './router/blogsRouter'
-import { blogsRepository } from './repository/blogsRepository'
-import { BlogViewModel } from './model/BlogViewModel'
+import { blogsRepository } from './model/repositories/blogsRepository'
+import { BlogViewModel } from './model/types/BlogViewModel'
 import { testBlog } from './mocks/blogsMock'
 
 export {

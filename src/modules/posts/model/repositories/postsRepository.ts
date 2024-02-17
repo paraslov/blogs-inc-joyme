@@ -1,7 +1,7 @@
-import { blogsRepository } from '../../blogs'
-import { PostInputModel } from '../model/PostInputModel'
-import { PostViewModel } from '../model/PostViewModel'
-import { postsCollection } from '../../../app/config/db'
+import { blogsRepository } from '../../../blogs'
+import { PostInputModel } from '../types/PostInputModel'
+import { PostViewModel } from '../types/PostViewModel'
+import { postsCollection } from '../../../../app/config/db'
 
 export const postsRepository = {
   async getAllPosts() {

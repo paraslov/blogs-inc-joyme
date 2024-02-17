@@ -1,6 +1,6 @@
-import { BlogInputModel } from '../model/BlogInputModel'
-import { BlogViewModel } from '../model/BlogViewModel'
-import { blogsCollection } from '../../../app/config/db'
+import { BlogInputModel } from '../types/BlogInputModel'
+import { BlogViewModel } from '../types/BlogViewModel'
+import { blogsCollection } from '../../../../app/config/db'
 
 export const blogsRepository = {
   async getAllBlogs() {

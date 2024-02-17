@@ -1,5 +1,5 @@
-import { PostViewModel } from '../model/PostViewModel'
-import { PostInputModel } from '../model/PostInputModel'
+import { PostViewModel } from '../model/types/PostViewModel'
+import { PostInputModel } from '../model/types/PostInputModel'
 
 export const testPost: PostViewModel = {
   id: '555999',
