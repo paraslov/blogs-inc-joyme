@@ -1,11 +1,16 @@
 import { blogsRouter } from './router/blogsRouter'
-import { blogsRepository } from './model/repositories/blogsRepository'
+import { blogsQueryRepository } from './model/repositories/blogsQueryRepository'
 import { BlogViewModel } from './model/types/BlogViewModel'
+import { BlogDbModel } from './model/types/BlogDbModel'
 import { testBlog } from './mocks/blogsMock'
 
 export {
-  BlogViewModel,
   blogsRouter,
-  blogsRepository,
+  blogsQueryRepository,
   testBlog,
+}
+
+export type {
+  BlogViewModel,
+  BlogDbModel,
 }
