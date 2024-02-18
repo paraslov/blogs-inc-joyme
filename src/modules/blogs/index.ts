@@ -1,12 +1,12 @@
 import { blogsRouter } from './router/blogsRouter'
-import { blogsQueryRepository } from './model/repositories/blogsQueryRepository'
+import { queryBlogsRepository } from './model/repositories/queryBlogsRepository'
 import { BlogViewModel } from './model/types/BlogViewModel'
 import { BlogDbModel } from './model/types/BlogDbModel'
 import { testBlog } from './mocks/blogsMock'
 
 export {
   blogsRouter,
-  blogsQueryRepository,
+  queryBlogsRepository,
   testBlog,
 }
 

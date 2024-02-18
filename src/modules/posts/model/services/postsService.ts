@@ -1,12 +1,12 @@
 import { commandPostsRepository } from '../repositories/commandPostsRepository'
 import { PostInputModel } from '../types/PostInputModel'
-import { blogsQueryRepository } from '../../../blogs'
+import { queryBlogsRepository } from '../../../blogs'
 import { ObjectId } from 'mongodb'
 import { PostDbModel } from '../types/PostDbModel'
 
 export const postsService = {
   async createPost(payload: PostInputModel) {
-    const blogData = await blogsQueryRepository.getBlogById(new ObjectId(payload.blogId))
+    const blogData = await queryBlogsRepository.getBlogById(new ObjectId(payload.blogId))
 
     if (!blogData) return false
 
@@ -29,7 +29,7 @@ export const postsService = {
       blogId: payload.blogId,
     }
 
-    const foundBlog = await blogsQueryRepository.getBlogById(new ObjectId(payload.blogId))
+    const foundBlog = await queryBlogsRepository.getBlogById(new ObjectId(payload.blogId))
 
     if (!foundBlog) return false
 

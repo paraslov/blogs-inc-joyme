@@ -3,6 +3,7 @@ import { testBlogInput } from '../../mocks/blogsMock'
 import { HttpStatusCode } from '../../../common/enums'
 import { app } from '../../../../app/app'
 import { blogsCollection } from '../../../../app/config/db'
+import { ObjectId } from 'mongodb'
 
 const supertest = require('supertest')
 
@@ -30,12 +31,12 @@ class BlogsTestManager {
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
-      const blogFromDb = await blogsCollection.findOne({ id: result.body.id })
+      const blogFromDb = await blogsCollection.findOne({ _id: new ObjectId(result.body.id) })
 
       expect(result.body.name).toBe(testBlogInput.name)
       expect(result.body.websiteUrl).toBe(testBlogInput.websiteUrl)
       expect(blogFromDb?.description).toStrictEqual(testBlogInput.description)
-      expect(blogFromDb?._id).toStrictEqual(expect.any(String))
+      expect(blogFromDb?._id.toString()).toStrictEqual(expect.any(String))
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {

@@ -1,6 +1,6 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { blogsCommandRepository } from '../repositories/blogsCommandRepository'
+import { commandBlogsRepository } from '../repositories/commandBlogsRepository'
 import { ObjectId } from 'mongodb'
 
 export const blogsService = {
@@ -13,7 +13,7 @@ export const blogsService = {
       createdAt: new Date().toISOString(),
     }
 
-    return blogsCommandRepository.createNewBlog(newBlog)
+    return commandBlogsRepository.createNewBlog(newBlog)
   },
   async updateBlog(blogId: string, payload: BlogInputModel) {
     const updateData: BlogInputModel = {
@@ -22,9 +22,9 @@ export const blogsService = {
       websiteUrl: payload.websiteUrl,
     }
 
-    return blogsCommandRepository.updateBlog(new ObjectId(blogId), updateData)
+    return commandBlogsRepository.updateBlog(new ObjectId(blogId), updateData)
   },
   async deleteBlog(blogId: string) {
-    return blogsCommandRepository.deleteBlog(new ObjectId(blogId))
+    return commandBlogsRepository.deleteBlog(new ObjectId(blogId))
   }
 }

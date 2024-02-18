@@ -2,7 +2,7 @@ import { blogsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { blogsMappers } from '../mappers/blogsMappers'
 
-export const blogsQueryRepository = {
+export const queryBlogsRepository = {
   async getAllBlogs() {
     const foundBlogs = await blogsCollection.find({}).toArray()
     return foundBlogs.map(blogsMappers.mapCreatedBlogToView)

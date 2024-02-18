@@ -3,7 +3,7 @@ import { BlogViewModel } from '../types/BlogViewModel'
 import { blogsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 
-export const blogsCommandRepository = {
+export const commandBlogsRepository = {
   async createNewBlog(newBlog: Omit<BlogViewModel, 'id'>): Promise<string> {
     const result = await blogsCollection.insertOne({ ...newBlog })
 

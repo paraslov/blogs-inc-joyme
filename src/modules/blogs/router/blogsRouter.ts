@@ -5,19 +5,19 @@ import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
 import { blogsService } from '../model/services/blogsService'
-import { blogsQueryRepository } from '../model/repositories/blogsQueryRepository'
+import { queryBlogsRepository } from '../model/repositories/queryBlogsRepository'
 import { ObjectId } from 'mongodb'
 
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await blogsQueryRepository.getAllBlogs()
+  const blogs = await queryBlogsRepository.getAllBlogs()
 
   res.status(HttpStatusCode.OK_200).send(blogs)
 })
 
 blogsRouter.get('/:blogId', async (req, res) => {
-  const foundBlogById = await blogsQueryRepository.getBlogById(new ObjectId(req.params.blogId))
+  const foundBlogById = await queryBlogsRepository.getBlogById(new ObjectId(req.params.blogId))
 
   if (!foundBlogById) {
     res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -34,7 +34,7 @@ blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: Request
     websiteUrl: req.body.websiteUrl,
   }
   const createdBlogId = await blogsService.createBlog(newBlogData)
-  const newBlog = await blogsQueryRepository.getBlogById(new ObjectId(createdBlogId))
+  const newBlog = await queryBlogsRepository.getBlogById(new ObjectId(createdBlogId))
 
   if (!newBlog) {
     res.sendStatus(404)
