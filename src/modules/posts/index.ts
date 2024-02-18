@@ -1,7 +1,7 @@
 import { postsRouter } from './router/postsRouter'
-import { PostViewModel } from './model/PostViewModel'
+import { PostDbModel } from './model/types/PostDbModel'
 
 export {
   postsRouter,
-  PostViewModel,
+  PostDbModel,
 }

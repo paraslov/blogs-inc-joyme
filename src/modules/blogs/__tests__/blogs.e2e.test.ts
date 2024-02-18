@@ -1,9 +1,10 @@
 import { app } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
-import { testBlog, testBlogInput, testUpdateBlogInput } from '../mocks/blogsMock'
+import { testBlog, testBlogInput, testUpdateBlogInput, wrongBLogId } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
 import { blogsCollection, client } from '../../../app/config/db'
+import { ObjectId } from 'mongodb'
 
 const supertest = require('supertest')
 
@@ -43,7 +44,7 @@ describe('/blogs route GET tests: ',() => {
   it('GET /blogs/:id 404 not found', async () => {
     await blogsTestManager.createBlog()
 
-    await request.get(`${RoutesList.BLOGS}/someId`).expect(HttpStatusCode.NOT_FOUND_404)
+    await request.get(`${RoutesList.BLOGS}/${wrongBLogId}`).expect(HttpStatusCode.NOT_FOUND_404)
   })
 })
 
@@ -128,10 +129,10 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(createdBlog.body.id) })
 
     expect(blog?.name).toBe(testUpdateBlogInput.name)
-    expect(blog?.id).toBe(createdBlog.body.id)
+    expect(blog?._id.toString()).toBe(createdBlog.body.id)
     expect(blog?.websiteUrl).not.toBe(testBlog.websiteUrl)
   })
 
@@ -143,7 +144,7 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(createdBlog.body.id) })
 
     expect(blog?.name).toBe(testBlogInput.name)
   })
@@ -151,12 +152,12 @@ describe('/blogs route PUT tests: ', () => {
   it('PUT /blogs failed::notFound', async () => {
     const createdBlog = await blogsTestManager.createBlog()
 
-    await request.put(`${RoutesList.BLOGS}/someId`)
+    await request.put(`${RoutesList.BLOGS}/${wrongBLogId}`)
       .auth('admin', 'qwerty')
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    const blog = await blogsCollection.findOne({ id: createdBlog.body.id })
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(createdBlog.body.id) })
 
     expect(blog?.name).toBe(createdBlog.body.name)
     expect(blog?.websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
@@ -202,7 +203,7 @@ describe('/blogs route DELETE tests: ', () => {
   it('DELETE /blogs/:id failed::notFound', async () => {
     await blogsTestManager.createBlog()
 
-    await request.delete(`${RoutesList.BLOGS}/wrongId`)
+    await request.delete(`${RoutesList.BLOGS}/${wrongBLogId}`)
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 

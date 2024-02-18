@@ -3,7 +3,7 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
-import { testPostInput } from '../mocks/postsMock'
+import { postWrongId, testPostInput } from '../mocks/postsMock'
 import { client, postsCollection } from '../../../app/config/db'
 
 const supertest = require('supertest')
@@ -43,7 +43,7 @@ describe('/posts route GET tests: ', () => {
 
   it('GET /posts/:id not found', async () => {
     await postsTestManager.createPost()
-    await request.get(`${RoutesList.POSTS}/wrongId`).expect(HttpStatusCode.NOT_FOUND_404)
+    await request.get(`${RoutesList.POSTS}/${postWrongId}`).expect(HttpStatusCode.NOT_FOUND_404)
   })
 })
 
@@ -230,7 +230,7 @@ describe('/posts DELETE tests: ', () => {
   it('DELETE /posts failed::notFoundPostId: ', async () => {
     await postsTestManager.createPost()
 
-    await request.delete(`${RoutesList.POSTS}/wrongId`)
+    await request.delete(`${RoutesList.POSTS}/${postWrongId}`)
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 

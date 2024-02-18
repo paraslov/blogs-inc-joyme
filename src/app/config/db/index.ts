@@ -1,7 +1,7 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
-import { BlogViewModel } from '../../../modules/blogs'
-import { PostViewModel } from '../../../modules/posts'
+import { BlogDbModel } from '../../../modules/blogs'
+import { PostDbModel } from '../../../modules/posts'
 import { Collections } from './config'
 
 
@@ -19,8 +19,8 @@ export const client = new MongoClient(uri, {
 });
 
 const db = client.db(process.env.MONGO_DB_NAME)
-const blogsCollection = db.collection<BlogViewModel>(Collections.BLOGS)
-const postsCollection = db.collection<PostViewModel>(Collections.POSTS)
+const blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
+const postsCollection = db.collection<PostDbModel>(Collections.POSTS)
 
 async function runDb() {
   try {
@@ -35,7 +35,7 @@ async function runDb() {
   }
 }
 
-const cleanup = async (event: any) => {
+const cleanup = async () => {
   await client.close()
   process.exit()
 }
