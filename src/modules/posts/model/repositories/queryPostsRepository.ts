@@ -1,6 +1,3 @@
-import { blogsQueryRepository } from '../../../blogs'
-import { PostInputModel } from '../types/PostInputModel'
-import { PostViewModel } from '../types/PostViewModel'
 import { postsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { postsMappers } from '../mappers/postsMappers'

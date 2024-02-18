@@ -1,6 +1,5 @@
-import { Router, Response } from 'express'
+import { Response, Router } from 'express'
 import { HttpStatusCode } from '../../common/enums'
-import { commandPostsRepository } from '../model/repositories/commandPostsRepository'
 import { RequestBody, RequestParamsBody } from '../../common/types/RequestGenericTypes'
 import { PostInputModel } from '../model/types/PostInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
