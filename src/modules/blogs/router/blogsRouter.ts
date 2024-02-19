@@ -1,17 +1,25 @@
 import { Router, Response } from 'express'
 import { HttpStatusCode } from '../../common/enums'
-import { RequestBody, RequestParamsBody } from '../../common/types/RequestGenericTypes'
+import { RequestBody, RequestParamsBody, RequestQuery } from '../../common/types'
 import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
 import { blogsService } from '../model/services/blogsService'
 import { queryBlogsRepository } from '../model/repositories/queryBlogsRepository'
 import { ObjectId } from 'mongodb'
+import { BlogQueryModel } from '../model/types/BlogQueryModel'
 
 export const blogsRouter = Router()
 
-blogsRouter.get('/', async (req, res) => {
-  const blogs = await queryBlogsRepository.getAllBlogs()
+blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => {
+  const blogsQuery: BlogQueryModel = {
+    searchNameTerm: req.query.searchNameTerm ?? null,
+    sortBy: req.query.sortBy ?? 'createdAt',
+    sortDirection: req.query.sortDirection ?? 'desc',
+    pageNumber: Number(req.query.pageNumber) ?? 1,
+    pageSize: Number(req.query.pageSize) ?? 10,
+  }
+  const blogs = await queryBlogsRepository.getAllBlogs(blogsQuery)
 
   res.status(HttpStatusCode.OK_200).send(blogs)
 })

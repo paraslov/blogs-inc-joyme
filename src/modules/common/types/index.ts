@@ -14,3 +14,14 @@ export interface RequestParamsBody<P, B> extends Express.Request {
 export interface RequestQuery<Q> extends Express.Request {
   query: Q
 }
+
+export type Pagination = {
+  pagesCount?: number
+  page?: number
+  pageSize?: number
+  totalCount?: number
+}
+
+export type PaginationWithItems<T> = Pagination & {
+  items: T
+}
