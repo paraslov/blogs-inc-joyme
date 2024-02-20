@@ -3,7 +3,7 @@ import { HttpStatusCode } from '../../common/enums'
 import { RequestBody, RequestParamsBody } from '../../common/types'
 import { PostInputModel } from '../model/types/PostInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
-import { postInputValidation } from '../validations/postsValidations'
+import { postIdValidationMW, postInputValidation } from '../validations/postsValidations'
 import { queryPostsRepository } from '../model/repositories/queryPostsRepository'
 import { postsService } from '../model/services/postsService'
 
@@ -15,7 +15,7 @@ postsRouter.get('/', async (req, res) => {
   res.status(HttpStatusCode.OK_200).send(posts)
 })
 
-postsRouter.get('/:postId', async (req, res) => {
+postsRouter.get('/:postId', postIdValidationMW, async (req, res) => {
   const foundPost = await queryPostsRepository.getPostById(req.params.postId)
 
   if (!foundPost) {
@@ -41,7 +41,7 @@ postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: Reques
   res.status(HttpStatusCode.CREATED_201).send(createdPost)
 })
 
-postsRouter.put('/:postId', authMiddleware, postInputValidation(),  async (req: RequestParamsBody<{ postId: string }, PostInputModel>, res: Response) => {
+postsRouter.put('/:postId', authMiddleware, postIdValidationMW, postInputValidation(),  async (req: RequestParamsBody<{ postId: string }, PostInputModel>, res: Response) => {
   const isPostUpdated = await postsService.updatePost(req.body, req.params.postId)
 
   if (!isPostUpdated) {
@@ -53,7 +53,7 @@ postsRouter.put('/:postId', authMiddleware, postInputValidation(),  async (req: 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
-postsRouter.delete('/:postId', authMiddleware, async (req, res) => {
+postsRouter.delete('/:postId', authMiddleware, postIdValidationMW, async (req, res) => {
   const isDeleted = await postsService.deletePostById(req.params.postId)
 
   if (!isDeleted) {

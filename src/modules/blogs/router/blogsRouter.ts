@@ -10,7 +10,7 @@ import {
 } from '../../common/types'
 import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
-import { blogInputValidation } from '../validations/blogsValidations'
+import { blogIdValidationMW, blogInputValidation } from '../validations/blogsValidations'
 import { blogsService } from '../model/services/blogsService'
 import { queryBlogsRepository } from '../model/repositories/queryBlogsRepository'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
@@ -31,7 +31,7 @@ blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => 
   res.status(HttpStatusCode.OK_200).send(blogs)
 })
 
-blogsRouter.get('/:blogId', async (req, res) => {
+blogsRouter.get('/:blogId', blogIdValidationMW, async (req, res) => {
   const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
 
   if (!foundBlogById) {
@@ -42,7 +42,8 @@ blogsRouter.get('/:blogId', async (req, res) => {
   res.status(HttpStatusCode.OK_200).send(foundBlogById)
 })
 
-blogsRouter.get('/:blogId/posts', async (req: RequestParamsQuery<{ blogId: string }, PaginationQuery & SortQuery>, res: Response) => {
+blogsRouter.get('/:blogId/posts', blogIdValidationMW,
+  async (req: RequestParamsQuery<{ blogId: string }, PaginationQuery & SortQuery>, res: Response) => {
   const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
 
   if (!foundBlogById) {
@@ -71,7 +72,7 @@ blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: Request
   res.status(HttpStatusCode.CREATED_201).send(newBlog)
 })
 
-blogsRouter.post('/:blogId/posts', authMiddleware, postForBlogsInputValidation(), async (req: RequestParamsBody<{ blogId: string }, Omit<PostInputModel, 'blogId'>>, res: Response) => {
+blogsRouter.post('/:blogId/posts', authMiddleware, blogIdValidationMW, postForBlogsInputValidation(), async (req: RequestParamsBody<{ blogId: string }, Omit<PostInputModel, 'blogId'>>, res: Response) => {
   const createdPostId = await blogsService.createPostForBlog({...req.body, blogId: req.params.blogId})
 
   if (!createdPostId) {
@@ -85,7 +86,7 @@ blogsRouter.post('/:blogId/posts', authMiddleware, postForBlogsInputValidation()
   res.status(HttpStatusCode.CREATED_201).send(newPost)
 })
 
-blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) => {
+blogsRouter.put('/:blogId', authMiddleware, blogIdValidationMW, blogInputValidation(), async (req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) => {
   const isBlogUpdated = await blogsService.updateBlog(req.params.blogId, req.body)
 
   if (!isBlogUpdated) {
@@ -96,7 +97,7 @@ blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: R
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
-blogsRouter.delete('/:blogId', authMiddleware, async (req, res) => {
+blogsRouter.delete('/:blogId', authMiddleware, blogIdValidationMW, async (req, res) => {
   const isDeleted = await blogsService.deleteBlog(req.params.blogId)
 
   if (!isDeleted) {

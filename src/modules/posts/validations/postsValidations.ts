@@ -1,7 +1,9 @@
 import { body } from 'express-validator'
-import { stringWithLengthValidation } from '../../common/validations'
+import { isValidId, stringWithLengthValidation } from '../../common/validations'
 import { queryBlogsRepository } from '../../blogs'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
+import { NextFunction } from 'express'
+import { HttpStatusCode } from '../../common/enums'
 
 const titleValidation = stringWithLengthValidation('title', { min: 1, max: 30 })
 
@@ -33,3 +35,13 @@ export const postForBlogsInputValidation = () => [
   contentValidation,
   inputValidationMiddleware,
 ]
+
+export function postIdValidationMW(req: any, res: any, next: NextFunction) {
+  if (!isValidId(req.params.postId)) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+
+    return
+  }
+
+  next()
+}
