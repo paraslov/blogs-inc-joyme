@@ -9,13 +9,13 @@ export const commandPostsRepository = {
 
     return result.insertedId.toString()
   },
-  async updatePost(updatePostData: PostInputModel, postId: ObjectId) {
-    const updateResult = await postsCollection.updateOne({ _id: postId }, { $set: updatePostData })
+  async updatePost(updatePostData: PostInputModel, postId: string) {
+    const updateResult = await postsCollection.updateOne({ _id: new ObjectId(postId) }, { $set: updatePostData })
 
     return Boolean(updateResult.matchedCount)
   },
-  async deletePostById(postId: ObjectId) {
-    const deleteResult = await postsCollection.deleteOne({ _id: postId })
+  async deletePostById(postId: string) {
+    const deleteResult = await postsCollection.deleteOne({ _id: new ObjectId(postId) })
 
     return Boolean(deleteResult.deletedCount)
   }

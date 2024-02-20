@@ -6,8 +6,8 @@ import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
 import { blogsService } from '../model/services/blogsService'
 import { queryBlogsRepository } from '../model/repositories/queryBlogsRepository'
-import { ObjectId } from 'mongodb'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
+import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } from '../../posts'
 
 export const blogsRouter = Router()
 
@@ -25,7 +25,7 @@ blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => 
 })
 
 blogsRouter.get('/:blogId', async (req, res) => {
-  const foundBlogById = await queryBlogsRepository.getBlogById(new ObjectId(req.params.blogId))
+  const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
 
   if (!foundBlogById) {
     res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -42,13 +42,27 @@ blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: Request
     websiteUrl: req.body.websiteUrl,
   }
   const createdBlogId = await blogsService.createBlog(newBlogData)
-  const newBlog = await queryBlogsRepository.getBlogById(new ObjectId(createdBlogId))
+  const newBlog = await queryBlogsRepository.getBlogById(createdBlogId)
 
   if (!newBlog) {
     res.sendStatus(404)
   }
 
   res.status(HttpStatusCode.CREATED_201).send(newBlog)
+})
+
+blogsRouter.post('/:blogId/posts', authMiddleware, postForBlogsInputValidation(), async (req: RequestParamsBody<{ blogId: string }, Omit<PostInputModel, 'blogId'>>, res: Response) => {
+  const createdPostId = await blogsService.createPostForBlog({...req.body, blogId: req.params.blogId})
+
+  if (!createdPostId) {
+    res.sendStatus(404)
+
+    return
+  }
+
+  const newPost = queryPostsRepository.getPostById(createdPostId)
+
+  res.status(HttpStatusCode.CREATED_201).send(newPost)
 })
 
 blogsRouter.put('/:blogId', authMiddleware, blogInputValidation(), async (req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) => {

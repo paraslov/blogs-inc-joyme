@@ -33,8 +33,8 @@ export const queryBlogsRepository = {
       items: mappedBlogs,
     }
   },
-  async getBlogById(blogId: ObjectId) {
-    const foundBlog = await blogsCollection.findOne({ _id: blogId })
+  async getBlogById(blogId: string) {
+    const foundBlog = await blogsCollection.findOne({ _id: new ObjectId(blogId) })
     const viewModelBlog = foundBlog && blogsMappers.mapCreatedBlogToView(foundBlog)
 
     return viewModelBlog

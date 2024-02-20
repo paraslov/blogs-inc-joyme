@@ -8,8 +8,8 @@ export const queryPostsRepository = {
 
     return posts.map(postsMappers.mapDbPostsIntoView)
   },
-  async getPostById(postId: ObjectId) {
-    const foundPost = await postsCollection.findOne({ _id: postId })
+  async getPostById(postId: string) {
+    const foundPost = await postsCollection.findOne({ _id: new ObjectId(postId) })
     const mappedPost = foundPost && postsMappers.mapDbPostsIntoView(foundPost)
 
     return mappedPost

@@ -2,7 +2,6 @@ import { body } from 'express-validator'
 import { stringWithLengthValidation } from '../../common/validations'
 import { queryBlogsRepository } from '../../blogs'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
-import { ObjectId } from 'mongodb'
 
 const titleValidation = stringWithLengthValidation('title', { min: 1, max: 30 })
 
@@ -13,7 +12,7 @@ const contentValidation = stringWithLengthValidation('content', { min: 1, max: 1
 const blogIdValidation = body('blogId')
   .isString().withMessage('Should be a string')
   .custom(async (blogId: string) => {
-    const existingBlog = await queryBlogsRepository.getBlogById(new ObjectId(blogId))
+    const existingBlog = await queryBlogsRepository.getBlogById(blogId)
 
     if (!existingBlog) {
       throw new Error('There is no blogs with this id')
@@ -25,5 +24,12 @@ export const postInputValidation = () => [
   shortDescriptionValidation,
   contentValidation,
   blogIdValidation,
+  inputValidationMiddleware,
+]
+
+export const postForBlogsInputValidation = () => [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
   inputValidationMiddleware,
 ]
