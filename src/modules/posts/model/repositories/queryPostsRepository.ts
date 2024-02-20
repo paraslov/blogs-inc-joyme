@@ -12,8 +12,8 @@ export const queryPostsRepository = {
   async getPostByBlogId(blogId: string, queryParams: PaginationQuery & SortQuery) {
     const sortBy = queryParams.sortBy ?? 'createdAt'
     const sortDirection = queryParams.sortDirection ?? 'desc'
-    const pageNumber = Number(queryParams.pageNumber) ?? 1
-    const pageSize = Number(queryParams.pageSize) ?? 10
+    const pageNumber = Number(queryParams.pageNumber) || 1
+    const pageSize = Number(queryParams.pageSize) || 10
 
     let filter: any = { blogId: blogId }
 

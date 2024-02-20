@@ -1,4 +1,4 @@
-import { blogsCollection, postsCollection } from '../../../../app/config/db'
+import { blogsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { blogsMappers } from '../mappers/blogsMappers'
 import { BlogQueryModel } from '../types/BlogQueryModel'

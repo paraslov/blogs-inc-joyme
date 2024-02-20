@@ -23,8 +23,8 @@ blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => 
     searchNameTerm: req.query.searchNameTerm ?? null,
     sortBy: req.query.sortBy ?? 'createdAt',
     sortDirection: req.query.sortDirection ?? 'desc',
-    pageNumber: Number(req.query.pageNumber) ?? 1,
-    pageSize: Number(req.query.pageSize) ?? 10,
+    pageNumber: Number(req.query.pageNumber) || 1,
+    pageSize: Number(req.query.pageSize) || 10,
   }
   const blogs = await queryBlogsRepository.getAllBlogs(blogsQuery)
 
