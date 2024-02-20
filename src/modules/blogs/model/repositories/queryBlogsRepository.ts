@@ -1,4 +1,4 @@
-import { blogsCollection } from '../../../../app/config/db'
+import { blogsCollection, postsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { blogsMappers } from '../mappers/blogsMappers'
 import { BlogQueryModel } from '../types/BlogQueryModel'
@@ -23,7 +23,7 @@ export const queryBlogsRepository = {
 
     const totalCount = await blogsCollection.countDocuments()
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedBlogs = foundBlogs.map(blogsMappers.mapCreatedBlogToView)
+    const mappedBlogs = foundBlogs.map(blogsMappers.mapBlogToView)
 
     return {
       pageSize,
@@ -35,7 +35,7 @@ export const queryBlogsRepository = {
   },
   async getBlogById(blogId: string) {
     const foundBlog = await blogsCollection.findOne({ _id: new ObjectId(blogId) })
-    const viewModelBlog = foundBlog && blogsMappers.mapCreatedBlogToView(foundBlog)
+    const viewModelBlog = foundBlog && blogsMappers.mapBlogToView(foundBlog)
 
     return viewModelBlog
   },

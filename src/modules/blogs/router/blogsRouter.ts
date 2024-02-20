@@ -1,6 +1,13 @@
-import { Router, Response } from 'express'
+import { Response, Router } from 'express'
 import { HttpStatusCode } from '../../common/enums'
-import { RequestBody, RequestParamsBody, RequestQuery } from '../../common/types'
+import {
+  PaginationQuery,
+  RequestBody,
+  RequestParamsBody,
+  RequestParamsQuery,
+  RequestQuery,
+  SortQuery
+} from '../../common/types'
 import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogInputValidation } from '../validations/blogsValidations'
@@ -33,6 +40,19 @@ blogsRouter.get('/:blogId', async (req, res) => {
   }
 
   res.status(HttpStatusCode.OK_200).send(foundBlogById)
+})
+
+blogsRouter.get('/:blogId/posts', async (req: RequestParamsQuery<{ blogId: string }, PaginationQuery & SortQuery>, res: Response) => {
+  const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
+
+  if (!foundBlogById) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    return
+  }
+
+  const foundPostsById = await queryPostsRepository.getPostByBlogId(req.params.blogId, req.query)
+
+  res.status(HttpStatusCode.OK_200).send(foundPostsById)
 })
 
 blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: RequestBody<BlogInputModel>, res: Response) => {
