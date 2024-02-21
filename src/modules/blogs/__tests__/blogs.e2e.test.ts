@@ -27,8 +27,47 @@ describe('/blogs route GET tests: ',() => {
 
     const result = await request.get(RoutesList.BLOGS).expect(HttpStatusCode.OK_200)
 
-    expect(result.body.length).toBe(1)
-    expect(result.body[0].name).toBe(createdBlog.body.name)
+    expect(result.body.items.length).toBe(1)
+    expect(result.body.items[0].name).toBe(createdBlog.body.name)
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.pageSize).toBe(10)
+  })
+
+  it('GET /blogs success query params', async () => {
+    const createdBlog = await blogsTestManager.createBlog()
+
+    const result = await request
+      .get(RoutesList.BLOGS)
+      .query({
+        pageNumber: 4,
+        pageSize: 20,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.page).toBe(4)
+    expect(result.body.pageSize).toBe(20)
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.items.length).toBe(0)
+  })
+
+  it('GET /blogs get posts by blog id and create post by blog id', async () => {
+    const createdBlog = await blogsTestManager.createBlog()
+    await request
+      .post(`${RoutesList.BLOGS}/${createdBlog.body.id}/posts`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 'Abrakadabra',
+        shortDescription: 'A spell',
+        content: 'Spell that kills all sh$t code',
+      })
+      .expect(HttpStatusCode.CREATED_201)
+
+    const result = await request.get(`${RoutesList.BLOGS}/${createdBlog.body.id}/posts`).expect(HttpStatusCode.OK_200)
+
+    expect(result.body.items.length).toBe(1)
+    expect(result.body.items[0].title).toBe('Abrakadabra')
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.pageSize).toBe(10)
   })
 
   it('GET /blogs/:id success', async () => {

@@ -3,7 +3,7 @@ import { BlogDbModel } from '../types/BlogDbModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 
 export const blogsMappers = {
-  mapCreatedBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
+  mapBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blogFromDb._id.toString(),
       name: blogFromDb.name,
