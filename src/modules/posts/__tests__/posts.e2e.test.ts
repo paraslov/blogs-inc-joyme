@@ -26,9 +26,27 @@ describe('/posts route GET tests: ', () => {
     const createdPost = await postsTestManager.createPost()
     const result = await request.get(RoutesList.POSTS).expect(HttpStatusCode.OK_200)
 
-    expect(result.body?.length).toBe(1)
-    expect(result.body[0].blogId).toBe(createdPost.body.blogId)
-    expect(result.body[0].title).toBe(createdPost.body.title)
+    expect(result.body.items?.length).toBe(1)
+    expect(result.body.items[0].blogId).toBe(createdPost.body.blogId)
+    expect(result.body.items[0].title).toBe(createdPost.body.title)
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.pageSize).toBe(10)
+  })
+
+  it('GET /posts success query params', async () => {
+    await postsTestManager.createPost()
+    const result = await request
+      .get(RoutesList.POSTS)
+      .query({
+        pageNumber: 4,
+        pageSize: 20,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.items?.length).toBe(0)
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.pageSize).toBe(20)
+    expect(result.body.page).toBe(4)
   })
 
   it('GET /posts/:id success', async () => {
