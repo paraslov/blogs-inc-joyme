@@ -50,7 +50,7 @@ describe('/blogs route GET tests: ',() => {
     expect(result.body.items.length).toBe(0)
   })
 
-  it('GET /blogs get posts by blog id and create post by blog id', async () => {
+  it('GET /blogs get posts by blog id', async () => {
     const createdBlog = await blogsTestManager.createBlog()
     await request
       .post(`${RoutesList.BLOGS}/${createdBlog.body.id}/posts`)
@@ -101,6 +101,22 @@ describe('/blogs route POST tests: ', () => {
 
   it('POST /blogs success', async () => {
     await blogsTestManager.createBlog({ shouldExpect: true })
+  })
+
+  it('POST /blogs create post by blog id', async () => {
+    const createdBlog = await blogsTestManager.createBlog()
+    const createdPost = await request
+      .post(`${RoutesList.BLOGS}/${createdBlog.body.id}/posts`)
+      .auth('admin', 'qwerty')
+      .send({
+        title: 'Abrakadabra',
+        shortDescription: 'A spell',
+        content: 'Spell that kills all sh$t code',
+      })
+      .expect(HttpStatusCode.CREATED_201)
+
+    expect(createdPost.body.title).toBe('Abrakadabra')
+    expect(createdPost.body.shortDescription).toBe('A spell')
   })
 
   it('POST /blogs failed::unauthorized', async () => {

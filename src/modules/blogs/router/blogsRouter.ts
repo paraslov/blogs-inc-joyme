@@ -81,7 +81,7 @@ blogsRouter.post('/:blogId/posts', authMiddleware, blogIdValidationMW, postForBl
     return
   }
 
-  const newPost = queryPostsRepository.getPostById(createdPostId)
+  const newPost = await queryPostsRepository.getPostById(createdPostId)
 
   res.status(HttpStatusCode.CREATED_201).send(newPost)
 })
