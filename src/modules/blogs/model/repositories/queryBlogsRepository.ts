@@ -21,7 +21,7 @@ export const queryBlogsRepository = {
       .limit(pageSize)
       .toArray()
 
-    const totalCount = await blogsCollection.countDocuments()
+    const totalCount = await blogsCollection.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedBlogs = foundBlogs.map(blogsMappers.mapBlogToView)
 
