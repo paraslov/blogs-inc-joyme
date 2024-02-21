@@ -5,8 +5,8 @@ import { PaginationQuery, SortQuery } from '../../../common/types'
 
 export const queryPostsRepository = {
   async getPosts(queryParams: PaginationQuery & SortQuery, blogId?: string, ) {
-    const sortBy = queryParams.sortBy ?? 'createdAt'
-    const sortDirection = queryParams.sortDirection ?? 'desc'
+    const sortBy = queryParams.sortBy || 'createdAt'
+    const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection) ? queryParams.sortDirection : 'desc'
     const pageNumber = Number(queryParams.pageNumber) || 1
     const pageSize = Number(queryParams.pageSize) || 10
 
@@ -23,7 +23,7 @@ export const queryPostsRepository = {
       .limit(pageSize)
       .toArray()
 
-    const totalCount = await postsCollection.countDocuments()
+    const totalCount = await postsCollection.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedBlogs = foundPosts.map(postsMappers.mapDbPostsIntoView)
 
