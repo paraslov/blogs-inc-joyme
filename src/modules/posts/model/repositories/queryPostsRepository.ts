@@ -4,18 +4,17 @@ import { postsMappers } from '../mappers/postsMappers'
 import { PaginationQuery, SortQuery } from '../../../common/types'
 
 export const queryPostsRepository = {
-  async getAllPosts() {
-    const posts = await postsCollection.find({}).toArray()
-
-    return posts.map(postsMappers.mapDbPostsIntoView)
-  },
-  async getPostByBlogId(blogId: string, queryParams: PaginationQuery & SortQuery) {
+  async getPosts(queryParams: PaginationQuery & SortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy ?? 'createdAt'
     const sortDirection = queryParams.sortDirection ?? 'desc'
     const pageNumber = Number(queryParams.pageNumber) || 1
     const pageSize = Number(queryParams.pageSize) || 10
 
-    let filter: any = { blogId: blogId }
+    let filter: any = {}
+
+    if (blogId) {
+      filter.blogId = blogId
+    }
 
     const foundPosts = await postsCollection
       .find(filter)

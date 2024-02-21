@@ -51,7 +51,7 @@ blogsRouter.get('/:blogId/posts', blogIdValidationMW,
     return
   }
 
-  const foundPostsById = await queryPostsRepository.getPostByBlogId(req.params.blogId, req.query)
+  const foundPostsById = await queryPostsRepository.getPosts(req.query, req.params.blogId)
 
   res.status(HttpStatusCode.OK_200).send(foundPostsById)
 })
