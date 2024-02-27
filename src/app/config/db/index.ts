@@ -1,8 +1,9 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
+import { Collections } from './config'
 import { BlogDbModel } from '../../../modules/blogs'
 import { PostDbModel } from '../../../modules/posts'
-import { Collections } from './config'
+import { UserDbModel } from '../../../modules/users'
 
 
 const uri = process.env.MONGO_URI
@@ -21,7 +22,7 @@ export const client = new MongoClient(uri, {
 const db = client.db(process.env.MONGO_DB_NAME)
 const blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
 const postsCollection = db.collection<PostDbModel>(Collections.POSTS)
-const usersCollection = db.collection<PostDbModel>(Collections.USERS)
+const usersCollection = db.collection<UserDbModel>(Collections.USERS)
 
 async function runDb() {
   try {

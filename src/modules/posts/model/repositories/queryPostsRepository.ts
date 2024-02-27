@@ -1,10 +1,10 @@
 import { postsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { postsMappers } from '../mappers/postsMappers'
-import { PaginationQuery, SortQuery } from '../../../common/types'
+import { PaginationAndSortQuery } from '../../../common/types'
 
 export const queryPostsRepository = {
-  async getPosts(queryParams: PaginationQuery & SortQuery, blogId?: string, ) {
+  async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy || 'createdAt'
     const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection) ? queryParams.sortDirection : 'desc'
     const pageNumber = Number(queryParams.pageNumber) || 1

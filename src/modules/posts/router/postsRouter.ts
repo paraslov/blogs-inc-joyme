@@ -1,6 +1,11 @@
 import { Response, Router } from 'express'
 import { HttpStatusCode } from '../../common/enums'
-import { PaginationQuery, RequestBody, RequestParamsBody, RequestQuery, SortQuery } from '../../common/types'
+import {
+  PaginationAndSortQuery,
+  RequestBody,
+  RequestParamsBody,
+  RequestQuery,
+} from '../../common/types'
 import { PostInputModel } from '../model/types/PostInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { postIdValidationMW, postInputValidation } from '../validations/postsValidations'
@@ -9,7 +14,7 @@ import { postsService } from '../model/services/postsService'
 
 export const postsRouter = Router()
 
-postsRouter.get('/', async (req: RequestQuery<PaginationQuery & SortQuery>, res) => {
+postsRouter.get('/', async (req: RequestQuery<PaginationAndSortQuery>, res) => {
   const posts = await queryPostsRepository.getPosts(req.query)
 
   res.status(HttpStatusCode.OK_200).send(posts)

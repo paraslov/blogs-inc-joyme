@@ -55,3 +55,5 @@ export type SortQuery = {
    */
   sortDirection: 'asc' | 'desc'
 }
+
+export type PaginationAndSortQuery = PaginationQuery & SortQuery
