@@ -2,11 +2,15 @@ import { app } from '../../app'
 import { testingRouter } from '../../../modules/common/testing'
 import { blogsRouter } from '../../../modules/blogs'
 import { postsRouter } from '../../../modules/posts'
+import { usersRouter } from '../../../modules/users'
+import { authRouter } from '../../../modules/auth'
 
 const RoutesList = {
   BASE: '/',
   BLOGS: '/blogs',
   POSTS: '/posts',
+  USERS: '/users',
+  AUTH: '/auth',
   VERSION: '/version',
   TESTING: '/testing',
 }
@@ -14,6 +18,8 @@ const RoutesList = {
 function initRoutes() {
   app.use(RoutesList.BLOGS, blogsRouter)
   app.use(RoutesList.POSTS, postsRouter)
+  app.use(RoutesList.USERS, usersRouter)
+  app.use(RoutesList.AUTH, authRouter)
   app.use(RoutesList.TESTING, testingRouter)
 
   app.get(RoutesList.BASE, (req, res) => {

@@ -21,6 +21,7 @@ export const client = new MongoClient(uri, {
 const db = client.db(process.env.MONGO_DB_NAME)
 const blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
 const postsCollection = db.collection<PostDbModel>(Collections.POSTS)
+const usersCollection = db.collection<PostDbModel>(Collections.USERS)
 
 async function runDb() {
   try {
@@ -47,4 +48,5 @@ export {
   runDb,
   blogsCollection,
   postsCollection,
+  usersCollection,
 }

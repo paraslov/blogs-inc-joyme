@@ -1,4 +1,3 @@
 import { Router } from 'express'
 
-export const blogsRouter = Router()
-
+export const usersRouter = Router()
