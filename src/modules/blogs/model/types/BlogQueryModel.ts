@@ -1,6 +1,6 @@
-import { PaginationQuery, SortQuery } from '../../../common/types'
+import { PaginationAndSortQuery } from '../../../common/types'
 
-export type BlogQueryModel = PaginationQuery & SortQuery & {
+export type BlogQueryModel = PaginationAndSortQuery & {
   /**
    * (query)
    * Search term for blog Name: Name should contain this term in any position

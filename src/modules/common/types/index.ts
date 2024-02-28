@@ -36,22 +36,24 @@ export type PaginationQuery = {
    * pageNumber is number of portion that should be returned
    * Default value : 1
    */
-  pageNumber: number
+  pageNumber?: number
   /**
    * pageSize is portion size that should be returned
    * Default value : 10
    */
-  pageSize: number
+  pageSize?: number
 }
 
 export type SortQuery = {
   /**
    * default createdAt
    */
-  sortBy: string
+  sortBy?: string
   /**
    * Default value: desc
    * Available values : asc, desc
    */
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
 }
+
+export type PaginationAndSortQuery = PaginationQuery & SortQuery

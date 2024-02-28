@@ -1,5 +1,7 @@
 import { body } from 'express-validator'
 import { ObjectId } from 'mongodb'
+import { NextFunction } from 'express'
+import { HttpStatusCode } from '../enums'
 
 export const stringWithLengthValidation = (field: string, options: { max: number, min: number }) => {
   const { min, max } = options
@@ -10,3 +12,13 @@ export const stringWithLengthValidation = (field: string, options: { max: number
 }
 
 export const isValidId = (id: string) => ObjectId.isValid(id)
+
+export function entityIdValidationMW(req: any, res: any, next: NextFunction) {
+  if (!isValidId(req.params.postId)) {
+    res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+
+    return
+  }
+
+  next()
+}
