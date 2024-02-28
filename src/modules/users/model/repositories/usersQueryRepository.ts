@@ -1,11 +1,11 @@
 import { UsersQueryModel } from '../types/UsersQueryModel'
-import { UserViewModel } from '../types/UserViewModel'
 import { usersCollection } from '../../../../app/config/db'
 import { usersMappers } from '../mappers/usersMappers'
+import { ObjectId } from 'mongodb'
 
-export const queryUsersRepository = {
+export const usersQueryRepository = {
   async getUsers(payload: UsersQueryModel) {
-    const queryParams: UsersQueryModel = {
+    const queryParams: Required<UsersQueryModel> = {
       pageNumber: isNaN(Number(payload.pageNumber)) ? 1 : Number(payload.pageNumber),
       pageSize: isNaN(Number(payload.pageSize)) ? 10 : Number(payload.pageSize),
       sortBy: payload.sortBy ?? 'createdAt',
@@ -13,13 +13,11 @@ export const queryUsersRepository = {
       searchEmailTerm: payload.searchEmailTerm ?? null,
       searchLoginTerm: payload.searchLoginTerm ?? null,
     }
-    let filter: Partial<Record<keyof UserViewModel, any>> = {}
-
-    if (queryParams.searchLoginTerm) {
-      filter.login = { $regex: queryParams.searchLoginTerm, $options: 'i' }
-    }
-    if (queryParams.searchEmailTerm) {
-      filter.email = { $regex: queryParams.searchEmailTerm, $options: 'i' }
+    const filter = {
+      $or: [
+        { login: { $regex: queryParams.searchLoginTerm ?? '', $options: 'i' } },
+        { email: { $regex: queryParams.searchEmailTerm ?? '', $options: 'i' } },
+      ]
     }
 
     const foundUsers = await usersCollection
@@ -40,5 +38,10 @@ export const queryUsersRepository = {
       pageSize: queryParams.pageSize,
       items: mappedUsers,
     }
-  }
+  },
+  async getUserById(userId: string) {
+    const foundUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+
+    return foundUser && usersMappers.mapUserDbToViewDTO(foundUser)
+  },
 }

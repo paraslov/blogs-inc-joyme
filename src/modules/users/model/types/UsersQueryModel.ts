@@ -4,9 +4,9 @@ export type UsersQueryModel = PaginationAndSortQuery & {
   /**
    * default: null
    */
-  searchLoginTerm: string
+  searchLoginTerm?: string | null
   /**
    * default: null
    */
-  searchEmailTerm: string
+  searchEmailTerm?: string | null
 }

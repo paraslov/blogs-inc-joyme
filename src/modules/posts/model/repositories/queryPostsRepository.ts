@@ -6,7 +6,7 @@ import { PaginationAndSortQuery } from '../../../common/types'
 export const queryPostsRepository = {
   async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy || 'createdAt'
-    const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection) ? queryParams.sortDirection : 'desc'
+    const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection ?? '') ? queryParams.sortDirection : 'desc'
     const pageNumber = Number(queryParams.pageNumber) || 1
     const pageSize = Number(queryParams.pageSize) || 10
 

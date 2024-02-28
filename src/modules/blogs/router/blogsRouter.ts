@@ -18,7 +18,7 @@ import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } fro
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => {
-  const blogsQuery: BlogQueryModel = {
+  const blogsQuery: Required<BlogQueryModel> = {
     searchNameTerm: req.query.searchNameTerm ?? null,
     sortBy: req.query.sortBy ?? 'createdAt',
     sortDirection: req.query.sortDirection ?? 'desc',
