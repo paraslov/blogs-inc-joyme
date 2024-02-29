@@ -3,6 +3,7 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../utils/testing/usersTestManager'
 import { client } from '../../../app/config/db'
+import { userWrongId } from '../mocks/usersMock'
 
 const supertest = require('supertest')
 
@@ -116,5 +117,44 @@ describe('/users route POST tests: ', () => {
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
       shouldExpect: true
     })
+  })
+})
+
+describe('/users route DELETE tests: ', () => {
+  beforeAll(async () => {
+    await client.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await client.close()
+  })
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
+  })
+
+  it('DELETE /users success', async () => {
+    const createdUser = await usersTestManager.createUser()
+    await request.delete(`${RoutesList.USERS}/${createdUser.body.id}`)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    const users = await request.get(RoutesList.USERS)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.OK_200)
+
+    expect(users.body.items.length).toBe(0)
+  })
+
+  it('DELETE /users failed::notFound', async () => {
+    await usersTestManager.createUser()
+    await request.delete(`${RoutesList.USERS}/${userWrongId}`)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.NOT_FOUND_404)
+
+    const users = await request.get(RoutesList.USERS)
+      .auth('admin', 'qwerty')
+      .expect(HttpStatusCode.OK_200)
+
+    expect(users.body.items.length).toBe(1)
   })
 })

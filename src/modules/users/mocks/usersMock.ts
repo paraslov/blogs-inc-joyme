@@ -5,3 +5,5 @@ export const userInputMock: UserInputModel = {
   email: 'myemail@gmail.com',
   password: 'mYpAss123!@#',
 }
+
+export const userWrongId = '123456789012345678901234'
