@@ -3,7 +3,6 @@ import { usersCommandRepository } from '../repositories/usersCommandRepository'
 import { cryptService } from '../../../common/services/cryptService'
 import { UserDbModel } from '../types/UserDbModel'
 import { usersQueryRepository } from '../repositories/usersQueryRepository'
-import { HttpStatusCode } from '../../../common/enums'
 
 export const usersService = {
   async createUser(payload: UserInputModel) {
