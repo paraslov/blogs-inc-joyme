@@ -1,7 +1,8 @@
+import { ObjectId } from 'mongodb'
 import { UsersQueryModel } from '../types/UsersQueryModel'
 import { usersCollection } from '../../../../app/config/db'
 import { usersMappers } from '../mappers/usersMappers'
-import { ObjectId } from 'mongodb'
+import { UserViewModel } from '../types/UserViewModel'
 
 export const usersQueryRepository = {
   async getUsers(payload: UsersQueryModel) {
@@ -15,8 +16,8 @@ export const usersQueryRepository = {
     }
     const filter = {
       $or: [
-        { login: { $regex: queryParams.searchLoginTerm ?? '', $options: 'i' } },
-        { email: { $regex: queryParams.searchEmailTerm ?? '', $options: 'i' } },
+        { login: queryParams.searchLoginTerm ? { $regex: queryParams.searchLoginTerm, $options: 'i' } : undefined },
+        { email: queryParams.searchEmailTerm ? { $regex: queryParams.searchEmailTerm, $options: 'i' } : undefined },
       ]
     }
 

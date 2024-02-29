@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction } from 'express'
 import { HttpStatusCode } from '../../../modules/common/enums'
 
 export const authMiddleware = (req: any, res: any, next: NextFunction) => {

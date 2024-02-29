@@ -1,4 +1,4 @@
-import { Router, Response } from 'express'
+import { Response, Router } from 'express'
 import { RequestBody, RequestQuery } from '../../common/types'
 import { UsersQueryModel } from '../model/types/UsersQueryModel'
 import { usersQueryRepository } from '../model/repositories/usersQueryRepository'
@@ -36,4 +36,14 @@ usersRouter.post('/', authMiddleware, userInputValidation(), async (req: Request
   }
 
   return res.status(HttpStatusCode.CREATED_201).send(newUser)
+})
+
+usersRouter.delete('/:userId', authMiddleware, async (req, res) => {
+  const isDeleted = await usersService.deleteUser(req.params.userId)
+
+  if (!isDeleted) {
+    return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+  }
+
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
