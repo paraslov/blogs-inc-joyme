@@ -52,7 +52,7 @@ describe('/users route GET tests: ', () => {
   })
 
   it('GET /users success (200) login search with no results', async () => {
-    const createdUser = await usersTestManager.createUser()
+    await usersTestManager.createUser()
     const result = await request.get(RoutesList.USERS)
       .auth('admin', 'qwerty')
       .query({
