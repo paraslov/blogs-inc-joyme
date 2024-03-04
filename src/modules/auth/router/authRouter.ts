@@ -8,11 +8,11 @@ import { authPostValidation } from '../validations/authValidations'
 export const authRouter = Router()
 
 authRouter.post('/login', authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
-  const isAuthPassed = await authService.checkUser(req.body.loginOrEmail, req.body.password)
+  const token = await authService.checkUser(req.body.loginOrEmail, req.body.password)
 
-  if (!isAuthPassed) {
+  if (!token) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+  return res.status(HttpStatusCode.OK_200).send({ accessToken: token })
 })
