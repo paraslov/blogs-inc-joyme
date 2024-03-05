@@ -1,10 +1,10 @@
 import { cryptService } from '../../../common/services/cryptService'
 import { authCommandRepository } from '../repositories/authCommandRepository'
-import { jwtService } from './jwtService'
+import { jwtService } from '../../../common/services/jwtService'
 
 export const authService = {
   async checkUser(loginOrEmail: string, password: string) {
-    const user = await authCommandRepository.getUser(loginOrEmail, password)
+    const user = await authCommandRepository.getUser(loginOrEmail)
     if (!user) {
       return false
     }
