@@ -1,7 +1,7 @@
 import { usersCollection } from '../../../../app/config/db'
 
 export const authCommandRepository = {
-  async getUser(loginOrEmail: string, password: string) {
+  async getUser(loginOrEmail: string) {
     const users = await usersCollection.find({
       $or: [
         { login: loginOrEmail },
