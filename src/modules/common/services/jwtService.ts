@@ -8,7 +8,8 @@ export const jwtService = {
     if (!AppSettings.JWT_SECRET) {
       return false
     }
-    return jwt.sign({ userId: user._id }, AppSettings.JWT_SECRET, { expiresIn: '1h' })
+
+    return jwt.sign({ userId: user._id }, AppSettings.JWT_SECRET, { expiresIn: AppSettings.JWT_EXPIRES })
   },
   async getUserIdByToken(token: string) {
     if (!AppSettings.JWT_SECRET) {
