@@ -4,18 +4,20 @@ import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../utils/testing/usersTestManager'
 import { client } from '../../../app/config/db'
 import { userWrongId } from '../mocks/usersMock'
+import { getMongoMemoryService } from '../../common/services'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
+const memoryService = getMongoMemoryService()
 
 describe('/users route GET tests: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
@@ -75,11 +77,11 @@ describe('/users route GET tests: ', () => {
 
 describe('/users route POST tests: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
@@ -122,11 +124,11 @@ describe('/users route POST tests: ', () => {
 
 describe('/users route DELETE tests: ', () => {
   beforeAll(async () => {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)

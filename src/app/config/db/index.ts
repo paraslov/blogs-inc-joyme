@@ -1,30 +1,35 @@
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
 import { Collections } from './config'
 import { BlogDbModel } from '../../../modules/blogs'
 import { PostDbModel } from '../../../modules/posts'
 import { UserDbModel } from '../../../modules/users'
+import { AppSettings } from '../../appSettings'
 
-
-const uri = process.env.MONGO_URI
-if (!uri) {
-  throw new Error('!!! MONGODB_URI not found')
-}
-
-export const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-const db = client.db(process.env.MONGO_DB_NAME)
-const blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
-const postsCollection = db.collection<PostDbModel>(Collections.POSTS)
-const usersCollection = db.collection<UserDbModel>(Collections.USERS)
+export let client: MongoClient
+let blogsCollection: Collection<BlogDbModel>
+let postsCollection: Collection<PostDbModel>
+let usersCollection: Collection<UserDbModel>
 
 async function runDb() {
+  const uri = AppSettings.MONGO_URI
+  if (!uri) {
+    throw new Error('!!! MONGODB_URI not found')
+  }
+
+  client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  });
+
+  const db = client.db(process.env.MONGO_DB_NAME)
+  blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
+  postsCollection = db.collection<PostDbModel>(Collections.POSTS)
+  usersCollection = db.collection<UserDbModel>(Collections.USERS)
+
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect()

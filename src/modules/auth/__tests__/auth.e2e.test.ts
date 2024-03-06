@@ -1,22 +1,23 @@
 import { app } from '../../../app/app'
-import { client } from '../../../app/config/db'
 import { RoutesList } from '../../../app/config/routes'
 import { userInputMock } from '../../users'
 import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../../users/utils/testing/usersTestManager'
+import { getMongoMemoryService } from '../../common/services'
 
 
 const supertest = require('supertest')
 
 const request = supertest(app)
+const memoryService = getMongoMemoryService()
 
 describe('/auth/me route: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
