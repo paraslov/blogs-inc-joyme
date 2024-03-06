@@ -2,7 +2,6 @@ import { app } from '../../../app/app'
 import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../utils/testing/usersTestManager'
-import { client } from '../../../app/config/db'
 import { userWrongId } from '../mocks/usersMock'
 import { getMongoMemoryService } from '../../common/services'
 

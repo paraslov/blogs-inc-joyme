@@ -36,7 +36,7 @@ describe('/blogs route GET tests: ',() => {
   })
 
   it('GET /blogs success query params', async () => {
-    const createdBlog = await blogsTestManager.createBlog()
+    await blogsTestManager.createBlog()
 
     const result = await request
       .get(RoutesList.BLOGS)

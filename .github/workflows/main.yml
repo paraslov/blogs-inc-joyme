@@ -9,6 +9,7 @@ on:
 env:
   MONGO_URI: ${{ secrets.MONGO_URI }}
   MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 jobs:
   Pipeline:
