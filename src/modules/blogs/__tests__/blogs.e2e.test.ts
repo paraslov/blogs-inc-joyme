@@ -3,20 +3,22 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput, wrongBLogId } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
-import { blogsCollection, client } from '../../../app/config/db'
+import { blogsCollection } from '../../../app/config/db'
 import { ObjectId } from 'mongodb'
+import { getMongoMemoryService } from '../../common/services'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
+const memoryService = getMongoMemoryService()
 
 describe('/blogs route GET tests: ',() => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
@@ -34,7 +36,7 @@ describe('/blogs route GET tests: ',() => {
   })
 
   it('GET /blogs success query params', async () => {
-    const createdBlog = await blogsTestManager.createBlog()
+    await blogsTestManager.createBlog()
 
     const result = await request
       .get(RoutesList.BLOGS)
@@ -89,11 +91,11 @@ describe('/blogs route GET tests: ',() => {
 
 describe('/blogs route POST tests: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
@@ -166,11 +168,11 @@ describe('/blogs route POST tests: ', () => {
 
 describe('/blogs route PUT tests: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
@@ -221,11 +223,11 @@ describe('/blogs route PUT tests: ', () => {
 
 describe('/blogs route DELETE tests: ', () => {
   beforeAll(async ()=> {
-    await client.connect()
+    await memoryService.connect()
   })
   afterAll(async () => {
     // Closing the DB connection allows Jest to exit successfully.
-    await client.close()
+    await memoryService.close()
   })
   beforeEach(async () => {
     await request.delete(`${RoutesList.TESTING}/all-data`)
