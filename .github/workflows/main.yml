@@ -1,5 +1,5 @@
 name: build, e2e
-run-name: test
+run-name: test e2e
 on:
   push:
     branches: '**'
