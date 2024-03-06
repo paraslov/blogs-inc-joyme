@@ -2,7 +2,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import { AppSettings } from '../../../app/appSettings'
 import { client, runDb } from '../../../app/config/db'
 
-export function getMongoMemoryService() {
+function getMongoMemoryService() {
   let memoryServer: MongoMemoryServer
 
   async function connect() {
@@ -19,3 +19,5 @@ export function getMongoMemoryService() {
 
   return { connect, close }
 }
+
+export const memoryService = getMongoMemoryService()
