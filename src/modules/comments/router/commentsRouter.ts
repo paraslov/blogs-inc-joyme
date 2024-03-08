@@ -45,3 +45,23 @@ commentsRouter.put(
 
     return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   })
+
+commentsRouter.delete(
+  '/commentId',
+  jwtAuthMiddleware,
+  async (req: RequestParamsBody<{ commentId: string }, CommentInputModel>, res: Response) => {
+    const user = await usersQueryRepository.getUserById(req.userId)
+    if(!user || !req.params.commentId) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    const result = await commentsService.deleteComment(req.params.commentId, user.id)
+
+    if (result.status === ResultToRouterStatus.NOT_FOUND) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    } else if (result.status === ResultToRouterStatus.FORBIDDEN) {
+      return res.sendStatus(HttpStatusCode.FORBIDDEN_403)
+    }
+
+    return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+  })

@@ -10,5 +10,10 @@ export const commentsCommandRepository = {
     )
 
     return Boolean(result.matchedCount)
+  },
+  async deleteComment(commentId: string) {
+    const result = await commentsCollection.deleteOne({ _id: new ObjectId(commentId) })
+
+    return Boolean(result.deletedCount)
   }
 }
