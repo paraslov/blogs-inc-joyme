@@ -8,7 +8,7 @@ export const stringWithLengthValidation = (field: string, options: { max: number
 
   return body(field)
     .isString().withMessage('Must be string').trim()
-    .isLength({min, max}).withMessage(`Not more than ${max}  symbols, not empty`)
+    .isLength({min, max}).withMessage(`Not more than ${max} symbols, not less that ${min}`)
 }
 
 export const isValidId = (id: string) => ObjectId.isValid(id)

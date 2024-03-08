@@ -1,5 +1,5 @@
 import { commentsCollection } from '../../../../app/config/db'
-import { ObjectId, WithId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { commentsMappers } from '../mappers/commentsMappers'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 
