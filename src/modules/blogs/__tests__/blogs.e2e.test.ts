@@ -120,6 +120,21 @@ describe('/blogs route POST tests: ', () => {
     expect(createdPost.body.shortDescription).toBe('A spell')
   })
 
+  it('POST /blogs create post by blog id failed bearer auth', async () => {
+    const createdBlog = await blogsTestManager.createBlog()
+    const createdPost = await request
+      .post(`${RoutesList.BLOGS}/${createdBlog.body.id}/posts`)
+      .auth('YWRtaW46cXdlcnR5', { type: 'bearer' })
+      .send({
+        title: 'Abrakadabra',
+        shortDescription: 'A spell',
+        content: 'Spell that kills all sh$t code',
+      })
+      .expect(HttpStatusCode.UNAUTHORIZED_401)
+
+    expect(createdPost.body.title).toBe(undefined)
+  })
+
   it('POST /blogs failed::unauthorized', async () => {
     await blogsTestManager.createBlog({ user: 'wrong', password: 'auth', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
     await blogsTestManager.createBlog({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })

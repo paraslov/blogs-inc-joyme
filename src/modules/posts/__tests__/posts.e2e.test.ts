@@ -8,7 +8,6 @@ import { postsCollection } from '../../../app/config/db'
 import { memoryService } from '../../common/services'
 import { usersTestManager } from '../../users/utils/testing/usersTestManager'
 import { userInputMock } from '../../users'
-import { queryPostsRepository } from '../model/repositories/queryPostsRepository'
 
 const supertest = require('supertest')
 
