@@ -47,7 +47,7 @@ export const queryPostsRepository = {
       .limit(pageSize)
       .toArray()
 
-    const totalCount = await postsCollection.countDocuments(filter)
+    const totalCount = await commentsCollection.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedComments = foundComments.map(commentsMappers.mapCommentDtoToViewModel)
 

@@ -6,6 +6,9 @@ import { testBlog } from '../../blogs'
 import { postWrongId, testPostInput } from '../mocks/postsMock'
 import { postsCollection } from '../../../app/config/db'
 import { memoryService } from '../../common/services'
+import { usersTestManager } from '../../users/utils/testing/usersTestManager'
+import { userInputMock } from '../../users'
+import { queryPostsRepository } from '../model/repositories/queryPostsRepository'
 
 const supertest = require('supertest')
 
@@ -63,6 +66,20 @@ describe('/posts route GET tests: ', () => {
   it('GET /posts/:id not found', async () => {
     await postsTestManager.createPost()
     await request.get(`${RoutesList.POSTS}/${postWrongId}`).expect(HttpStatusCode.NOT_FOUND_404)
+  })
+
+  it('GET /posts/:id/comments success', async () => {
+    const { postId, comment, accessToken } = await postsTestManager.createComment()
+
+    const commentsResult = await request.get(`${RoutesList.POSTS}/${postId}/comments`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(commentsResult.body.items?.length).toBe(1)
+    expect(commentsResult.body.items[0].content).toBe(comment.content)
+    expect(commentsResult.body.items[0].commentatorInfo.userId).toBe(comment.commentatorInfo.userId)
+    expect(commentsResult.body.totalCount).toBe(1)
+    expect(commentsResult.body.pageSize).toBe(10)
   })
 })
 
@@ -138,6 +155,26 @@ describe('/posts route POST tests: ', () => {
       expectedStatusCode: HttpStatusCode.BAD_REQUEST_400,
       checkedData: { field: 'blogId', value: null }
     })
+  })
+
+  it('POST /posts/:postId/comments success comment added', async () => {
+    const createdPost = await postsTestManager.createPost()
+    const createUser = await usersTestManager.createUser()
+    const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
+      .send({
+        loginOrEmail: createUser.body.login,
+        password: userInputMock.password,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+    const commentResult = await request.post(`${RoutesList.POSTS}/${createdPost.body.id}/comments`)
+      .auth(resultLogin.body.accessToken, { type: 'bearer' })
+      .send({ content: `This is my comment to ${createdPost.body.title} post <3`})
+      .expect(HttpStatusCode.CREATED_201)
+
+    expect(commentResult.body.content).toBe(`This is my comment to ${createdPost.body.title} post <3`)
+    expect(commentResult.body.commentatorInfo.userId).toBe(createUser.body.id)
+    expect(commentResult.body.commentatorInfo.userLogin).toBe(createUser.body.login)
   })
 })
 

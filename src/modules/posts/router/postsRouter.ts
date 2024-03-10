@@ -39,8 +39,8 @@ postsRouter.get('/:postId', postIdValidationMW, async (req, res) => {
 postsRouter.get(
   '/:postId/comments',
   postIdValidationMW,
-  sortingAndPaginationMiddleware,
-  async (req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery>>, res) => {
+  sortingAndPaginationMiddleware(),
+  async (req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery>>, res: Response) => {
     const comments = await queryPostsRepository.getPostComments(req.params.postId, req.query)
 
     res.status(HttpStatusCode.OK_200).send(comments)
@@ -74,7 +74,11 @@ postsRouter.post(
 
     const createdComment = await commentsQueryRepository.getCommentById(createCommentResult.data!.commentId)
 
-    return res.status(HttpStatusCode.CREATED_201).send(createdComment)
+    if (createdComment.status === ResultToRouterStatus.NOT_FOUND) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    return res.status(HttpStatusCode.CREATED_201).send(createdComment.data)
 })
 
 postsRouter.put('/:postId', authMiddleware, postIdValidationMW, postInputValidation(),  async (req: RequestParamsBody<{ postId: string }, PostInputModel>, res: Response) => {
