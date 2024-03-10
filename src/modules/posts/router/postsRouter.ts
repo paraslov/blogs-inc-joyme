@@ -36,6 +36,16 @@ postsRouter.get('/:postId', postIdValidationMW, async (req, res) => {
   res.status(HttpStatusCode.OK_200).send(foundPost)
 })
 
+postsRouter.get(
+  '/:postId/comments',
+  postIdValidationMW,
+  sortingAndPaginationMiddleware,
+  async (req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery>>, res) => {
+    const comments = await queryPostsRepository.getPostComments(req.params.postId, req.query)
+
+    res.status(HttpStatusCode.OK_200).send(comments)
+})
+
 postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: RequestBody<PostInputModel>, res: Response) => {
   const createdPostId = await postsService.createPost(req.body)
 
