@@ -1,0 +1,50 @@
+import { app } from '../../../app/app'
+import { memoryService } from '../../common/services'
+import { RoutesList } from '../../../app/config/routes'
+import { postsTestManager } from '../../posts/utils/testing/postsTestManager'
+import { HttpStatusCode } from '../../common/enums'
+
+const supertest = require('supertest')
+
+const request = supertest(app)
+
+describe('/comments route tests: ', () => {
+  beforeAll(async () => {
+    await memoryService.connect()
+  })
+  afterAll(async () => {
+    // Closing the DB connection allows Jest to exit successfully.
+    await memoryService.close()
+  })
+  beforeEach(async () => {
+    await request.delete(`${RoutesList.TESTING}/all-data`)
+  })
+
+  it('GET /comments/:commentId success', async () => {
+    const { comment, accessToken } = await postsTestManager.createComment()
+    const result = await request.get(`${RoutesList.COMMENTS}/${comment.id}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.id).toBe(comment.id)
+  })
+
+  it('PUT /comments/:commentId success', async () => {
+    const { comment, accessToken } = await postsTestManager.createComment()
+    await request.put(`${RoutesList.COMMENTS}/${comment.id}`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ content: 'new comment content!!!' })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+  })
+
+  it('DELETE /comments/:commentId success', async () => {
+    const { comment, accessToken } = await postsTestManager.createComment()
+    await request.delete(`${RoutesList.COMMENTS}/${comment.id}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    await request.get(`${RoutesList.COMMENTS}/${comment.id}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.NOT_FOUND_404)
+  })
+})

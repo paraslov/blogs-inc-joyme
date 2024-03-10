@@ -1,6 +1,6 @@
 import { UserInputModel } from '../types/UserInputModel'
 import { usersCommandRepository } from '../repositories/usersCommandRepository'
-import { cryptService } from '../../../common/services/cryptService'
+import { cryptService } from '../../../common/services'
 import { UserDbModel } from '../types/UserDbModel'
 import { usersQueryRepository } from '../repositories/usersQueryRepository'
 
