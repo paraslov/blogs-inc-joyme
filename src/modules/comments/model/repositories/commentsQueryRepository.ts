@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb'
 import { commentsMappers } from '../mappers/commentsMappers'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 
-export const commentsQueryRepositories = {
+export const commentsQueryRepository = {
   async getCommentById(commentId: string) {
     const comment = await commentsCollection.findOne({ _id: new ObjectId(commentId) })
 

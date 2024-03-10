@@ -2,6 +2,11 @@ import { commandPostsRepository } from '../repositories/commandPostsRepository'
 import { PostInputModel } from '../types/PostInputModel'
 import { queryBlogsRepository } from '../../../blogs'
 import { PostDbModel } from '../types/PostDbModel'
+import { CommentInputModel } from '../types/CommentInputModel'
+import { queryPostsRepository } from '../repositories/queryPostsRepository'
+import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
+import { usersQueryRepository } from '../../../users'
+import { CommentDbModel } from '../../../comments'
 
 export const postsService = {
   async createPost(payload: PostInputModel) {
@@ -19,6 +24,33 @@ export const postsService = {
     }
 
     return commandPostsRepository.createPost(createdPostData)
+  },
+  async createCommentToPost(postId: string, userId: string, payload: CommentInputModel) {
+    const post = await queryPostsRepository.getPostById(postId)
+    const user = await usersQueryRepository.getUserById(userId)
+
+    if (!(post && user)) {
+      return {
+        status: ResultToRouterStatus.NOT_FOUND
+      }
+    }
+
+    const newComment: CommentDbModel = {
+      postId,
+      content: payload.content,
+      commentatorInfo: {
+        userId,
+        userLogin: user.login,
+      },
+      createdAt: new Date().toISOString(),
+    }
+
+    const commentId = await commandPostsRepository.createCommentToPost(newComment)
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: { commentId },
+    }
   },
   async updatePost(payload: PostInputModel, postId: string) {
     const updatePostData: PostInputModel = {

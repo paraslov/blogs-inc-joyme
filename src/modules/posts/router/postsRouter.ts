@@ -4,13 +4,17 @@ import {
   PaginationAndSortQuery,
   RequestBody,
   RequestParamsBody,
+  RequestParamsQuery,
   RequestQuery,
 } from '../../common/types'
 import { PostInputModel } from '../model/types/PostInputModel'
-import { authMiddleware } from '../../../app/config/middleware'
-import { postIdValidationMW, postInputValidation } from '../validations/postsValidations'
+import { authMiddleware, jwtAuthMiddleware, sortingAndPaginationMiddleware } from '../../../app/config/middleware'
+import { commentInputValidation, postIdValidationMW, postInputValidation } from '../validations/postsValidations'
 import { queryPostsRepository } from '../model/repositories/queryPostsRepository'
 import { postsService } from '../model/services/postsService'
+import { CommentInputModel } from '../model/types/CommentInputModel'
+import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
+import { commentsQueryRepository } from '../../comments'
 
 export const postsRouter = Router()
 
@@ -44,6 +48,23 @@ postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: Reques
   const createdPost = await queryPostsRepository.getPostById(createdPostId)
 
   res.status(HttpStatusCode.CREATED_201).send(createdPost)
+})
+
+postsRouter.post(
+  '/:postId/comments',
+  postIdValidationMW,
+  jwtAuthMiddleware,
+  commentInputValidation(),
+  async (req: RequestParamsBody<{ postId: string }, CommentInputModel>, res: Response) => {
+    const createCommentResult = await postsService.createCommentToPost(req.params.postId, req.userId, req.body)
+
+    if (createCommentResult.status === ResultToRouterStatus.NOT_FOUND) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    const createdComment = await commentsQueryRepository.getCommentById(createCommentResult.data!.commentId)
+
+    return res.status(HttpStatusCode.CREATED_201).send(createdComment)
 })
 
 postsRouter.put('/:postId', authMiddleware, postIdValidationMW, postInputValidation(),  async (req: RequestParamsBody<{ postId: string }, PostInputModel>, res: Response) => {

@@ -1,11 +1,17 @@
 import { PostInputModel } from '../types/PostInputModel'
-import { postsCollection } from '../../../../app/config/db'
+import { commentsCollection, postsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { PostDbModel } from '../types/PostDbModel'
+import { CommentDbModel } from '../../../comments'
 
 export const commandPostsRepository = {
   async createPost(createdPostData: PostDbModel) {
     const result = await postsCollection.insertOne(createdPostData)
+
+    return result.insertedId.toString()
+  },
+  async createCommentToPost(newComment: CommentDbModel) {
+    const result = await commentsCollection.insertOne(newComment)
 
     return result.insertedId.toString()
   },

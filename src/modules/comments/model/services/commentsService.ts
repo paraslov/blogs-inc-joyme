@@ -1,5 +1,5 @@
 import { CommentInputModel } from '../types/CommentInputModel'
-import { commentsQueryRepositories } from '../repositories/commentsQueryRepositories'
+import { commentsQueryRepository } from '../repositories/commentsQueryRepository'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { commentsCommandRepository } from '../repositories/commentsCommandRepository'
 
@@ -41,7 +41,7 @@ export const commentsService = {
     }
   },
   async isCommentAvailable(commentId: string, userId: string) {
-    const commentResult = await commentsQueryRepositories.getCommentById(commentId)
+    const commentResult = await commentsQueryRepository.getCommentById(commentId)
 
     if (commentResult.status === ResultToRouterStatus.NOT_FOUND) {
       return {

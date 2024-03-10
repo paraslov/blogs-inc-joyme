@@ -2,7 +2,7 @@ import { Response, Router } from 'express'
 import { jwtAuthMiddleware } from '../../../app/config/middleware'
 import { usersQueryRepository } from '../../users'
 import { HttpStatusCode } from '../../common/enums'
-import { commentsQueryRepositories } from '../model/repositories/commentsQueryRepositories'
+import { commentsQueryRepository } from '../model/repositories/commentsQueryRepository'
 import { RequestParams, RequestParamsBody } from '../../common/types'
 import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
 import { CommentInputModel } from '../model/types/CommentInputModel'
@@ -17,7 +17,7 @@ commentsRouter.get('/commentId', jwtAuthMiddleware, async (req: RequestParams<{ 
     return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
   }
 
-  const result = await commentsQueryRepositories.getCommentById(req.params.commentId)
+  const result = await commentsQueryRepository.getCommentById(req.params.commentId)
   if (result.status === ResultToRouterStatus.NOT_FOUND) {
     return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
   }

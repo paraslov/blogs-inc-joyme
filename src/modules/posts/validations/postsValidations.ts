@@ -11,6 +11,8 @@ const shortDescriptionValidation = stringWithLengthValidation('shortDescription'
 
 const contentValidation = stringWithLengthValidation('content', { min: 1, max: 1000 })
 
+const commentValidation = stringWithLengthValidation('content', { max: 300, min: 20 })
+
 const blogIdValidation = body('blogId')
   .isString().withMessage('Should be a string')
   .custom(async (blogId: string) => {
@@ -20,6 +22,8 @@ const blogIdValidation = body('blogId')
       throw new Error('There is no blogs with this id')
     }
   })
+
+export const commentInputValidation = () => [ commentValidation, inputValidationMiddleware ]
 
 export const postInputValidation = () => [
   titleValidation,
