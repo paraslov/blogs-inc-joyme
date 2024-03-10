@@ -22,9 +22,7 @@ describe('/comments route tests: ', () => {
 
   it('GET /comments/:commentId success', async () => {
     const { comment, accessToken } = await postsTestManager.createComment()
-    const result = await request.get(`${RoutesList.COMMENTS}/${comment.id}`)
-      .auth(accessToken, { type: 'bearer' })
-      .expect(HttpStatusCode.OK_200)
+    const result = await request.get(`${RoutesList.COMMENTS}/${comment.id}`).expect(HttpStatusCode.OK_200)
 
     expect(result.body.id).toBe(comment.id)
   })

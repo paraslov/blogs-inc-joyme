@@ -1,6 +1,5 @@
 import { commentsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
-import { CommentInputModel } from '../types/CommentInputModel'
 import { CommentDbModel } from '../types/CommentDbModel'
 
 export const commentsCommandRepository = {
