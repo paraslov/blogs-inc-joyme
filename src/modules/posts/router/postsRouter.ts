@@ -41,9 +41,15 @@ postsRouter.get(
   postIdValidationMW,
   sortingAndPaginationMiddleware(),
   async (req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery>>, res: Response) => {
+    const post = await queryPostsRepository.getPostById(req.params.postId)
+
+    if (!post) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
     const comments = await queryPostsRepository.getPostComments(req.params.postId, req.query)
 
-    res.status(HttpStatusCode.OK_200).send(comments)
+    return res.status(HttpStatusCode.OK_200).send(comments)
 })
 
 postsRouter.post('/', authMiddleware, postInputValidation(),  async (req: RequestBody<PostInputModel>, res: Response) => {
