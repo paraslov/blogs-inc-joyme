@@ -11,12 +11,7 @@ import { commentsService } from '../model/services/commentsService'
 
 export const commentsRouter = Router()
 
-commentsRouter.get('/:commentId', jwtAuthMiddleware, async (req: RequestParams<{ commentId: string }>, res) => {
-  const user = await usersQueryRepository.getUserById(req.userId)
-  if(!user) {
-    return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
-  }
-
+commentsRouter.get('/:commentId', async (req: RequestParams<{ commentId: string }>, res) => {
   const result = await commentsQueryRepository.getCommentById(req.params.commentId)
   if (result.status === ResultToRouterStatus.NOT_FOUND) {
     return res.sendStatus(HttpStatusCode.NOT_FOUND_404)

@@ -3,8 +3,6 @@ import { commentsQueryRepository } from '../repositories/commentsQueryRepository
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { commentsCommandRepository } from '../repositories/commentsCommandRepository'
 import { CommentDbModel } from '../types/CommentDbModel'
-import { WithId } from 'mongodb'
-import { CommentViewModel } from '../types/CommentViewModel'
 
 export const commentsService = {
   async updateComment(commentId: string, userId: string, payload: CommentInputModel) {
