@@ -5,12 +5,11 @@ import { testBlog, testBlogInput, testUpdateBlogInput, wrongBLogId } from '../mo
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
 import { blogsCollection } from '../../../app/config/db'
 import { ObjectId } from 'mongodb'
-import { getMongoMemoryService } from '../../common/services'
+import { memoryService } from '../../common/services'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
-const memoryService = getMongoMemoryService()
 
 describe('/blogs route GET tests: ',() => {
   beforeAll(async ()=> {

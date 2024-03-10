@@ -1,15 +1,17 @@
 import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
+import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
 import { BlogDbModel } from '../../../modules/blogs'
 import { PostDbModel } from '../../../modules/posts'
 import { UserDbModel } from '../../../modules/users'
-import { AppSettings } from '../../appSettings'
+import { CommentDbModel } from '../../../modules/comments'
 
 export let client: MongoClient
 let blogsCollection: Collection<BlogDbModel>
 let postsCollection: Collection<PostDbModel>
 let usersCollection: Collection<UserDbModel>
+let commentsCollection: Collection<CommentDbModel>
 
 async function runDb() {
   const uri = AppSettings.MONGO_URI
@@ -29,6 +31,7 @@ async function runDb() {
   blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
   postsCollection = db.collection<PostDbModel>(Collections.POSTS)
   usersCollection = db.collection<UserDbModel>(Collections.USERS)
+  commentsCollection = db.collection<CommentDbModel>(Collections.COMMENTS)
 
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -55,4 +58,5 @@ export {
   blogsCollection,
   postsCollection,
   usersCollection,
+  commentsCollection,
 }

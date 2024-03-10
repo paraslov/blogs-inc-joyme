@@ -1,3 +1,5 @@
+import { ResultToRouterStatus } from '../enums/ResultToRouterStatus'
+
 export interface RequestBody<B> extends Express.Request {
   body: B
 }
@@ -57,3 +59,9 @@ export type SortQuery = {
 }
 
 export type PaginationAndSortQuery = PaginationQuery & SortQuery
+
+export type ResultToRouter<T = null> = {
+  status: ResultToRouterStatus
+  errorMessage?: string
+  data: T
+}

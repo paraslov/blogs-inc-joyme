@@ -1,9 +1,9 @@
-import { getMongoMemoryService } from './mongoMemoryService'
+import { memoryService } from './mongoMemoryService'
 import { cryptService } from './cryptService'
 import { jwtService } from './jwtService'
 
 export {
-  getMongoMemoryService,
+  memoryService,
   cryptService,
   jwtService,
 }

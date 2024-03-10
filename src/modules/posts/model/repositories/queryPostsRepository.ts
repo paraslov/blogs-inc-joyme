@@ -1,7 +1,8 @@
-import { postsCollection } from '../../../../app/config/db'
+import { commentsCollection, postsCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { postsMappers } from '../mappers/postsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
+import { commentsMappers } from '../../../comments'
 
 export const queryPostsRepository = {
   async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
@@ -33,6 +34,29 @@ export const queryPostsRepository = {
       totalCount,
       page: pageNumber,
       items: mappedBlogs,
+    }
+  },
+  async getPostComments(postId: string, queryParams: Required<PaginationAndSortQuery>) {
+    const { pageNumber, pageSize, sortBy, sortDirection} = queryParams
+    const filter = { postId: postId }
+
+    const foundComments = await commentsCollection
+      .find(filter)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .toArray()
+
+    const totalCount = await commentsCollection.countDocuments(filter)
+    const pagesCount = Math.ceil(totalCount / pageSize)
+    const mappedComments = foundComments.map(commentsMappers.mapCommentDtoToViewModel)
+
+    return {
+      pageSize,
+      pagesCount,
+      totalCount,
+      page: pageNumber,
+      items: mappedComments,
     }
   },
   async getPostById(postId: string) {

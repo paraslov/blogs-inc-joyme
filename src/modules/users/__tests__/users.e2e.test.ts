@@ -3,12 +3,11 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../utils/testing/usersTestManager'
 import { userWrongId } from '../mocks/usersMock'
-import { getMongoMemoryService } from '../../common/services'
+import { memoryService } from '../../common/services'
 
 const supertest = require('supertest')
 
 const request = supertest(app)
-const memoryService = getMongoMemoryService()
 
 describe('/users route GET tests: ', () => {
   beforeAll(async ()=> {

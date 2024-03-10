@@ -5,6 +5,8 @@ import { testPostInput } from '../../mocks/postsMock'
 import { postsCollection } from '../../../../app/config/db'
 import { blogsTestManager } from '../../../blogs/utils/testing/blogsTestManager'
 import { ObjectId } from 'mongodb'
+import { usersTestManager } from '../../../users/utils/testing/usersTestManager'
+import { userInputMock } from '../../../users'
 
 const supertest = require('supertest')
 
@@ -55,6 +57,23 @@ class PostsTestManager {
     }
 
     return result
+  }
+  async createComment() {
+    const createdPost = await this.createPost()
+    const createUser = await usersTestManager.createUser()
+    const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
+      .send({
+        loginOrEmail: createUser.body.login,
+        password: userInputMock.password,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+    const commentResult = await request.post(`${RoutesList.POSTS}/${createdPost.body.id}/comments`)
+      .auth(resultLogin.body.accessToken, { type: 'bearer' })
+      .send({ content: `This is my comment to ${createdPost.body.title} post <3`})
+      .expect(HttpStatusCode.CREATED_201)
+
+    return { postId: createdPost.body.id, comment: commentResult.body, accessToken: resultLogin.body.accessToken }
   }
 }
 
