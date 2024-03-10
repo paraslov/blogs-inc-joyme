@@ -21,10 +21,15 @@ describe('/comments route tests: ', () => {
   })
 
   it('GET /comments/:commentId success', async () => {
-    const { comment, accessToken } = await postsTestManager.createComment()
+    const { comment } = await postsTestManager.createComment()
     const result = await request.get(`${RoutesList.COMMENTS}/${comment.id}`).expect(HttpStatusCode.OK_200)
 
     expect(result.body.id).toBe(comment.id)
+  })
+
+  it('GET /comments/:commentId failed:notFound', async () => {
+    await postsTestManager.createComment()
+    await request.get(`${RoutesList.COMMENTS}/123456789012345678901234`).expect(HttpStatusCode.NOT_FOUND_404)
   })
 
   it('PUT /comments/:commentId success', async () => {
@@ -41,8 +46,15 @@ describe('/comments route tests: ', () => {
       .auth(accessToken, { type: 'bearer' })
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    await request.get(`${RoutesList.COMMENTS}/${comment.id}`)
+    await request.get(`${RoutesList.COMMENTS}/${comment.id}`).expect(HttpStatusCode.NOT_FOUND_404)
+  })
+
+  it('DELETE /comments/:commentId failed::notFound', async () => {
+    const { comment, accessToken } = await postsTestManager.createComment()
+    await request.delete(`${RoutesList.COMMENTS}/123456789012345678901234`)
       .auth(accessToken, { type: 'bearer' })
       .expect(HttpStatusCode.NOT_FOUND_404)
+
+    await request.get(`${RoutesList.COMMENTS}/${comment.id}`).expect(HttpStatusCode.OK_200)
   })
 })

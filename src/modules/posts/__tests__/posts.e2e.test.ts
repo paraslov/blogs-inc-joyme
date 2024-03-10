@@ -80,6 +80,16 @@ describe('/posts route GET tests: ', () => {
     expect(commentsResult.body.totalCount).toBe(1)
     expect(commentsResult.body.pageSize).toBe(10)
   })
+
+  it('GET /posts/:id/comments failed::notFound', async () => {
+    const { accessToken } = await postsTestManager.createComment()
+
+    const commentsResult = await request.get(`${RoutesList.POSTS}/${postWrongId}/comments`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.NOT_FOUND_404)
+
+    expect(commentsResult.body.items?.length).toBe(undefined)
+  })
 })
 
 describe('/posts route POST tests: ', () => {
