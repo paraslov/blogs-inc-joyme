@@ -17,5 +17,19 @@ export const commentsQueryRepository = {
       status: ResultToRouterStatus.SUCCESS,
       data: commentsMappers.mapCommentDtoToViewModel(comment),
     }
+  },
+  async getCommentDbModelById(commentId: string) {
+    const comment = await commentsCollection.findOne({ _id: new ObjectId(commentId) })
+
+    if (!comment) {
+      return {
+        status: ResultToRouterStatus.NOT_FOUND,
+      }
+    }
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: comment,
+    }
   }
 }

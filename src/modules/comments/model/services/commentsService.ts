@@ -2,16 +2,26 @@ import { CommentInputModel } from '../types/CommentInputModel'
 import { commentsQueryRepository } from '../repositories/commentsQueryRepository'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { commentsCommandRepository } from '../repositories/commentsCommandRepository'
+import { CommentDbModel } from '../types/CommentDbModel'
+import { WithId } from 'mongodb'
+import { CommentViewModel } from '../types/CommentViewModel'
 
 export const commentsService = {
   async updateComment(commentId: string, userId: string, payload: CommentInputModel) {
-    const commentAvailability = await this.isCommentAvailable(commentId, userId)
+    const commentResult = await this.getCommentResult(commentId, userId)
 
-    if (commentAvailability.status !== ResultToRouterStatus.SUCCESS) {
-      return commentAvailability
+    if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
+      return commentResult
     }
 
-    const updateResult = await commentsCommandRepository.updateComment(commentId, payload)
+    const updatedComment: CommentDbModel = {
+      postId: commentResult.data!.postId,
+      content: payload.content,
+      commentatorInfo: commentResult.data!.commentatorInfo,
+      createdAt: commentResult.data!.createdAt,
+    }
+
+    const updateResult = await commentsCommandRepository.updateComment(commentId, updatedComment)
     if (!updateResult) {
       return {
         status: ResultToRouterStatus.NOT_FOUND
@@ -23,10 +33,10 @@ export const commentsService = {
     }
   },
   async deleteComment(commentId: string, userId: string) {
-    const commentAvailability = await this.isCommentAvailable(commentId, userId)
+    const commentResult = await this.getCommentResult(commentId, userId)
 
-    if (commentAvailability.status !== ResultToRouterStatus.SUCCESS) {
-      return commentAvailability
+    if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
+      return commentResult
     }
 
     const deleteResult = await commentsCommandRepository.deleteComment(commentId)
@@ -40,21 +50,21 @@ export const commentsService = {
       status: ResultToRouterStatus.SUCCESS
     }
   },
-  async isCommentAvailable(commentId: string, userId: string) {
-    const commentResult = await commentsQueryRepository.getCommentById(commentId)
+  async getCommentResult(commentId: string, userId: string) {
+    const commentResult = await commentsQueryRepository.getCommentDbModelById(commentId)
 
     if (commentResult.status === ResultToRouterStatus.NOT_FOUND) {
       return {
-        status: ResultToRouterStatus.NOT_FOUND
+        status: ResultToRouterStatus.NOT_FOUND,
+        data: null,
       }
     } else if (commentResult.data?.commentatorInfo.userId !== userId) {
       return {
-        status: ResultToRouterStatus.FORBIDDEN
+        status: ResultToRouterStatus.FORBIDDEN,
+        data: null,
       }
     }
 
-    return {
-      status: ResultToRouterStatus.SUCCESS
-    }
-  }
+    return commentResult
+  },
 }
