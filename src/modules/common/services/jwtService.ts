@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { UserDbModel } from '../../users'
-import { ObjectId, WithId } from 'mongodb'
+import { WithId } from 'mongodb'
 import { AppSettings } from '../../../app/appSettings'
 
 export const jwtService = {
