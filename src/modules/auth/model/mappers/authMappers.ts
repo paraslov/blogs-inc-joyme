@@ -6,8 +6,8 @@ export const authMappers = {
   mapDbUserToMeModel(user: WithId<UserDbModel>): MeViewModel {
     return {
       userId: user._id.toString(),
-      login: user.login,
-      email: user.email,
+      login: user.userData.login,
+      email: user.userData.email,
     }
   }
 }
