@@ -13,6 +13,8 @@ const transporter = nodemailer.createTransport({
 export const emailService = {
   async sendEmail(emailTemplate: MailOptions) {
     const info = await transporter.sendMail(emailTemplate)
+
+    return info
   }
 }
 
