@@ -50,7 +50,7 @@ export const authService = {
     const savedUserId = await authCommandRepository.registerUser(newUserRegistration)
 
     try {
-      const mailInfo = await emailManager.sendRegistrationEmail(email)
+      const mailInfo = await emailManager.sendRegistrationEmail(email, confirmationData.confirmationCode)
       console.log('@> Information::mailInfo: ', mailInfo)
     } catch (err) {
       console.error('@> Error::emailManager: ', err)

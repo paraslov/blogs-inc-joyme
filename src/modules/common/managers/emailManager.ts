@@ -1,8 +1,8 @@
 import { emailService, mailTemplatesService } from '../services'
 
 export const emailManager = {
-  async sendRegistrationEmail(email: string) {
-    const emailTemplate = mailTemplatesService.getRegistrationMailTemplate(email)
+  async sendRegistrationEmail(email: string, confirmationCode: string) {
+    const emailTemplate = mailTemplatesService.getRegistrationMailTemplate(email, confirmationCode)
 
     return await emailService.sendEmail(emailTemplate)
   },

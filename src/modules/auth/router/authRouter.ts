@@ -37,11 +37,7 @@ authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
 })
 
 authRouter.post('/registration', userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
-  const token = await authService.registerUser(req.body)
+  const registrationResult = await authService.registerUser(req.body)
 
-  if (!token) {
-    return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
-  }
-
-  return res.status(HttpStatusCode.OK_200).send({ accessToken: token })
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
