@@ -6,6 +6,7 @@ import { HttpStatusCode } from '../../common/enums'
 import { authPostValidation } from '../validations/authValidations'
 import { authQueryRepository } from '../model/repositories/authQueryRepository'
 import { jwtAuthMiddleware } from '../../../app/config/middleware'
+import { UserInputModel, userInputValidation } from '../../users'
 
 export const authRouter = Router()
 
@@ -33,4 +34,14 @@ authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
   }
 
   return res.status(HttpStatusCode.OK_200).send(user)
+})
+
+authRouter.post('/registration', userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
+  const token = await authService.registerUser(req.body)
+
+  if (!token) {
+    return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
+  }
+
+  return res.status(HttpStatusCode.OK_200).send({ accessToken: token })
 })

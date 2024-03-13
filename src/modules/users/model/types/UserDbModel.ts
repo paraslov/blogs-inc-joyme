@@ -1,6 +1,7 @@
+import { UserDataModel } from './UserDataModel'
+import { ConfirmationInfoModel } from '../../../auth'
+
 export type UserDbModel = {
-  login: string
-  email: string
-  passwordHash: string
-  createdAt?: string
+  userData: UserDataModel
+  confirmationData: ConfirmationInfoModel
 }
