@@ -1,7 +1,6 @@
 import { body } from 'express-validator'
 import { stringWithLengthValidation } from '../../common/validations'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
-import { usersQueryRepository } from '../model/repositories/usersQueryRepository'
 import { usersCollection } from '../../../app/config/db'
 
 const loginValidation = stringWithLengthValidation('login', { min: 3, max: 10 })
