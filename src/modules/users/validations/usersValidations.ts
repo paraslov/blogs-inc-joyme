@@ -24,7 +24,7 @@ export const userInputValidation = () => [
 ]
 
 async function uniqueLoginCheck(login: string) {
-  const user = await usersCollection.findOne({ login: login })
+  const user = await usersCollection.findOne({ 'userData.login': login })
 
   if (user) {
     throw new Error(`This login is already exists`)
@@ -32,7 +32,7 @@ async function uniqueLoginCheck(login: string) {
 }
 
 async function uniqueEmailCheck(email: string) {
-  const user = await usersCollection.findOne({ email: email })
+  const user = await usersCollection.findOne({ 'userData.email': email })
   if (user) {
     throw new Error(`This login is already exists`)
   }

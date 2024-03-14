@@ -16,10 +16,10 @@ export const usersQueryRepository = {
     let filter: any = { $or: [] }
 
     if (queryParams.searchLoginTerm) {
-      filter.$or.push({ login: { $regex: queryParams.searchLoginTerm, $options: 'i' }})
+      filter.$or.push({ 'userData.login': { $regex: queryParams.searchLoginTerm, $options: 'i' }})
     }
     if (queryParams.searchEmailTerm) {
-      filter.$or.push({ email: { $regex: queryParams.searchEmailTerm, $options: 'i' }})
+      filter.$or.push({ 'userData.email': { $regex: queryParams.searchEmailTerm, $options: 'i' }})
     }
     if (!filter.$or.length) {
       filter = {}
