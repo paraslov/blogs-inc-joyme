@@ -7,4 +7,12 @@ export const authCommandRepository = {
 
     return result.insertedId.toString()
   },
+  async confirmUser(confirmationCode: string) {
+    const result = await usersCollection.updateOne(
+      { 'confirmationData.confirmationCode': confirmationCode },
+      { $set: { 'confirmationData.isConfirmed': true } },
+    )
+
+    return Boolean(result.modifiedCount === 1)
+  }
 }

@@ -8,6 +8,11 @@ import { authQueryRepository } from '../repositories/authQueryRepository'
 import { authCommandRepository } from '../repositories/authCommandRepository'
 import { emailManager } from '../../../common/managers/emailManager'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
+import {
+  ErrorMessageHandleResult,
+  errorMessagesHandleService
+} from '../../../common/services/errorMessagesHandleService'
+import { ResultToRouter } from '../../../common/types'
 
 export const authService = {
   async checkUser(loginOrEmail: string, password: string) {
@@ -38,7 +43,10 @@ export const authService = {
     }
     const confirmationData: ConfirmationInfoModel = {
       confirmationCode: uuidv4(),
-      confirmationCodeExpirationDate: add(new Date(), { hours: 1, minutes: 1 }),
+      confirmationCodeExpirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 1,
+      }),
       isConfirmed: false,
     }
 
@@ -47,13 +55,48 @@ export const authService = {
       confirmationData,
     }
 
-    const savedUserId = await authCommandRepository.registerUser(newUserRegistration)
+    await authCommandRepository.registerUser(newUserRegistration)
 
     try {
       const mailInfo = await emailManager.sendRegistrationEmail(email, confirmationData.confirmationCode)
       console.log('@> Information::mailInfo: ', mailInfo)
     } catch (err) {
       console.error('@> Error::emailManager: ', err)
+    }
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: null,
+    }
+  },
+  async confirmUser(confirmationCode: string): Promise<ResultToRouter<ErrorMessageHandleResult | null>> {
+    const userToConfirm = await authQueryRepository.getUserByConfirmationCode(confirmationCode)
+
+    if (!userToConfirm || userToConfirm.confirmationData.confirmationCode !== confirmationCode) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Incorrect verification code', field: 'code' }),
+      }
+    }
+    if (userToConfirm.confirmationData.isConfirmed) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Registration was already confirmed', field: 'code' }),
+      }
+    }
+    if (userToConfirm.confirmationData.confirmationCodeExpirationDate < new Date()) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Confirmation code expired', field: 'code' }),
+      }
+    }
+
+    const confirmationResult = await authCommandRepository.confirmUser(confirmationCode)
+    if (!confirmationResult) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Ups! Something goes wrong...', field: 'code' }),
+      }
     }
 
     return {
