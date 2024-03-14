@@ -11,8 +11,8 @@ export const authQueryRepository = {
   async getUserByLoginOrEmail(loginOrEmail: string) {
     const users = await usersCollection.find({
       $or: [
-        { login: loginOrEmail },
-        { email: loginOrEmail },
+        { 'userData.login': loginOrEmail },
+        { 'userData.email': loginOrEmail },
       ]
     }).toArray()
 
@@ -22,4 +22,7 @@ export const authQueryRepository = {
 
     return users[0]
   },
+  async getUserByConfirmationCode(confirmationCode: string) {
+    return await usersCollection.findOne({ 'confirmationData.confirmationCode': confirmationCode })
+  }
 }
