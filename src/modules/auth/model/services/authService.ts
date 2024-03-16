@@ -119,12 +119,12 @@ export const authService = {
         data: errorMessagesHandleService({ message: 'Registration was already confirmed', field: 'email' }),
       }
     }
-    if (user.confirmationData.confirmationCodeExpirationDate > new Date()) {
-      return {
-        status: ResultToRouterStatus.BAD_REQUEST,
-        data: errorMessagesHandleService({ message: 'Confirmation code is not expired yet. Check your email', field: 'code' }),
-      }
-    }
+    // if (user.confirmationData.confirmationCodeExpirationDate > new Date()) {
+    //   return {
+    //     status: ResultToRouterStatus.BAD_REQUEST,
+    //     data: errorMessagesHandleService({ message: 'Confirmation code is not expired yet. Check your email', field: 'code' }),
+    //   }
+    // }
 
     const updatedUser: UserDbModel = {
       ...user,
