@@ -3,11 +3,11 @@ type ErrorMessageData = {
   field: string
 }
 
-export type ErrorMessageHandleResult = { errorMessages: ErrorMessageData[] }
+export type ErrorMessageHandleResult = { errorsMessages: ErrorMessageData[] }
 
 export const errorMessagesHandleService = (errorMessageData: ErrorMessageData): ErrorMessageHandleResult => {
   return {
-    errorMessages: [
+    errorsMessages: [
       {
         message: errorMessageData.message,
         field: errorMessageData.field,
