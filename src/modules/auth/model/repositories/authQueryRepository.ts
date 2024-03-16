@@ -7,5 +7,22 @@ export const authQueryRepository = {
     const foundUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
 
     return foundUser && authMappers.mapDbUserToMeModel(foundUser)
+  },
+  async getUserByLoginOrEmail(loginOrEmail: string) {
+    const users = await usersCollection.find({
+      $or: [
+        { 'userData.login': loginOrEmail },
+        { 'userData.email': loginOrEmail },
+      ]
+    }).toArray()
+
+    if (users.length !== 1) {
+      return false
+    }
+
+    return users[0]
+  },
+  async getUserByConfirmationCode(confirmationCode: string) {
+    return await usersCollection.findOne({ 'confirmationData.confirmationCode': confirmationCode })
   }
 }

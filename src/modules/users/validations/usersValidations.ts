@@ -1,7 +1,6 @@
 import { body } from 'express-validator'
 import { stringWithLengthValidation } from '../../common/validations'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
-import { usersQueryRepository } from '../model/repositories/usersQueryRepository'
 import { usersCollection } from '../../../app/config/db'
 
 const loginValidation = stringWithLengthValidation('login', { min: 3, max: 10 })
@@ -24,7 +23,7 @@ export const userInputValidation = () => [
 ]
 
 async function uniqueLoginCheck(login: string) {
-  const user = await usersCollection.findOne({ login: login })
+  const user = await usersCollection.findOne({ 'userData.login': login })
 
   if (user) {
     throw new Error(`This login is already exists`)
@@ -32,7 +31,7 @@ async function uniqueLoginCheck(login: string) {
 }
 
 async function uniqueEmailCheck(email: string) {
-  const user = await usersCollection.findOne({ email: email })
+  const user = await usersCollection.findOne({ 'userData.email': email })
   if (user) {
     throw new Error(`This login is already exists`)
   }

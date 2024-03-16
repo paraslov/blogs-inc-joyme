@@ -15,6 +15,7 @@ export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextF
   if (userId) {
     req.userId = userId
     next()
+
     return
   }
 

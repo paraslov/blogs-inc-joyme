@@ -6,9 +6,9 @@ export const usersMappers = {
   mapUserDbToViewDTO(dBUser: WithId<UserDbModel>): UserViewModel  {
     return {
       id: dBUser._id.toString(),
-      login: dBUser.login,
-      email: dBUser.email,
-      createdAt: dBUser.createdAt,
+      login: dBUser.userData.login,
+      email: dBUser.userData.email,
+      createdAt: dBUser.userData.createdAt,
     }
   }
 }

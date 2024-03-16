@@ -1,18 +1,26 @@
 import { usersCollection } from '../../../../app/config/db'
+import { UserDbModel } from '../../../users'
 
 export const authCommandRepository = {
-  async getUser(loginOrEmail: string) {
-    const users = await usersCollection.find({
-      $or: [
-        { login: loginOrEmail },
-        { email: loginOrEmail },
-      ]
-    }).toArray()
+  async registerUser(newUserRegistration: UserDbModel) {
+    const result = await usersCollection.insertOne(newUserRegistration)
 
-    if (users.length !== 1) {
-      return false
-    }
+    return result.insertedId.toString()
+  },
+  async updateUser(filter: any, updateUser: UserDbModel) {
+    const result = await usersCollection.updateOne(
+      filter,
+      { $set: updateUser },
+    )
 
-    return users[0]
-  }
+    return Boolean(result.modifiedCount === 1)
+  },
+  async confirmUser(confirmationCode: string) {
+    const result = await usersCollection.updateOne(
+      { 'confirmationData.confirmationCode': confirmationCode },
+      { $set: { 'confirmationData.isConfirmed': true } },
+    )
+
+    return Boolean(result.modifiedCount === 1)
+  },
 }
