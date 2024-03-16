@@ -7,6 +7,14 @@ export const authCommandRepository = {
 
     return result.insertedId.toString()
   },
+  async updateUser(filter: any, updateUser: UserDbModel) {
+    const result = await usersCollection.updateOne(
+      filter,
+      { $set: updateUser },
+    )
+
+    return Boolean(result.modifiedCount === 1)
+  },
   async confirmUser(confirmationCode: string) {
     const result = await usersCollection.updateOne(
       { 'confirmationData.confirmationCode': confirmationCode },
@@ -14,5 +22,5 @@ export const authCommandRepository = {
     )
 
     return Boolean(result.modifiedCount === 1)
-  }
+  },
 }

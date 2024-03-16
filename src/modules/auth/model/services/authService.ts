@@ -103,5 +103,53 @@ export const authService = {
       status: ResultToRouterStatus.SUCCESS,
       data: null,
     }
-  }
+  },
+  async resendConfirmationCode(email: string) {
+    const user = await authQueryRepository.getUserByLoginOrEmail(email)
+
+    if (!user) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'You have not registered yet', field: 'email' }),
+      }
+    }
+    if (user.confirmationData.isConfirmed) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Registration was already confirmed', field: 'email' }),
+      }
+    }
+    if (user.confirmationData.confirmationCodeExpirationDate > new Date()) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Confirmation code is not expired yet. Check your email', field: 'code' }),
+      }
+    }
+
+    const updatedUser: UserDbModel = {
+      ...user,
+      confirmationData: {
+        ...user.confirmationData,
+        confirmationCode: uuidv4(),
+        confirmationCodeExpirationDate: add(new Date(), {
+          hours: 1,
+          minutes: 1,
+        }),
+      },
+    }
+
+    await authCommandRepository.updateUser({ 'userData.email': email }, updatedUser)
+
+    try {
+      const mailInfo = await emailManager.resendRegistrationEmail(email, updatedUser.confirmationData.confirmationCode)
+      console.log('@> Information::mailInfo: ', mailInfo)
+    } catch (err) {
+      console.error('@> Error::emailManager: ', err)
+    }
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: null,
+    }
+  },
 }

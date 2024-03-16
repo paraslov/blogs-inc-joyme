@@ -54,7 +54,11 @@ authRouter.post('/registration-confirmation', authCodeValidation(), async (req: 
 })
 
 authRouter.post('/registration-email-resending', resentEmailValidation(), async (req: RequestBody<{ email: string }>, res: Response) => {
-  await authService.resendConfirmationCode(req.body.email)
+  const resendResult = await authService.resendConfirmationCode(req.body.email)
+
+  if (resendResult.status === ResultToRouterStatus.BAD_REQUEST) {
+    return res.status(HttpStatusCode.BAD_REQUEST_400).send(resendResult.data)
+  }
 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
