@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "yarn nodemon --inspect dist/index.js",
     "watch": "tsc -w",
-    "test:e2e": "jest --runInBand"
+    "test:e2e": "jest --runInBand \".e2e.test.ts$\"",
+    "test:int": "jest --runInBand \".integration.test.ts$\"",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.6",
