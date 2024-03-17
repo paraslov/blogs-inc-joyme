@@ -10,7 +10,7 @@ const supertest = require('supertest')
 
 const request = supertest(app)
 
-describe('/auth/me route: ', () => {
+describe('/auth/me route e2e tests: ', () => {
   beforeAll(async ()=> {
     await memoryService.connect()
   })
