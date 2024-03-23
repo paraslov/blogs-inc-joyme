@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { HttpStatusCode } from '../../../modules/common/enums'
-import { jwtService } from '../../../modules/common/services/jwtService'
+import { jwtService } from '../../../modules/common/services'
 
 export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.headers.authorization || !req.headers.authorization.includes('Bearer')) {

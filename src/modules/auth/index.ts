@@ -1,5 +1,6 @@
 import { authRouter } from './router/authRouter'
-import { ConfirmationInfoModel } from '../users/model/types/ConfirmationInfoModel'
+import type { ConfirmationInfoModel } from '../users/model/types/ConfirmationInfoModel'
+import type { SessionsDbModel } from './model/types/SessionsModel'
 
 export {
   authRouter,
@@ -7,4 +8,5 @@ export {
 
 export type {
   ConfirmationInfoModel,
+  SessionsDbModel,
 }

@@ -24,7 +24,7 @@ export const jwtService = {
 
     return { accessToken, refreshToken }
   },
-  async getUserIdByToken(token: string) {
+  async getUserIdByToken(token: string): Promise<string | null> {
     if (!AppSettings.ACCESS_JWT_SECRET) {
       return null
     }
