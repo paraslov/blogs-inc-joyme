@@ -40,6 +40,23 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
   return res.status(HttpStatusCode.OK_200).send({ accessToken: updateTokensResult.data?.accessToken })
 })
 
+authRouter.post('/logout', async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken
+  if (!refreshToken) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
+    return
+  }
+
+  const logoutResult = await authService.logoutUser(refreshToken)
+
+  if (logoutResult.status === ResultToRouterStatus.NOT_AUTHORIZED) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
+    return
+  }
+
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})
+
 authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
   const userId = req.userId
 

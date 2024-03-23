@@ -33,11 +33,6 @@ export const authService = {
       return false
     }
 
-    // const isSessionCreated = await authCommandRepository.createUserSession(user._id.toString(), refreshToken as string)
-    // if (!isSessionCreated) {
-    //   return false
-    // }
-
     return { accessToken, refreshToken }
   },
   async updateTokenPair(refreshToken: string) {
@@ -76,6 +71,33 @@ export const authService = {
     return {
       status: ResultToRouterStatus.SUCCESS,
       data: { accessToken, refreshToken: updatedRefreshToken }
+    }
+  },
+  async logoutUser(refreshToken: string) {
+    const userId = await jwtService.getUserIdByToken(refreshToken)
+    const user = userId && await authQueryRepository.getUserMeModelById(userId)
+
+    if (!userId || !user) {
+      return {
+        status: ResultToRouterStatus.NOT_AUTHORIZED,
+        data: null,
+      }
+    }
+
+    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
+
+    if (!isRefreshTokenValid) {
+      return {
+        status: ResultToRouterStatus.NOT_AUTHORIZED,
+        data: null,
+      }
+    }
+
+    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: null,
     }
   },
   async registerUser(payload: UserInputModel) {
