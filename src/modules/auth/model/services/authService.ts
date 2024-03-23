@@ -27,9 +27,13 @@ export const authService = {
       return false
     }
 
-    const token = await jwtService.createJWT(user)
+    const { accessToken, refreshToken } = await jwtService.createTokenPair(user)
 
-    return token
+    if (!accessToken || !refreshToken) {
+      return false
+    }
+
+    return { accessToken, refreshToken }
   },
   async registerUser(payload: UserInputModel) {
     const { login, email, password } = payload

@@ -12,13 +12,14 @@ import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
 export const authRouter = Router()
 
 authRouter.post('/login', authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
-  const token = await authService.checkUser(req.body.loginOrEmail, req.body.password)
+  const tokens = await authService.checkUser(req.body.loginOrEmail, req.body.password)
 
-  if (!token) {
+  if (!tokens) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  return res.status(HttpStatusCode.OK_200).send({ accessToken: token })
+  res.cookie('refreshToken', tokens.refreshToken, {httpOnly: true,secure: true})
+  return res.status(HttpStatusCode.OK_200).send({ accessToken: tokens.accessToken })
 })
 
 authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {

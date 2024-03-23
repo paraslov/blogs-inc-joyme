@@ -48,7 +48,7 @@ describe('/auth/me route e2e tests: ', () => {
     expect(meData.body.login).toBe(undefined)
   })
 
-  it('POST /auth/login failed', async () => {
+  it('POST /auth/login success', async () => {
     const createUser = await usersTestManager.createUser()
 
     const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
@@ -58,6 +58,9 @@ describe('/auth/me route e2e tests: ', () => {
       })
       .expect(HttpStatusCode.OK_200)
 
+    const cookies = resultLogin.headers['set-cookie']
+
     expect(resultLogin.body.accessToken).toStrictEqual(expect.any(String))
+    expect(cookies.some((cookie: string) => cookie.includes('refreshToken'))).toBeTruthy()
   })
 })
