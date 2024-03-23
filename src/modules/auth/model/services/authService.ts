@@ -15,7 +15,7 @@ import {
 import { ResultToRouter } from '../../../common/types'
 
 export const authService = {
-  async checkUser(loginOrEmail: string, password: string) {
+  async createTokenPair(loginOrEmail: string, password: string) {
     const user = await authQueryRepository.getUserByLoginOrEmail(loginOrEmail)
     if (!user) {
       return false
@@ -33,7 +33,50 @@ export const authService = {
       return false
     }
 
+    // const isSessionCreated = await authCommandRepository.createUserSession(user._id.toString(), refreshToken as string)
+    // if (!isSessionCreated) {
+    //   return false
+    // }
+
     return { accessToken, refreshToken }
+  },
+  async updateTokenPair(refreshToken: string) {
+    const userId = await jwtService.getUserIdByToken(refreshToken)
+    const user = userId && await authQueryRepository.getUserMeModelById(userId)
+
+    if (!userId || !user) {
+      return {
+        status: ResultToRouterStatus.NOT_AUTHORIZED,
+        data: null,
+      }
+    }
+
+    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
+    const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
+
+    if (!isRefreshTokenValid || !userFromDb) {
+      return {
+        status: ResultToRouterStatus.NOT_AUTHORIZED,
+        data: null,
+      }
+    }
+
+
+    const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb)
+
+    if (!accessToken || !updatedRefreshToken) {
+      return {
+        status: ResultToRouterStatus.NOT_AUTHORIZED,
+        data: null,
+      }
+    }
+
+    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: { accessToken, refreshToken: updatedRefreshToken }
+    }
   },
   async registerUser(payload: UserInputModel) {
     const { login, email, password } = payload

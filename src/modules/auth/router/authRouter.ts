@@ -12,14 +12,32 @@ import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
 export const authRouter = Router()
 
 authRouter.post('/login', authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
-  const tokens = await authService.checkUser(req.body.loginOrEmail, req.body.password)
+  const tokens = await authService.createTokenPair(req.body.loginOrEmail, req.body.password)
 
   if (!tokens) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  res.cookie('refreshToken', tokens.refreshToken, {httpOnly: true,secure: true})
+  res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true,secure: true })
   return res.status(HttpStatusCode.OK_200).send({ accessToken: tokens.accessToken })
+})
+
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken
+  if (!refreshToken) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
+    return
+  }
+
+  const updateTokensResult = await authService.updateTokenPair(refreshToken)
+
+  if (updateTokensResult.status === ResultToRouterStatus.NOT_AUTHORIZED) {
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
+    return
+  }
+
+  res.cookie('refreshToken', updateTokensResult.data?.refreshToken, { httpOnly: true,secure: true })
+  return res.status(HttpStatusCode.OK_200).send({ accessToken: updateTokensResult.data?.accessToken })
 })
 
 authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
