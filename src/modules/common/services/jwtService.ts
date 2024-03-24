@@ -12,11 +12,11 @@ export const jwtService = {
     return jwt.sign({ userId: user._id }, AppSettings.ACCESS_JWT_SECRET, { expiresIn: AppSettings.ACCESS_JWT_EXPIRES })
   },
   async createRefreshToken(user: WithId<UserDbModel>) {
-    if (!AppSettings.ACCESS_JWT_SECRET) {
+    if (!AppSettings.REFRESH_JWT_SECRET) {
       return false
     }
 
-    return jwt.sign({ userId: user._id }, AppSettings.ACCESS_JWT_SECRET, { expiresIn: AppSettings.ACCESS_JWT_EXPIRES })
+    return jwt.sign({ userId: user._id }, AppSettings.REFRESH_JWT_SECRET, { expiresIn: AppSettings.REFRESH_JWT_EXPIRES })
   },
   async createTokenPair(user: WithId<UserDbModel>) {
     const accessToken = await this.createAccessToken(user)

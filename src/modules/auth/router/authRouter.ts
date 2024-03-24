@@ -54,6 +54,7 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
     return
   }
 
+  res.clearCookie('refreshToken')
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
