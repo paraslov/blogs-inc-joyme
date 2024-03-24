@@ -1,8 +1,6 @@
-import { cryptService } from '../../../common/services'
-import { jwtService } from '../../../common/services'
-import { UserDataModel, UserDbModel, UserInputModel } from '../../../users'
-import { ConfirmationInfoModel } from '../../../users'
-import { v4 as uuidv4 } from 'uuid';
+import { cryptService, jwtService } from '../../../common/services'
+import { ConfirmationInfoModel, UserDataModel, UserDbModel, UserInputModel } from '../../../users'
+import { v4 as uuidv4 } from 'uuid'
 import { add } from 'date-fns'
 import { authQueryRepository } from '../repositories/authQueryRepository'
 import { authCommandRepository } from '../repositories/authCommandRepository'
@@ -13,6 +11,7 @@ import {
   errorMessagesHandleService
 } from '../../../common/services/errorMessagesHandleService'
 import { ResultToRouter } from '../../../common/types'
+import { operationsResultService } from '../../../common/services'
 
 export const authService = {
   async createTokenPair(loginOrEmail: string, password: string) {
@@ -40,38 +39,29 @@ export const authService = {
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
     if (!userId || !user) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
     const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
     const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
 
     if (!isRefreshTokenValid || !userFromDb) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
 
     const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb)
 
     if (!accessToken || !updatedRefreshToken) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
     await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
 
-    return {
-      status: ResultToRouterStatus.SUCCESS,
-      data: { accessToken, refreshToken: updatedRefreshToken }
-    }
+    return operationsResultService.generateResponse(
+      ResultToRouterStatus.SUCCESS,
+      { accessToken, refreshToken: updatedRefreshToken },
+    )
   },
   async logoutUser(refreshToken: string) {
     const userId = await jwtService.getUserIdByToken(refreshToken)

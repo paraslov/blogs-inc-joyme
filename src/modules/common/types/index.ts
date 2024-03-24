@@ -63,5 +63,5 @@ export type PaginationAndSortQuery = PaginationQuery & SortQuery
 export type ResultToRouter<T = null> = {
   status: ResultToRouterStatus
   errorMessage?: string
-  data: T
+  data: T | null
 }
