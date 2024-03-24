@@ -5,7 +5,6 @@ import { HttpStatusCode } from '../../common/enums'
 import { usersTestManager } from '../../users/utils/testing/usersTestManager'
 import { memoryService } from '../../common/services'
 
-
 const supertest = require('supertest')
 
 const request = supertest(app)
@@ -24,7 +23,6 @@ describe('/auth/me route e2e tests: ', () => {
 
   it('GET /auth/me success', async () => {
     const createUser = await usersTestManager.createUser()
-    console.log('@> cU: ', createUser.body)
 
     const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
       .send({
