@@ -16,11 +16,13 @@ import { operationsResultService } from '../../../common/services'
 export const authService = {
   async createTokenPair(loginOrEmail: string, password: string) {
     const user = await authQueryRepository.getUserByLoginOrEmail(loginOrEmail)
+    console.log('@> user in serv: ', user)
     if (!user) {
       return false
     }
 
     const isPasswordValid = await cryptService.checkPassword(password, user.userData.passwordHash)
+    console.log('@> isPasswordValid in serv: ', isPasswordValid)
 
     if (!isPasswordValid) {
       return false
@@ -28,6 +30,8 @@ export const authService = {
 
     const { accessToken, refreshToken } = await jwtService.createTokenPair(user)
 
+    console.log('@> accessToken in serv: ', accessToken)
+    console.log('@> refreshToken in serv: ', refreshToken)
     if (!accessToken || !refreshToken) {
       return false
     }
