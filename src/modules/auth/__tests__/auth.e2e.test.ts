@@ -24,6 +24,7 @@ describe('/auth/me route e2e tests: ', () => {
 
   it('GET /auth/me success', async () => {
     const createUser = await usersTestManager.createUser()
+    console.log('@> cU: ', createUser.body)
 
     const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
       .send({
