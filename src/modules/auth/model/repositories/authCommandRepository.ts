@@ -1,4 +1,4 @@
-import { usersCollection } from '../../../../app/config/db'
+import { sessionsCollection, usersCollection } from '../../../../app/config/db'
 import { UserDbModel } from '../../../users'
 
 export const authCommandRepository = {
@@ -23,4 +23,18 @@ export const authCommandRepository = {
 
     return Boolean(result.modifiedCount === 1)
   },
+  async addRefreshTokenToBlackList(userId: string, refreshToken: string) {
+    let result
+    const userSession = await sessionsCollection.findOne({ userId })
+
+    if (!userSession?.refreshTokensBlackList) {
+      result = await sessionsCollection.insertOne({ userId, refreshTokensBlackList: [refreshToken] })
+      return Boolean(result.insertedId.toString())
+    } else if (userSession.refreshTokensBlackList) {
+      result = await sessionsCollection.updateOne({ userId }, { $push: { refreshTokensBlackList: refreshToken } })
+      return Boolean(result.matchedCount)
+    }
+
+    return false
+  }
 }

@@ -1,9 +1,8 @@
 import express from 'express'
-import { initRoutes } from './config/routes'
+import { initAppRoutes } from './config/routes'
+import { initAppMiddleware } from './config/middleware/initAppMiddleware'
 
 export const app = express()
 
-const parseBodyMiddleware = express.json()
-app.use(parseBodyMiddleware)
-
-initRoutes()
+initAppMiddleware()
+initAppRoutes()

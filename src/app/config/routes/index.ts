@@ -17,7 +17,7 @@ const RoutesList = {
   TESTING: '/testing',
 }
 
-function initRoutes() {
+function initAppRoutes() {
   app.use(RoutesList.BLOGS, blogsRouter)
   app.use(RoutesList.POSTS, postsRouter)
   app.use(RoutesList.USERS, usersRouter)
@@ -36,5 +36,5 @@ function initRoutes() {
 
 export {
   RoutesList,
-  initRoutes,
+  initAppRoutes,
 }
