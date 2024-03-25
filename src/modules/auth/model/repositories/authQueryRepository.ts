@@ -29,7 +29,7 @@ export const authQueryRepository = {
     const userSession = await sessionsCollection.findOne({ userId })
 
     if (!userSession) {
-      return false
+      return true
     }
 
     return !userSession.refreshTokensBlackList.includes(refreshToken)

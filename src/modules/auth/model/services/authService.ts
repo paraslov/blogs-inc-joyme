@@ -35,7 +35,7 @@ export const authService = {
     return { accessToken, refreshToken }
   },
   async updateTokenPair(refreshToken: string) {
-    const userId = await jwtService.getUserIdByToken(refreshToken)
+    const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
     if (!userId || !user) {
@@ -44,7 +44,6 @@ export const authService = {
 
     const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
     const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
-
     if (!isRefreshTokenValid || !userFromDb) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
@@ -64,7 +63,7 @@ export const authService = {
     )
   },
   async logoutUser(refreshToken: string) {
-    const userId = await jwtService.getUserIdByToken(refreshToken)
+    const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
     if (!userId || !user) {

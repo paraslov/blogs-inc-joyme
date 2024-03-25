@@ -24,13 +24,15 @@ export const jwtService = {
 
     return { accessToken, refreshToken }
   },
-  async getUserIdByToken(token: string): Promise<string | null> {
-    if (!AppSettings.ACCESS_JWT_SECRET) {
+  async getUserIdByToken(token: string, secretType: 'access' | 'refresh' = 'access'): Promise<string | null> {
+    const secret = secretType === 'access' ? AppSettings.ACCESS_JWT_SECRET : AppSettings.REFRESH_JWT_SECRET
+
+    if (!secret) {
       return null
     }
 
     try {
-      const res: any = jwt.verify(token, AppSettings.ACCESS_JWT_SECRET)
+      const res: any = jwt.verify(token, secret)
 
       return res.userId
     } catch (err) {
