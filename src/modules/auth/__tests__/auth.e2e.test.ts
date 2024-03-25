@@ -62,4 +62,60 @@ describe('/auth/me route e2e tests: ', () => {
     expect(resultLogin.body.accessToken).toStrictEqual(expect.any(String))
     expect(cookies.some((cookie: string) => cookie.includes('refreshToken'))).toBeTruthy()
   })
+
+  it('POST /auth/refresh-token success', async () => {
+    const createUser = await usersTestManager.createUser()
+
+    const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
+      .send({
+        loginOrEmail: createUser.body.login,
+        password: userInputMock.password,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+
+    const cookies = resultLogin.headers['set-cookie']
+    const refreshCookie = cookies.find((cookie: string) => cookie.includes('refreshToken'))
+    const indexStartToken = refreshCookie?.indexOf('=')
+    const indexEndToken = refreshCookie?.indexOf(';')
+    const refreshToken = refreshCookie?.slice(indexStartToken + 1, indexEndToken)
+
+    expect(resultLogin.body.accessToken).toStrictEqual(expect.any(String))
+    expect(refreshToken).toStrictEqual(expect.any(String))
+    expect(cookies.some((cookie: string) => cookie.includes('refreshToken'))).toBeTruthy()
+
+    const refreshResult = await request.post(`${RoutesList.AUTH}/refresh-token`)
+      .set('Cookie', `refreshToken=${refreshToken}`)
+      .send({})
+      .expect(HttpStatusCode.OK_200)
+
+    expect(refreshResult.body.accessToken).toStrictEqual(expect.any(String))
+  })
+
+  it('POST /auth/logout success', async () => {
+    const createUser = await usersTestManager.createUser()
+
+    const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
+      .send({
+        loginOrEmail: createUser.body.login,
+        password: userInputMock.password,
+      })
+      .expect(HttpStatusCode.OK_200)
+
+
+    const cookies = resultLogin.headers['set-cookie']
+    const refreshCookie = cookies.find((cookie: string) => cookie.includes('refreshToken'))
+    const indexStartToken = refreshCookie?.indexOf('=')
+    const indexEndToken = refreshCookie?.indexOf(';')
+    const refreshToken = refreshCookie?.slice(indexStartToken + 1, indexEndToken)
+
+    expect(resultLogin.body.accessToken).toStrictEqual(expect.any(String))
+    expect(refreshToken).toStrictEqual(expect.any(String))
+    expect(cookies.some((cookie: string) => cookie.includes('refreshToken'))).toBeTruthy()
+
+    await request.post(`${RoutesList.AUTH}/logout`)
+      .set('Cookie', `refreshToken=${refreshToken}`)
+      .send({})
+      .expect(HttpStatusCode.NO_CONTENT_204)
+  })
 })
