@@ -1,6 +1,7 @@
 import { ResultToRouterStatus } from '../enums/ResultToRouterStatus'
+import { Request } from 'express'
 
-export interface RequestBody<B> extends Express.Request {
+export interface RequestBody<B> extends Request {
   body: B
 }
 

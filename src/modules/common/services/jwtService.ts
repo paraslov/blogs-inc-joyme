@@ -11,16 +11,16 @@ export const jwtService = {
 
     return jwt.sign({ userId: user._id }, AppSettings.ACCESS_JWT_SECRET, { expiresIn: AppSettings.ACCESS_JWT_EXPIRES })
   },
-  async createRefreshToken(user: WithId<UserDbModel>) {
+  async createRefreshToken(user: WithId<UserDbModel>, deviceId: string) {
     if (!AppSettings.REFRESH_JWT_SECRET) {
       return false
     }
 
-    return jwt.sign({ userId: user._id }, AppSettings.REFRESH_JWT_SECRET, { expiresIn: AppSettings.REFRESH_JWT_EXPIRES })
+    return jwt.sign({ userId: user._id, deviceId }, AppSettings.REFRESH_JWT_SECRET, { expiresIn: AppSettings.REFRESH_JWT_EXPIRES })
   },
-  async createTokenPair(user: WithId<UserDbModel>) {
+  async createTokenPair(user: WithId<UserDbModel>, deviceId: string) {
     const accessToken = await this.createAccessToken(user)
-    const refreshToken = await this.createRefreshToken(user)
+    const refreshToken = await this.createRefreshToken(user, deviceId)
 
     return { accessToken, refreshToken }
   },
@@ -38,5 +38,8 @@ export const jwtService = {
     } catch (err) {
       return null
     }
+  },
+  async decodeToken(token: string) {
+    return jwt.decode(token)
   }
 }
