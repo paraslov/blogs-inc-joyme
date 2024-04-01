@@ -1,5 +1,6 @@
-import { sessionsCollection, usersCollection } from '../../../../app/config/db'
+import { authSessionsCollection, usersCollection } from '../../../../app/config/db'
 import { UserDbModel } from '../../../users'
+import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authCommandRepository = {
   async registerUser(newUserRegistration: UserDbModel) {
@@ -25,16 +26,21 @@ export const authCommandRepository = {
   },
   async addRefreshTokenToBlackList(userId: string, refreshToken: string) {
     let result
-    const userSession = await sessionsCollection.findOne({ userId })
+    const userSession = await authSessionsCollection.findOne({ userId })
 
-    if (!userSession?.refreshTokensBlackList) {
-      result = await sessionsCollection.insertOne({ userId, refreshTokensBlackList: [refreshToken] })
-      return Boolean(result.insertedId.toString())
-    } else if (userSession.refreshTokensBlackList) {
-      result = await sessionsCollection.updateOne({ userId }, { $push: { refreshTokensBlackList: refreshToken } })
-      return Boolean(result.matchedCount)
-    }
+    // if (!userSession?.refreshTokensBlackList) {
+    //   result = await authSessionsCollection.insertOne({ userId, refreshTokensBlackList: [refreshToken] })
+    //   return Boolean(result.insertedId.toString())
+    // } else if (userSession.refreshTokensBlackList) {
+    //   result = await authSessionsCollection.updateOne({ userId }, { $push: { refreshTokensBlackList: refreshToken } })
+    //   return Boolean(result.matchedCount)
+    // }
 
-    return false
-  }
+    return true
+  },
+  async createAuthSession(authSession: AuthSessionsDbModel) {
+    const result = await authSessionsCollection.insertOne(authSession)
+
+    return result.insertedId
+  },
 }

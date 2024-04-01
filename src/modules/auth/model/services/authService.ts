@@ -12,9 +12,10 @@ import {
 } from '../../../common/services/errorMessagesHandleService'
 import { ResultToRouter } from '../../../common/types'
 import { operationsResultService } from '../../../common/services'
+import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authService = {
-  async createTokenPair(loginOrEmail: string, password: string) {
+  async createTokenPair(loginOrEmail: string, password: string, deviceName: string, ip: string) {
     const user = await authQueryRepository.getUserByLoginOrEmail(loginOrEmail)
     if (!user) {
       return false
@@ -26,11 +27,14 @@ export const authService = {
       return false
     }
 
-    const { accessToken, refreshToken } = await jwtService.createTokenPair(user)
+    const deviceId = uuidv4()
+    const { accessToken, refreshToken } = await jwtService.createTokenPair(user, deviceId)
 
     if (!accessToken || !refreshToken) {
       return false
     }
+
+    await this.createAuthSession(refreshToken as string, user._id.toString(), deviceName, ip)
 
     return { accessToken, refreshToken }
   },
@@ -42,14 +46,18 @@ export const authService = {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
+    }
+
     const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
     const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
     if (!isRefreshTokenValid || !userFromDb) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-
-    const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb)
+    const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb, tokenData.deviceId)
 
     if (!accessToken || !updatedRefreshToken) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
@@ -209,5 +217,31 @@ export const authService = {
       status: ResultToRouterStatus.SUCCESS,
       data: null,
     }
+  },
+  async createAuthSession(refreshToken: string, userId: string, deviceName: string, ip: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+
+    if (!tokenData) {
+      return
+    }
+
+    const authSession: AuthSessionsDbModel = {
+      userId,
+      ip,
+      deviceName,
+      deviceId: tokenData.deviceId,
+      iat: tokenData.iat!,
+      exp: tokenData.exp!,
+    }
+
+    await authCommandRepository.createAuthSession(authSession)
+  },
+  async getTokenData(refreshToken: string) {
+    const tokenData = await jwtService.decodeToken(refreshToken)
+    if (!tokenData || typeof tokenData === 'string') {
+      return null
+    }
+
+    return tokenData
   },
 }

@@ -12,7 +12,9 @@ import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
 export const authRouter = Router()
 
 authRouter.post('/login', authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
-  const tokens = await authService.createTokenPair(req.body.loginOrEmail, req.body.password)
+  const deviceName = req.headers['user-agent'] ?? 'Your device'
+  const ip = req.ip ?? 'no_ip'
+  const tokens = await authService.createTokenPair(req.body.loginOrEmail, req.body.password, deviceName, ip)
 
   if (!tokens) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
