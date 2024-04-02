@@ -6,14 +6,14 @@ import { AppSettings } from '../../../app/appSettings'
 export const jwtService = {
   async createAccessToken(user: WithId<UserDbModel>) {
     if (!AppSettings.ACCESS_JWT_SECRET) {
-      return false
+      return null
     }
 
     return jwt.sign({ userId: user._id }, AppSettings.ACCESS_JWT_SECRET, { expiresIn: AppSettings.ACCESS_JWT_EXPIRES })
   },
   async createRefreshToken(user: WithId<UserDbModel>, deviceId: string) {
     if (!AppSettings.REFRESH_JWT_SECRET) {
-      return false
+      return null
     }
 
     return jwt.sign({ userId: user._id, deviceId }, AppSettings.REFRESH_JWT_SECRET, { expiresIn: AppSettings.REFRESH_JWT_EXPIRES })
