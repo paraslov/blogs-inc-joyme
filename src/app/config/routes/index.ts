@@ -5,6 +5,7 @@ import { postsRouter } from '../../../modules/posts'
 import { usersRouter } from '../../../modules/users'
 import { authRouter } from '../../../modules/auth'
 import { commentsRouter } from '../../../modules/comments'
+import { devicesRouter } from '../../../modules/devices'
 
 const RoutesList = {
   BASE: '/',
@@ -12,6 +13,7 @@ const RoutesList = {
   POSTS: '/posts',
   USERS: '/users',
   AUTH: '/auth',
+  DEVICES: '/security/devices',
   COMMENTS: '/comments',
   VERSION: '/version',
   TESTING: '/testing',
@@ -22,6 +24,7 @@ function initAppRoutes() {
   app.use(RoutesList.POSTS, postsRouter)
   app.use(RoutesList.USERS, usersRouter)
   app.use(RoutesList.AUTH, authRouter)
+  app.use(RoutesList.DEVICES, devicesRouter)
   app.use(RoutesList.COMMENTS, commentsRouter)
   app.use(RoutesList.TESTING, testingRouter)
 
@@ -30,7 +33,7 @@ function initAppRoutes() {
   })
 
   app.get(RoutesList.VERSION, (req, res) => {
-    res.send('blogs-inc-joyme: v2.4.0')
+    res.send('blogs-inc-joyme: v3.1.0')
   })
 }
 
