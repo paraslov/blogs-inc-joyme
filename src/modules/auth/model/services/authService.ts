@@ -34,11 +34,16 @@ export const authService = {
       return false
     }
 
-    await this.createAuthSession(refreshToken as string, user._id.toString(), deviceName, ip)
+    await this.createAuthSession(refreshToken, user._id.toString(), deviceName, ip)
 
     return { accessToken, refreshToken }
   },
   async updateTokenPair(refreshToken: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
+    }
+
     const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
@@ -46,14 +51,9 @@ export const authService = {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    const tokenData = await this.getTokenData(refreshToken)
-    if (!tokenData) {
-      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
-    }
-
-    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
+    const hasAuthSession = await authQueryRepository.isAuthSessionExist(userId, tokenData.deviceId, tokenData?.iat ?? 0)
     const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
-    if (!isRefreshTokenValid || !userFromDb) {
+    if (!hasAuthSession || !userFromDb) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
@@ -63,7 +63,7 @@ export const authService = {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+    await this.updateAuthSession(userId, updatedRefreshToken)
 
     return operationsResultService.generateResponse(
       ResultToRouterStatus.SUCCESS,
@@ -71,31 +71,26 @@ export const authService = {
     )
   },
   async logoutUser(refreshToken: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
+    }
+
     const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
     if (!userId || !user) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
-
-    if (!isRefreshTokenValid) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+    const hasAuthSession = await authQueryRepository.isAuthSessionExist(userId, tokenData.deviceId, tokenData?.iat ?? 0)
+    if (!hasAuthSession) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+    await authCommandRepository.deleteAuthSession(userId, tokenData.deviceId, tokenData?.iat ?? 0)
 
-    return {
-      status: ResultToRouterStatus.SUCCESS,
-      data: null,
-    }
+    return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
   async registerUser(payload: UserInputModel) {
     const { login, email, password } = payload
@@ -235,6 +230,13 @@ export const authService = {
     }
 
     await authCommandRepository.createAuthSession(authSession)
+  },
+  async updateAuthSession(userId: string, refreshToken: string) {
+    const updatedTokenData = await this.getTokenData(refreshToken)
+    if (!updatedTokenData) {
+      return
+    }
+    await authCommandRepository.updateAuthSession(userId, updatedTokenData.deviceId, updatedTokenData?.iat ?? 0)
   },
   async getTokenData(refreshToken: string) {
     const tokenData = await jwtService.decodeToken(refreshToken)
