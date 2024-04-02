@@ -24,23 +24,31 @@ export const authCommandRepository = {
 
     return Boolean(result.modifiedCount === 1)
   },
-  async addRefreshTokenToBlackList(userId: string, refreshToken: string) {
-    let result
-    const userSession = await authSessionsCollection.findOne({ userId })
-
-    // if (!userSession?.refreshTokensBlackList) {
-    //   result = await authSessionsCollection.insertOne({ userId, refreshTokensBlackList: [refreshToken] })
-    //   return Boolean(result.insertedId.toString())
-    // } else if (userSession.refreshTokensBlackList) {
-    //   result = await authSessionsCollection.updateOne({ userId }, { $push: { refreshTokensBlackList: refreshToken } })
-    //   return Boolean(result.matchedCount)
-    // }
-
-    return true
-  },
   async createAuthSession(authSession: AuthSessionsDbModel) {
     const result = await authSessionsCollection.insertOne(authSession)
 
     return result.insertedId
   },
+  async updateAuthSession(userId: string, deviceId: string, iat: number) {
+    const result = await authSessionsCollection.updateOne({
+      userId,
+      deviceId,
+    },
+      {
+        $set: {
+          iat,
+        }
+      })
+
+    return Boolean(result.modifiedCount)
+  },
+  async deleteAuthSession(userId: string, deviceId: string, iat: number) {
+    const result = await authSessionsCollection.deleteOne({
+      userId,
+      deviceId,
+      iat,
+    })
+
+    return Boolean(result.deletedCount)
+  }
 }
