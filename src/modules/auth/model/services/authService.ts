@@ -239,11 +239,6 @@ export const authService = {
     await authCommandRepository.updateAuthSession(userId, updatedTokenData.deviceId, updatedTokenData?.iat ?? 0)
   },
   async getTokenData(refreshToken: string) {
-    const tokenData = await jwtService.decodeToken(refreshToken)
-    if (!tokenData || typeof tokenData === 'string') {
-      return null
-    }
-
-    return tokenData
+    return await jwtService.decodeToken(refreshToken)
   },
 }

@@ -2,7 +2,7 @@ import { WithId } from 'mongodb'
 import { AuthSessionsDbModel } from '../../../auth'
 import { DeviceViewModel } from '../types/DeviceViewModel'
 
-export const deviceMappers = {
+export const devicesMappers = {
   mapSessionsToDevicesView(authSessions: WithId<AuthSessionsDbModel>): DeviceViewModel {
     return {
       ip: authSessions.ip,

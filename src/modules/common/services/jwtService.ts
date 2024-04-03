@@ -40,6 +40,12 @@ export const jwtService = {
     }
   },
   async decodeToken(token: string) {
-    return jwt.decode(token)
+    const tokenData = jwt.decode(token)
+
+    if (!tokenData || typeof tokenData === 'string') {
+      return null
+    }
+
+    return tokenData
   }
 }
