@@ -8,10 +8,16 @@ import { authQueryRepository } from '../model/repositories/authQueryRepository'
 import { jwtAuthMiddleware } from '../../../app/config/middleware'
 import { UserInputModel, userInputValidation } from '../../users'
 import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
+import rateLimit from 'express-rate-limit'
 
 export const authRouter = Router()
+const limiter = rateLimit({
+  windowMs: 10000,
+  limit: 5,
+  message: 'Too many requests from this IP, please try again later',
+})
 
-authRouter.post('/login', authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
+authRouter.post('/login', limiter, authPostValidation(), async (req: RequestBody<AuthInputModel>, res: Response) => {
   const deviceName = req.headers['user-agent'] ?? 'Your device'
   const ip = req.ip ?? 'no_ip'
   const tokens = await authService.createTokenPair(req.body.loginOrEmail, req.body.password, deviceName, ip)
@@ -76,13 +82,13 @@ authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
   return res.status(HttpStatusCode.OK_200).send(user)
 })
 
-authRouter.post('/registration', userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
+authRouter.post('/registration', limiter, userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
   await authService.registerUser(req.body)
 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
-authRouter.post('/registration-confirmation', authCodeValidation(), async (req: RequestBody<{ code: string }>, res: Response) => {
+authRouter.post('/registration-confirmation', limiter, authCodeValidation(), async (req: RequestBody<{ code: string }>, res: Response) => {
   const confirmationResult = await authService.confirmUser(req.body.code)
 
   if (confirmationResult.status === ResultToRouterStatus.BAD_REQUEST) {
@@ -92,7 +98,7 @@ authRouter.post('/registration-confirmation', authCodeValidation(), async (req: 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
-authRouter.post('/registration-email-resending', resentEmailValidation(), async (req: RequestBody<{ email: string }>, res: Response) => {
+authRouter.post('/registration-email-resending', limiter, resentEmailValidation(), async (req: RequestBody<{ email: string }>, res: Response) => {
   const resendResult = await authService.resendConfirmationCode(req.body.email)
 
   if (resendResult.status === ResultToRouterStatus.BAD_REQUEST) {
