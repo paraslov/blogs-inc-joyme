@@ -7,7 +7,7 @@ import { RequestParams } from '../../common/types'
 
 export const devicesRouter = Router()
 
-devicesRouter.get('/', jwtAuthMiddleware, async (req, res) => {
+devicesRouter.get('/', async (req, res) => {
   const refreshToken = req.cookies.refreshToken
   if (!refreshToken) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
@@ -22,7 +22,7 @@ devicesRouter.get('/', jwtAuthMiddleware, async (req, res) => {
   return res.status(HttpStatusCode.OK_200).send(userDevices)
 })
 
-devicesRouter.delete('/', jwtAuthMiddleware, async (req, res) => {
+devicesRouter.delete('/', async (req, res) => {
   const refreshToken = req.cookies.refreshToken
   if (!refreshToken) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
@@ -38,7 +38,7 @@ devicesRouter.delete('/', jwtAuthMiddleware, async (req, res) => {
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
 
-devicesRouter.delete('/:deviceId', jwtAuthMiddleware, async (req: RequestParams<{ deviceId: string }>, res) => {
+devicesRouter.delete('/:deviceId', async (req: RequestParams<{ deviceId: string }>, res) => {
   const refreshToken = req.cookies.refreshToken
   if (!refreshToken) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
