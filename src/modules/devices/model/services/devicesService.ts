@@ -3,17 +3,22 @@ import { devicesQueryRepository } from '../repositories/devicesQueryRepository'
 import { devicesCommandRepository } from '../repositories/devicesCommandRepository'
 
 export const devicesService = {
-  async checkAuthSessionByRefreshToken(userId: string, refreshToken: string) {
+  async checkAuthSessionByRefreshToken(refreshToken: string) {
     const tokenData = await this.getTokenData(refreshToken)
     if (!tokenData) {
       return false
     }
 
-    const authSession = await devicesQueryRepository.isAuthSessionExist(userId, tokenData.deviceId, tokenData?.iat)
+    const authSession = await devicesQueryRepository.isAuthSessionExist(tokenData.userId, tokenData.deviceId, tokenData?.iat)
     return authSession;
   },
-  async deleteAllOtherSessions(userId: string, currentDeviceId: string) {
-    const userDevices = await devicesQueryRepository.getDevices(userId)
+  async deleteAllOtherSessions(currentDeviceId: string, refreshToken: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return false
+    }
+
+    const userDevices = await devicesQueryRepository.getDevices(tokenData.userId)
     const userDevicesIdsWithoutCurrent = userDevices
       .map((deviceData) => deviceData.deviceId)
       .filter((deviceId) => deviceId !== currentDeviceId)

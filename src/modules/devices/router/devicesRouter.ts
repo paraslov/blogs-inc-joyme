@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { jwtAuthMiddleware } from '../../../app/config/middleware'
 import { devicesQueryRepository } from '../model/repositories/devicesQueryRepository'
 import { HttpStatusCode } from '../../common/enums'
 import { devicesService } from '../model/services/devicesService'
@@ -13,8 +12,8 @@ devicesRouter.get('/', async (req, res) => {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  const hasAuthSession = await devicesService.checkAuthSessionByRefreshToken(req.userId, refreshToken)
-  if (!hasAuthSession) {
+  const authSession = await devicesService.checkAuthSessionByRefreshToken(refreshToken)
+  if (!authSession) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
@@ -28,12 +27,12 @@ devicesRouter.delete('/', async (req, res) => {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  const authSession = await devicesService.checkAuthSessionByRefreshToken(req.userId, refreshToken)
+  const authSession = await devicesService.checkAuthSessionByRefreshToken(refreshToken)
   if (!authSession) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  const deletedCount = await devicesService.deleteAllOtherSessions(req.userId, authSession.deviceId)
+  const deletedCount = await devicesService.deleteAllOtherSessions(authSession.deviceId, refreshToken)
 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
@@ -44,7 +43,7 @@ devicesRouter.delete('/:deviceId', async (req: RequestParams<{ deviceId: string 
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
 
-  const authSession = await devicesService.checkAuthSessionByRefreshToken(req.userId, refreshToken)
+  const authSession = await devicesService.checkAuthSessionByRefreshToken(refreshToken)
   if (!authSession) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
