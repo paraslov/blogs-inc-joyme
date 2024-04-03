@@ -1,11 +1,12 @@
 import { ResultToRouterStatus } from '../enums/ResultToRouterStatus'
 import { Request } from 'express'
+import * as core from 'express-serve-static-core'
 
 export interface RequestBody<B> extends Request {
   body: B
 }
 
-export interface RequestParams<P> extends Express.Request {
+export interface RequestParams<P extends core.ParamsDictionary> extends Request {
   params: P
 }
 
