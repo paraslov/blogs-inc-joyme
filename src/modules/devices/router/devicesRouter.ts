@@ -16,8 +16,7 @@ devicesRouter.get('/', async (req, res) => {
   if (!authSession) {
     return res.sendStatus(HttpStatusCode.UNAUTHORIZED_401)
   }
-
-  const userDevices = await devicesQueryRepository.getDevices(req.userId)
+  const userDevices = await devicesQueryRepository.getDevices(authSession.userId)
   return res.status(HttpStatusCode.OK_200).send(userDevices)
 })
 
