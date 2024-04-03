@@ -1,4 +1,4 @@
-import { sessionsCollection, usersCollection } from '../../../../app/config/db'
+import { authSessionsCollection, usersCollection } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 import { authMappers } from '../mappers/authMappers'
 
@@ -25,13 +25,13 @@ export const authQueryRepository = {
   async getUserByConfirmationCode(confirmationCode: string) {
     return await usersCollection.findOne({ 'confirmationData.confirmationCode': confirmationCode })
   },
-  async getIsRefreshTokenValid(userId: string, refreshToken: string) {
-    const userSession = await sessionsCollection.findOne({ userId })
+  async isAuthSessionExist(userId: string, deviceId: string, iat: number) {
+    const authSession = await authSessionsCollection.findOne({
+      userId,
+      deviceId,
+      iat,
+    })
 
-    if (!userSession) {
-      return true
-    }
-
-    return !userSession.refreshTokensBlackList.includes(refreshToken)
-  }
+    return Boolean(authSession)
+  },
 }

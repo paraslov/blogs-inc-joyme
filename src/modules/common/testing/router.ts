@@ -4,7 +4,7 @@ import {
   blogsCollection,
   commentsCollection,
   postsCollection,
-  sessionsCollection,
+  authSessionsCollection,
   usersCollection
 } from '../../../app/config/db'
 
@@ -14,7 +14,7 @@ testingRouter.delete('/all-data', async (req, res) => {
   await blogsCollection.deleteMany({})
   await postsCollection.deleteMany({})
   await usersCollection.deleteMany({})
-  await sessionsCollection.deleteMany({})
+  await authSessionsCollection.deleteMany({})
   await commentsCollection.deleteMany({})
 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)

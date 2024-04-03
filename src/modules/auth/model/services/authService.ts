@@ -12,9 +12,10 @@ import {
 } from '../../../common/services/errorMessagesHandleService'
 import { ResultToRouter } from '../../../common/types'
 import { operationsResultService } from '../../../common/services'
+import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authService = {
-  async createTokenPair(loginOrEmail: string, password: string) {
+  async createTokenPair(loginOrEmail: string, password: string, deviceName: string, ip: string) {
     const user = await authQueryRepository.getUserByLoginOrEmail(loginOrEmail)
     if (!user) {
       return false
@@ -26,15 +27,23 @@ export const authService = {
       return false
     }
 
-    const { accessToken, refreshToken } = await jwtService.createTokenPair(user)
+    const deviceId = uuidv4()
+    const { accessToken, refreshToken } = await jwtService.createTokenPair(user, deviceId)
 
     if (!accessToken || !refreshToken) {
       return false
     }
 
+    await this.createAuthSession(refreshToken, user._id.toString(), deviceName, ip)
+
     return { accessToken, refreshToken }
   },
   async updateTokenPair(refreshToken: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
+    }
+
     const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
@@ -42,20 +51,19 @@ export const authService = {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
+    const hasAuthSession = await authQueryRepository.isAuthSessionExist(userId, tokenData.deviceId, tokenData?.iat ?? 0)
     const userFromDb = await authQueryRepository.getUserByLoginOrEmail(user.email)
-    if (!isRefreshTokenValid || !userFromDb) {
+    if (!hasAuthSession || !userFromDb) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-
-    const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb)
+    const { accessToken, refreshToken: updatedRefreshToken } = await jwtService.createTokenPair(userFromDb, tokenData.deviceId)
 
     if (!accessToken || !updatedRefreshToken) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+    await this.updateAuthSession(userId, updatedRefreshToken)
 
     return operationsResultService.generateResponse(
       ResultToRouterStatus.SUCCESS,
@@ -63,31 +71,26 @@ export const authService = {
     )
   },
   async logoutUser(refreshToken: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+    if (!tokenData) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
+    }
+
     const userId = await jwtService.getUserIdByToken(refreshToken, 'refresh')
     const user = userId && await authQueryRepository.getUserMeModelById(userId)
 
     if (!userId || !user) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    const isRefreshTokenValid = await authQueryRepository.getIsRefreshTokenValid(userId, refreshToken)
-
-    if (!isRefreshTokenValid) {
-      return {
-        status: ResultToRouterStatus.NOT_AUTHORIZED,
-        data: null,
-      }
+    const hasAuthSession = await authQueryRepository.isAuthSessionExist(userId, tokenData.deviceId, tokenData?.iat ?? 0)
+    if (!hasAuthSession) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_AUTHORIZED)
     }
 
-    await authCommandRepository.addRefreshTokenToBlackList(userId, refreshToken)
+    await authCommandRepository.deleteAuthSession(userId, tokenData.deviceId, tokenData?.iat ?? 0)
 
-    return {
-      status: ResultToRouterStatus.SUCCESS,
-      data: null,
-    }
+    return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
   async registerUser(payload: UserInputModel) {
     const { login, email, password } = payload
@@ -209,5 +212,33 @@ export const authService = {
       status: ResultToRouterStatus.SUCCESS,
       data: null,
     }
+  },
+  async createAuthSession(refreshToken: string, userId: string, deviceName: string, ip: string) {
+    const tokenData = await this.getTokenData(refreshToken)
+
+    if (!tokenData) {
+      return
+    }
+
+    const authSession: AuthSessionsDbModel = {
+      userId,
+      ip,
+      deviceName,
+      deviceId: tokenData.deviceId,
+      iat: tokenData.iat!,
+      exp: tokenData.exp!,
+    }
+
+    await authCommandRepository.createAuthSession(authSession)
+  },
+  async updateAuthSession(userId: string, refreshToken: string) {
+    const updatedTokenData = await this.getTokenData(refreshToken)
+    if (!updatedTokenData) {
+      return
+    }
+    await authCommandRepository.updateAuthSession(userId, updatedTokenData.deviceId, updatedTokenData?.iat ?? 0)
+  },
+  async getTokenData(refreshToken: string) {
+    return await jwtService.decodeToken(refreshToken)
   },
 }
