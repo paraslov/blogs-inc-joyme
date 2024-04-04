@@ -10,6 +10,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     url: req.baseUrl,
     date: currentTime,
   }
+  await rateLimitCollection.insertOne(rateLimitData)
 
   // Calculate the timestamp for the start of the last 10 seconds
   const tenSecondsAgo = new Date(currentTime.getTime() - 10 * 1000);
@@ -21,13 +22,9 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
   }).toArray()
   const urlCount = urlSessions.length
 
-  console.log('@> urlCount: ', urlCount)
-
   if (urlCount > 5) {
     return res.sendStatus(HttpStatusCode.TOO_MANY_REQUESTS_429)
   }
-
-  await rateLimitCollection.insertOne(rateLimitData)
 
   return next()
 }
