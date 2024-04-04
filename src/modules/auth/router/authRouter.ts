@@ -14,6 +14,8 @@ export const authRouter = Router()
 const limiter = rateLimit({
   windowMs: 10000,
   limit: 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
   message: 'Too many requests from this IP, please try again later',
 })
 
