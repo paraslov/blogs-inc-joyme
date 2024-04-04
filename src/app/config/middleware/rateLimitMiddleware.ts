@@ -7,7 +7,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
   const currentTime = new Date();
   const rateLimitData: RateLimitModel = {
     ip: req.ip ?? 'no_ip',
-    url: req.baseUrl,
+    url: req.originalUrl,
     date: currentTime,
   }
   await rateLimitCollection.insertOne(rateLimitData)
