@@ -4,4 +4,5 @@ export const Collections = {
   USERS: 'users',
   COMMENTS: 'comments',
   SESSIONS: 'sessions',
+  RATE_LIMIT: 'rate-limit',
 }

@@ -6,7 +6,7 @@ import { BlogDbModel } from '../../../modules/blogs'
 import { PostDbModel } from '../../../modules/posts'
 import { UserDbModel } from '../../../modules/users'
 import { CommentDbModel } from '../../../modules/comments'
-import { AuthSessionsDbModel } from '../../../modules/auth'
+import { AuthSessionsDbModel, RateLimitModel } from '../../../modules/auth'
 
 export let client: MongoClient
 let blogsCollection: Collection<BlogDbModel>
@@ -14,6 +14,7 @@ let postsCollection: Collection<PostDbModel>
 let usersCollection: Collection<UserDbModel>
 let commentsCollection: Collection<CommentDbModel>
 let authSessionsCollection: Collection<AuthSessionsDbModel>
+let rateLimitCollection: Collection<RateLimitModel>
 
 async function runDb() {
   const uri = AppSettings.MONGO_URI
@@ -35,6 +36,7 @@ async function runDb() {
   usersCollection = db.collection<UserDbModel>(Collections.USERS)
   commentsCollection = db.collection<CommentDbModel>(Collections.COMMENTS)
   authSessionsCollection = db.collection<AuthSessionsDbModel>(Collections.SESSIONS)
+  rateLimitCollection = db.collection<RateLimitModel>(Collections.RATE_LIMIT)
 
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -63,4 +65,5 @@ export {
   usersCollection,
   commentsCollection,
   authSessionsCollection,
+  rateLimitCollection,
 }
