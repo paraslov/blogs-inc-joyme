@@ -1,14 +1,13 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { blogsCollection, postsCollection } from '../../../../app/config/db'
-import { ObjectId } from 'mongodb'
+import { BlogMongooseModel, postsCollection } from '../../../../app/config/db'
 import { PostDbModel } from '../../../posts'
 
 export const commandBlogsRepository = {
   async createNewBlog(newBlog: Omit<BlogViewModel, 'id'>): Promise<string> {
-    const result = await blogsCollection.insertOne(newBlog)
+    const result = await BlogMongooseModel.create(newBlog)
 
-    return result.insertedId.toString()
+    return result._id.toString()
   },
   async createNewPostForBlog(newPostData: PostDbModel) {
     const result = await postsCollection.insertOne(newPostData)
@@ -16,12 +15,12 @@ export const commandBlogsRepository = {
     return result.insertedId.toString()
   },
   async updateBlog(blogId: string, updateData: BlogInputModel) {
-    const updateResult = await blogsCollection.updateOne({ _id: new ObjectId(blogId) }, { $set: updateData })
+    const updateResult = await BlogMongooseModel.updateOne({ _id: blogId }, updateData)
 
     return Boolean(updateResult.matchedCount)
   },
   async deleteBlog(blogId: string) {
-    const deleteResult = await blogsCollection.deleteOne({ _id: new ObjectId(blogId) })
+    const deleteResult = await BlogMongooseModel.deleteOne({ _id: blogId })
 
     return Boolean(deleteResult.deletedCount)
   }
