@@ -1,5 +1,6 @@
 import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
 import mongoose from 'mongoose'
+import { BlogMongooseModel, runDbMongoose } from './mongoose/mongoose'
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
@@ -20,7 +21,10 @@ let rateLimitCollection: Collection<RateLimitModel>
 async function runDb() {
   const uri = AppSettings.MONGO_URI
   const dbName = AppSettings.DB_NAME
+
   if (!uri || !dbName) {
+    console.log('@> uri: ', uri)
+    console.log('@> dbName: ', dbName)
     throw new Error('!!! MONGODB_URI or DB_NAME not found')
   }
 
@@ -52,23 +56,6 @@ async function runDb() {
   }
 }
 
-async function runDbMongoose() {
-  const uri = AppSettings.MONGO_URI
-  const dbName = AppSettings.DB_NAME
-  if (!uri || !dbName) {
-    throw new Error('!!! MONGODB_URI or DB_NAME not found')
-  }
-
-  try {
-    await mongoose.connect(uri, { dbName })
-    console.log("Pinged your deployment. You successfully connected to mongoose!")
-  } catch (err) {
-    console.dir('!!! Can\'t connect to mongoose!', err)
-    await mongoose.disconnect()
-    console.log('Mongoose work is finished successfully')
-  }
-}
-
 const cleanup = async () => {
   await client.close()
   await mongoose.disconnect()
@@ -87,4 +74,5 @@ export {
   commentsCollection,
   authSessionsCollection,
   rateLimitCollection,
+  BlogMongooseModel,
 }
