@@ -1,5 +1,4 @@
-import { blogsCollection } from '../../../../app/config/db'
-import { ObjectId } from 'mongodb'
+import { BlogMongooseModel } from '../../../../app/config/db'
 import { blogsMappers } from '../mappers/blogsMappers'
 import { BlogQueryModel } from '../types/BlogQueryModel'
 import { BlogViewModel } from '../types/BlogViewModel'
@@ -14,14 +13,13 @@ export const queryBlogsRepository = {
       filter.name = { $regex: searchNameTerm, $options: 'i' }
     }
 
-    const foundBlogs = await blogsCollection
+    const foundBlogs = await BlogMongooseModel
       .find(filter)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray()
 
-    const totalCount = await blogsCollection.countDocuments(filter)
+    const totalCount = await BlogMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedBlogs = foundBlogs.map(blogsMappers.mapBlogToView)
 
@@ -34,7 +32,7 @@ export const queryBlogsRepository = {
     }
   },
   async getBlogById(blogId: string) {
-    const foundBlog = await blogsCollection.findOne({ _id: new ObjectId(blogId) })
+    const foundBlog = await BlogMongooseModel.findById(blogId)
     const viewModelBlog = foundBlog && blogsMappers.mapBlogToView(foundBlog)
 
     return viewModelBlog
