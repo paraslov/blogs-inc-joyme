@@ -2,8 +2,7 @@ import { RoutesList } from '../../../../app/config/routes'
 import { testBlogInput } from '../../mocks/blogsMock'
 import { HttpStatusCode } from '../../../common/enums'
 import { app } from '../../../../app/app'
-import { blogsCollection } from '../../../../app/config/db'
-import { ObjectId } from 'mongodb'
+import { BlogMongooseModel } from '../../../../app/config/db'
 
 const supertest = require('supertest')
 
@@ -31,7 +30,7 @@ class BlogsTestManager {
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
-      const blogFromDb = await blogsCollection.findOne({ _id: new ObjectId(result.body.id) })
+      const blogFromDb = await BlogMongooseModel.findOne({ _id: result.body.id })
 
       expect(result.body.name).toBe(testBlogInput.name)
       expect(result.body.websiteUrl).toBe(testBlogInput.websiteUrl)
@@ -40,7 +39,7 @@ class BlogsTestManager {
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
-      const blogsFromDb = await blogsCollection.find({}).toArray()
+      const blogsFromDb = await BlogMongooseModel.find({})
 
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)
