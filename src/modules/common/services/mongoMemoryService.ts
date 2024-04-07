@@ -10,6 +10,8 @@ function getMongoMemoryService() {
     memoryServer = await MongoMemoryServer.create()
     AppSettings.MONGO_URI = memoryServer.getUri()
     AppSettings.DB_NAME = 'memoryServerDbName'
+    AppSettings.ACCESS_JWT_SECRET = 'mSAS'
+    AppSettings.REFRESH_JWT_SECRET = 'mSRS'
 
     await runDb()
     await runDbMongoose()
