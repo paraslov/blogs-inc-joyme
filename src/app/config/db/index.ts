@@ -1,4 +1,5 @@
 import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
+import mongoose from 'mongoose'
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
@@ -18,8 +19,9 @@ let rateLimitCollection: Collection<RateLimitModel>
 
 async function runDb() {
   const uri = AppSettings.MONGO_URI
-  if (!uri) {
-    throw new Error('!!! MONGODB_URI not found')
+  const dbName = AppSettings.DB_NAME
+  if (!uri || !dbName) {
+    throw new Error('!!! MONGODB_URI or DB_NAME not found')
   }
 
   client = new MongoClient(uri, {
@@ -30,7 +32,7 @@ async function runDb() {
     }
   });
 
-  const db = client.db(process.env.MONGO_DB_NAME)
+  const db = client.db(dbName)
   blogsCollection = db.collection<BlogDbModel>(Collections.BLOGS)
   postsCollection = db.collection<PostDbModel>(Collections.POSTS)
   usersCollection = db.collection<UserDbModel>(Collections.USERS)
@@ -50,8 +52,26 @@ async function runDb() {
   }
 }
 
+async function runDbMongoose() {
+  const uri = AppSettings.MONGO_URI
+  const dbName = AppSettings.DB_NAME
+  if (!uri || !dbName) {
+    throw new Error('!!! MONGODB_URI or DB_NAME not found')
+  }
+
+  try {
+    await mongoose.connect(uri, { dbName })
+    console.log("Pinged your deployment. You successfully connected to mongoose!")
+  } catch (err) {
+    console.dir('!!! Can\'t connect to mongoose!', err)
+    await mongoose.disconnect()
+    console.log('Mongoose work is finished successfully')
+  }
+}
+
 const cleanup = async () => {
   await client.close()
+  await mongoose.disconnect()
   process.exit()
 }
 
@@ -60,6 +80,7 @@ process.on('SIGTERM', cleanup)
 
 export {
   runDb,
+  runDbMongoose,
   blogsCollection,
   postsCollection,
   usersCollection,
