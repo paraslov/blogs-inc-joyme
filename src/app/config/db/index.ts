@@ -4,6 +4,7 @@ import {
   BlogsMongooseModel,
   PostsMongooseModel,
   CommentsMongooseModel,
+  UsersMongooseModel,
   runDbMongoose
 } from './mongoose/mongoose'
 import 'dotenv/config'
@@ -70,4 +71,5 @@ export {
   BlogsMongooseModel,
   PostsMongooseModel,
   CommentsMongooseModel,
+  UsersMongooseModel,
 }

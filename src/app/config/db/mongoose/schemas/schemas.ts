@@ -4,10 +4,22 @@ import { BlogDbModel } from '../../../../../modules/blogs'
 import { PostDbModel } from '../../../../../modules/posts'
 import { CommentDbModel } from '../../../../../modules/comments'
 import { CommentatorInfoModel } from '../../../../../modules/comments/model/types/CommentatorInfoModel'
+import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../../modules/users'
 
 const CommentatorSchema = new mongoose.Schema<WithId<CommentatorInfoModel>>({
   userId: { type: String, required: true },
   userLogin: { type: String, required: true },
+})
+const UserDataSchema = new mongoose.Schema<WithId<UserDataModel>>({
+  login: { type: String, required: true },
+  email: { type: String, required: true },
+  passwordHash: { type: String, required: true },
+  createdAt: { type: Date },
+})
+const ConfirmationInfoSchema = new mongoose.Schema<WithId<ConfirmationInfoModel>>({
+  confirmationCode: { type: String, required: true },
+  confirmationCodeExpirationDate: { type: Date, required: true },
+  isConfirmed: { type: Boolean, required: true },
 })
 
 export const MongooseSchemas = {
@@ -31,5 +43,9 @@ export const MongooseSchemas = {
     content: { type: String, required: true },
     commentatorInfo: CommentatorSchema,
     createdAt: { type: String, required: true },
+  }),
+  UsersSchema: new mongoose.Schema<WithId<UserDbModel>>({
+    userData: UserDataSchema,
+    confirmationData: ConfirmationInfoSchema,
   }),
 }
