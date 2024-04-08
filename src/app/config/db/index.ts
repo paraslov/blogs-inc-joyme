@@ -1,6 +1,11 @@
 import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
 import mongoose from 'mongoose'
-import { BlogsMongooseModel, PostsMongooseModel, runDbMongoose } from './mongoose/mongoose'
+import {
+  BlogsMongooseModel,
+  PostsMongooseModel,
+  CommentsMongooseModel,
+  runDbMongoose
+} from './mongoose/mongoose'
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
@@ -68,4 +73,5 @@ export {
   rateLimitCollection,
   BlogsMongooseModel,
   PostsMongooseModel,
+  CommentsMongooseModel,
 }
