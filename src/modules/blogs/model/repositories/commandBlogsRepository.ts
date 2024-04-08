@@ -1,6 +1,6 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { BlogsMongooseModel, postsCollection } from '../../../../app/config/db'
+import { BlogsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
 import { PostDbModel } from '../../../posts'
 
 export const commandBlogsRepository = {
@@ -10,9 +10,9 @@ export const commandBlogsRepository = {
     return result._id.toString()
   },
   async createNewPostForBlog(newPostData: PostDbModel) {
-    const result = await postsCollection.insertOne(newPostData)
+    const result = await PostsMongooseModel.create(newPostData)
 
-    return result.insertedId.toString()
+    return result._id.toString()
   },
   async updateBlog(blogId: string, updateData: BlogInputModel) {
     const updateResult = await BlogsMongooseModel.updateOne({ _id: blogId }, updateData)
