@@ -1,11 +1,11 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { BlogMongooseModel, postsCollection } from '../../../../app/config/db'
+import { BlogsMongooseModel, postsCollection } from '../../../../app/config/db'
 import { PostDbModel } from '../../../posts'
 
 export const commandBlogsRepository = {
   async createNewBlog(newBlog: Omit<BlogViewModel, 'id'>): Promise<string> {
-    const result = await BlogMongooseModel.create(newBlog)
+    const result = await BlogsMongooseModel.create(newBlog)
 
     return result._id.toString()
   },
@@ -15,12 +15,12 @@ export const commandBlogsRepository = {
     return result.insertedId.toString()
   },
   async updateBlog(blogId: string, updateData: BlogInputModel) {
-    const updateResult = await BlogMongooseModel.updateOne({ _id: blogId }, updateData)
+    const updateResult = await BlogsMongooseModel.updateOne({ _id: blogId }, updateData)
 
     return Boolean(updateResult.matchedCount)
   },
   async deleteBlog(blogId: string) {
-    const deleteResult = await BlogMongooseModel.deleteOne({ _id: blogId })
+    const deleteResult = await BlogsMongooseModel.deleteOne({ _id: blogId })
 
     return Boolean(deleteResult.deletedCount)
   }

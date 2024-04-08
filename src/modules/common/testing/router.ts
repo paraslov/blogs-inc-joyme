@@ -6,13 +6,13 @@ import {
   authSessionsCollection,
   usersCollection,
   rateLimitCollection,
-  BlogMongooseModel,
+  BlogsMongooseModel,
 } from '../../../app/config/db'
 
 export const testingRouter = Router()
 
 testingRouter.delete('/all-data', async (req, res) => {
-  await BlogMongooseModel.deleteMany({})
+  await BlogsMongooseModel.deleteMany({})
   await postsCollection.deleteMany({})
   await usersCollection.deleteMany({})
   await authSessionsCollection.deleteMany({})

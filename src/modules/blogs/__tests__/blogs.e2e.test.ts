@@ -3,7 +3,7 @@ import { RoutesList } from '../../../app/config/routes'
 import { HttpStatusCode } from '../../common/enums'
 import { testBlog, testBlogInput, testUpdateBlogInput, wrongBLogId } from '../mocks/blogsMock'
 import { blogsTestManager } from '../utils/testing/blogsTestManager'
-import { BlogMongooseModel } from '../../../app/config/db'
+import { BlogsMongooseModel } from '../../../app/config/db'
 import { memoryService } from '../../common/services'
 
 const supertest = require('supertest')
@@ -139,7 +139,7 @@ describe('/blogs route POST tests: ', () => {
     await blogsTestManager.createBlog({ user: 'admin', password: 'wrongPass', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
     await blogsTestManager.createBlog({ user: 'wrongUser', password: 'qwerty', expectedStatusCode: HttpStatusCode.UNAUTHORIZED_401 })
 
-    const blogs = await BlogMongooseModel.find({})
+    const blogs = await BlogsMongooseModel.find({})
 
     expect(blogs.length).toBe(0)
   })
@@ -199,7 +199,7 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    const blog = await BlogMongooseModel.findOne({ _id: createdBlog.body.id })
+    const blog = await BlogsMongooseModel.findOne({ _id: createdBlog.body.id })
 
     expect(blog?.name).toBe(testUpdateBlogInput.name)
     expect(blog?._id.toString()).toBe(createdBlog.body.id)
@@ -214,7 +214,7 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    const blog = await BlogMongooseModel.findOne({ _id: createdBlog.body.id })
+    const blog = await BlogsMongooseModel.findOne({ _id: createdBlog.body.id })
 
     expect(blog?.name).toBe(testBlogInput.name)
   })
@@ -227,7 +227,7 @@ describe('/blogs route PUT tests: ', () => {
       .send(testUpdateBlogInput)
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    const blog = await BlogMongooseModel.findOne({ _id: createdBlog.body.id })
+    const blog = await BlogsMongooseModel.findOne({ _id: createdBlog.body.id })
 
     expect(blog?.name).toBe(createdBlog.body.name)
     expect(blog?.websiteUrl).not.toBe(testUpdateBlogInput.websiteUrl)
@@ -253,7 +253,7 @@ describe('/blogs route DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    const blogs = await BlogMongooseModel.find({})
+    const blogs = await BlogsMongooseModel.find({})
 
     expect(blogs.length).toBe(0)
   })
@@ -265,7 +265,7 @@ describe('/blogs route DELETE tests: ', () => {
       .auth('failed', 'password')
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    const blogs = await BlogMongooseModel.find({})
+    const blogs = await BlogsMongooseModel.find({})
 
     expect(blogs.length).toBe(1)
   })
@@ -277,7 +277,7 @@ describe('/blogs route DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    const blogs = await BlogMongooseModel.find({})
+    const blogs = await BlogsMongooseModel.find({})
 
     expect(blogs.length).toBe(1)
   })
