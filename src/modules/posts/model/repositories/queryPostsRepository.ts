@@ -1,4 +1,4 @@
-import { commentsCollection, PostsMongooseModel } from '../../../../app/config/db'
+import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
 import { postsMappers } from '../mappers/postsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
@@ -38,14 +38,13 @@ export const queryPostsRepository = {
     const { pageNumber, pageSize, sortBy, sortDirection} = queryParams
     const filter = { postId: postId }
 
-    const foundComments = await commentsCollection
+    const foundComments = await CommentsMongooseModel
       .find(filter)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray()
 
-    const totalCount = await commentsCollection.countDocuments(filter)
+    const totalCount = await CommentsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedComments = foundComments.map(commentsMappers.mapCommentDtoToViewModel)
 

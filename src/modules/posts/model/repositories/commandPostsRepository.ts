@@ -1,5 +1,5 @@
 import { PostInputModel } from '../types/PostInputModel'
-import { commentsCollection, PostsMongooseModel } from '../../../../app/config/db'
+import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
 import { PostDbModel } from '../types/PostDbModel'
 import { CommentDbModel } from '../../../comments'
 
@@ -10,9 +10,9 @@ export const commandPostsRepository = {
     return result._id.toString()
   },
   async createCommentToPost(newComment: CommentDbModel) {
-    const result = await commentsCollection.insertOne(newComment)
+    const result = await CommentsMongooseModel.create(newComment)
 
-    return result.insertedId.toString()
+    return result._id.toString()
   },
   async updatePost(updatePostData: PostInputModel, postId: string) {
     const updateResult = await PostsMongooseModel.updateOne({ _id: postId }, updatePostData)

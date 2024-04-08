@@ -15,8 +15,6 @@ export async function runDbMongoose() {
   const uri = AppSettings.MONGO_URI
   const dbName = AppSettings.DB_NAME
   if (!uri || !dbName) {
-    console.log('@> uri: ', uri)
-    console.log('@> dbName: ', dbName)
     throw new Error('!!! MONGODB_URI or DB_NAME not found')
   }
 
