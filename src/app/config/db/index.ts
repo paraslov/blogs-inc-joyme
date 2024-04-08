@@ -4,13 +4,11 @@ import { BlogsMongooseModel, PostsMongooseModel, runDbMongoose } from './mongoos
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
-import { PostDbModel } from '../../../modules/posts'
 import { UserDbModel } from '../../../modules/users'
 import { CommentDbModel } from '../../../modules/comments'
 import { AuthSessionsDbModel, RateLimitModel } from '../../../modules/auth'
 
 export let client: MongoClient
-let postsCollection: Collection<PostDbModel>
 let usersCollection: Collection<UserDbModel>
 let commentsCollection: Collection<CommentDbModel>
 let authSessionsCollection: Collection<AuthSessionsDbModel>
@@ -35,7 +33,6 @@ async function runDb() {
   });
 
   const db = client.db(dbName)
-  postsCollection = db.collection<PostDbModel>(Collections.POSTS)
   usersCollection = db.collection<UserDbModel>(Collections.USERS)
   commentsCollection = db.collection<CommentDbModel>(Collections.COMMENTS)
   authSessionsCollection = db.collection<AuthSessionsDbModel>(Collections.SESSIONS)
@@ -65,7 +62,6 @@ process.on('SIGTERM', cleanup)
 export {
   runDb,
   runDbMongoose,
-  postsCollection,
   usersCollection,
   commentsCollection,
   authSessionsCollection,
