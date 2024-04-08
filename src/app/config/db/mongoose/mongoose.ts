@@ -9,7 +9,7 @@ import { CommentDbModel } from '../../../../modules/comments'
 
 export const BlogsMongooseModel = mongoose.model<WithId<BlogDbModel>>(Collections.BLOGS, MongooseSchemas.BlogsSchema)
 export const PostsMongooseModel = mongoose.model<WithId<PostDbModel>>(Collections.POSTS, MongooseSchemas.PostsSchema)
-export const CommentsMongooseModel = mongoose.model<WithId<CommentDbModel>>(Collections.POSTS, MongooseSchemas.CommentsSchema)
+export const CommentsMongooseModel = mongoose.model<WithId<CommentDbModel>>(Collections.COMMENTS, MongooseSchemas.CommentsSchema)
 
 export async function runDbMongoose() {
   const uri = AppSettings.MONGO_URI
