@@ -1,5 +1,4 @@
-import { commentsCollection, postsCollection } from '../../../../app/config/db'
-import { ObjectId } from 'mongodb'
+import { commentsCollection, PostsMongooseModel } from '../../../../app/config/db'
 import { postsMappers } from '../mappers/postsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
@@ -17,14 +16,13 @@ export const queryPostsRepository = {
       filter.blogId = blogId
     }
 
-    const foundPosts = await postsCollection
+    const foundPosts = await PostsMongooseModel
       .find(filter)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray()
 
-    const totalCount = await postsCollection.countDocuments(filter)
+    const totalCount = await PostsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const mappedBlogs = foundPosts.map(postsMappers.mapDbPostsIntoView)
 
@@ -60,7 +58,7 @@ export const queryPostsRepository = {
     }
   },
   async getPostById(postId: string) {
-    const foundPost = await postsCollection.findOne({ _id: new ObjectId(postId) })
+    const foundPost = await PostsMongooseModel.findById(postId)
     const mappedPost = foundPost && postsMappers.mapDbPostsIntoView(foundPost)
 
     return mappedPost

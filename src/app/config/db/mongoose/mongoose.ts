@@ -4,9 +4,10 @@ import { BlogDbModel } from '../../../../modules/blogs'
 import { WithId } from 'mongodb'
 import { Collections } from '../config'
 import { MongooseSchemas } from './schemas/schemas'
+import { PostDbModel } from '../../../../modules/posts'
 
 export const BlogsMongooseModel = mongoose.model<WithId<BlogDbModel>>(Collections.BLOGS, MongooseSchemas.BlogsSchema)
-export const PostsMongooseModel = mongoose.model<WithId<BlogDbModel>>(Collections.POSTS, MongooseSchemas.PostsSchema)
+export const PostsMongooseModel = mongoose.model<WithId<PostDbModel>>(Collections.POSTS, MongooseSchemas.PostsSchema)
 
 export async function runDbMongoose() {
   const uri = AppSettings.MONGO_URI
