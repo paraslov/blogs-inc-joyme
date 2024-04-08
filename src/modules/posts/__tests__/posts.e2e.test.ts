@@ -4,7 +4,7 @@ import { HttpStatusCode } from '../../common/enums'
 import { postsTestManager } from '../utils/testing/postsTestManager'
 import { testBlog } from '../../blogs'
 import { postWrongId, testPostInput } from '../mocks/postsMock'
-import { postsCollection } from '../../../app/config/db'
+import { PostsMongooseModel } from '../../../app/config/db'
 import { memoryService } from '../../common/services'
 import { usersTestManager } from '../../users/utils/testing/usersTestManager'
 import { userInputMock } from '../../users'
@@ -275,7 +275,7 @@ describe('/posts DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NO_CONTENT_204)
 
-    const posts = await postsCollection.find({}).toArray()
+    const posts = await PostsMongooseModel.find({})
 
     expect(posts.length).toBe(0)
   })
@@ -287,7 +287,7 @@ describe('/posts DELETE tests: ', () => {
       .auth('wrong', 'auth')
       .expect(HttpStatusCode.UNAUTHORIZED_401)
 
-    const posts = await postsCollection.find({}).toArray()
+    const posts = await PostsMongooseModel.find({})
 
     expect(posts.length).toBe(1)
   })
@@ -299,9 +299,8 @@ describe('/posts DELETE tests: ', () => {
       .auth('admin', 'qwerty')
       .expect(HttpStatusCode.NOT_FOUND_404)
 
-    const posts = await postsCollection.find({}).toArray()
+    const posts = await PostsMongooseModel.find({})
 
     expect(posts.length).toBe(1)
-
   })
 })
