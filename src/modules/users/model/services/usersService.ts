@@ -17,7 +17,7 @@ export const usersService = {
       createdAt: new Date().toISOString(),
     }
     const confirmationData: ConfirmationInfoModel = {
-      confirmationCode: '',
+      confirmationCode: 'default_code',
       confirmationCodeExpirationDate: new Date(),
       isConfirmed: true,
     }
