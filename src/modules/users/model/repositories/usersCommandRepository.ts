@@ -1,15 +1,14 @@
-import { usersCollection } from '../../../../app/config/db'
+import { UsersMongooseModel } from '../../../../app/config/db'
 import { UserDbModel } from '../types/UserDbModel'
-import { ObjectId } from 'mongodb'
 
 export const usersCommandRepository = {
   async createUser(newUser: UserDbModel): Promise<string> {
-    const createUserData = await usersCollection.insertOne(newUser)
+    const createUserData = await UsersMongooseModel.create(newUser)
 
-    return createUserData.insertedId.toString()
+    return createUserData._id.toString()
   },
   async deleteUser(userId: string) {
-    const deleteResult = await usersCollection.deleteOne({ _id: new ObjectId(userId)})
+    const deleteResult = await UsersMongooseModel.deleteOne({ _id: userId })
 
     return Boolean(deleteResult.deletedCount)
   }
