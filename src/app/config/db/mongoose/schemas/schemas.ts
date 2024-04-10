@@ -20,6 +20,9 @@ const ConfirmationInfoSchema = new mongoose.Schema<WithId<ConfirmationInfoModel>
   confirmationCode: { type: String, required: true },
   confirmationCodeExpirationDate: { type: Date, required: true },
   isConfirmed: { type: Boolean, required: true },
+  passwordRecoveryCode: { type: String },
+  passwordRecoveryCodeExpirationDate: { type: Date },
+  isPasswordRecoveryConfirmed: { type: Boolean },
 })
 
 export const MongooseSchemas = {
