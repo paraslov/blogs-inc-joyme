@@ -10,11 +10,9 @@ import {
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
-import { UserDbModel } from '../../../modules/users'
 import { AuthSessionsDbModel, RateLimitModel } from '../../../modules/auth'
 
 export let client: MongoClient
-let usersCollection: Collection<UserDbModel>
 let authSessionsCollection: Collection<AuthSessionsDbModel>
 let rateLimitCollection: Collection<RateLimitModel>
 
@@ -37,7 +35,6 @@ async function runDb() {
   });
 
   const db = client.db(dbName)
-  usersCollection = db.collection<UserDbModel>(Collections.USERS)
   authSessionsCollection = db.collection<AuthSessionsDbModel>(Collections.SESSIONS)
   rateLimitCollection = db.collection<RateLimitModel>(Collections.RATE_LIMIT)
 
@@ -65,7 +62,6 @@ process.on('SIGTERM', cleanup)
 export {
   runDb,
   runDbMongoose,
-  usersCollection,
   authSessionsCollection,
   rateLimitCollection,
   BlogsMongooseModel,
