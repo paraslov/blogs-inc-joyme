@@ -14,7 +14,10 @@ const emailValidation = body('email')
   .notEmpty()
   .isEmail().withMessage('Should be a valid email')
 
-const emailResetValidation = emailValidation
+const emailResetValidation = body('email')
+  .isString()
+  .notEmpty()
+  .isEmail().withMessage('Should be a valid email')
   .custom(hasEmailCheck).withMessage('You have not registered yet')
 
 export const authPostValidation = () => [ loginOrEmailValidation, passwordValidation, inputValidationMiddleware ]
