@@ -1,11 +1,13 @@
 import { inputValidationMiddleware } from '../../../app/config/middleware'
-import { notEmptyString } from '../../common/validations'
+import { notEmptyString, stringWithLengthValidation } from '../../common/validations'
 import { body } from 'express-validator'
 import { UsersMongooseModel } from '../../../app/config/db'
 
 const loginOrEmailValidation = notEmptyString('loginOrEmail')
 const passwordValidation = notEmptyString('password')
+const passwordValidationWithLength = stringWithLengthValidation('newPassword', { min: 6, max: 20 })
 const codeValidation = notEmptyString('code')
+const recoveryCodeValidation = notEmptyString('recoveryCode')
 
 const emailValidation = body('email')
   .isString()
@@ -19,6 +21,7 @@ export const authPostValidation = () => [ loginOrEmailValidation, passwordValida
 export const authCodeValidation = () => [ codeValidation, inputValidationMiddleware ]
 export const resentEmailValidation = () => [ emailResetValidation, inputValidationMiddleware ]
 export const isEmailValidation = () => [ emailValidation, inputValidationMiddleware ]
+export const passwordRecoveryValidation = () => [ recoveryCodeValidation, passwordValidationWithLength, inputValidationMiddleware ]
 
 async function hasEmailCheck(email: string) {
   const user = await UsersMongooseModel.findOne({ 'userData.email': email })

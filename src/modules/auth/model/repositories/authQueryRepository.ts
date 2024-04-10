@@ -24,6 +24,9 @@ export const authQueryRepository = {
   async getUserByConfirmationCode(confirmationCode: string) {
     return UsersMongooseModel.findOne({ 'confirmationData.confirmationCode': confirmationCode })
   },
+  async getUserByPasswordRecoveryConfirmationCode(recoveryCode: string) {
+    return UsersMongooseModel.findOne({ 'confirmationData.passwordRecoveryCode': recoveryCode })
+  },
   async isAuthSessionExist(userId: string, deviceId: string, iat: number) {
     const authSession = await authSessionsCollection.findOne({
       userId,
