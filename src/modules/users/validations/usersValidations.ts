@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 import { stringWithLengthValidation } from '../../common/validations'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
-import { usersCollection } from '../../../app/config/db'
+import { UsersMongooseModel } from '../../../app/config/db'
 
 const loginValidation = stringWithLengthValidation('login', { min: 3, max: 10 })
   .matches(/^[a-zA-Z0-9_-]*$/).withMessage('Login should be latin letters and numbers')
@@ -23,7 +23,7 @@ export const userInputValidation = () => [
 ]
 
 async function uniqueLoginCheck(login: string) {
-  const user = await usersCollection.findOne({ 'userData.login': login })
+  const user = await UsersMongooseModel.findOne({ 'userData.login': login })
 
   if (user) {
     throw new Error(`This login is already exists`)
@@ -31,7 +31,7 @@ async function uniqueLoginCheck(login: string) {
 }
 
 async function uniqueEmailCheck(email: string) {
-  const user = await usersCollection.findOne({ 'userData.email': email })
+  const user = await UsersMongooseModel.findOne({ 'userData.email': email })
   if (user) {
     throw new Error(`This login is already exists`)
   }

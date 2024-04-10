@@ -1,7 +1,7 @@
 import { inputValidationMiddleware } from '../../../app/config/middleware'
 import { notEmptyString } from '../../common/validations'
 import { body } from 'express-validator'
-import { usersCollection } from '../../../app/config/db'
+import { UsersMongooseModel } from '../../../app/config/db'
 
 const loginOrEmailValidation = notEmptyString('loginOrEmail')
 const passwordValidation = notEmptyString('password')
@@ -18,7 +18,7 @@ export const authCodeValidation = () => [ codeValidation, inputValidationMiddlew
 export const resentEmailValidation = () => [ emailValidation, inputValidationMiddleware ]
 
 async function hasEmailCheck(email: string) {
-  const user = await usersCollection.findOne({ 'userData.email': email })
+  const user = await UsersMongooseModel.findOne({ 'userData.email': email })
   if (!user) {
     throw new Error(`You have not registered yet`)
   }
