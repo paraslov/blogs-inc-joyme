@@ -1,4 +1,4 @@
-import { cryptService, jwtService } from '../../../common/services'
+import { cryptService, jwtService, operationsResultService } from '../../../common/services'
 import { ConfirmationInfoModel, UserDataModel, UserDbModel, UserInputModel } from '../../../users'
 import { v4 as uuidv4 } from 'uuid'
 import { add } from 'date-fns'
@@ -11,7 +11,6 @@ import {
   errorMessagesHandleService
 } from '../../../common/services/errorMessagesHandleService'
 import { ResultToRouter } from '../../../common/types'
-import { operationsResultService } from '../../../common/services'
 import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authService = {
@@ -124,6 +123,78 @@ export const authService = {
     } catch (err) {
       console.error('@> Error::emailManager: ', err)
     }
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: null,
+    }
+  },
+  async sendPasswordRecoveryEmail(email: string) {
+    const user = await authQueryRepository.getUserByLoginOrEmail(email)
+
+    if (!user) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
+    }
+
+    const updateUserData: UserDbModel = {
+      ...user,
+      confirmationData: {
+        ...user.confirmationData,
+        passwordRecoveryCode: uuidv4(),
+        passwordRecoveryCodeExpirationDate: add(new Date(), {
+          hours: 1,
+          minutes: 1,
+        }),
+        isPasswordRecoveryConfirmed: false,
+      }
+    }
+
+    await authCommandRepository.updateUser({ 'userData.email': email }, updateUserData)
+
+    try {
+      const mailInfo = await emailManager.sendPasswordRecoveryEmail(email, updateUserData.confirmationData.passwordRecoveryCode!)
+      console.log('@> Information::mailInfo: ', mailInfo)
+    } catch (err) {
+      console.error('@> Error::emailManager: ', err)
+    }
+
+    return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
+  },
+  async recoverUserPassword(newPassword: string, recoveryCode: string) {
+    const userToConfirm = await authQueryRepository.getUserByPasswordRecoveryConfirmationCode(recoveryCode)
+
+    if (!userToConfirm || userToConfirm.confirmationData.passwordRecoveryCode !== recoveryCode) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Incorrect verification code', field: 'recoveryCode' }),
+      }
+    }
+    if (userToConfirm.confirmationData.isPasswordRecoveryConfirmed) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Registration was already confirmed', field: 'recoveryCode' }),
+      }
+    }
+    if (userToConfirm.confirmationData.passwordRecoveryCodeExpirationDate && userToConfirm.confirmationData.passwordRecoveryCodeExpirationDate < new Date()) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Confirmation code expired', field: 'recoveryCode' }),
+      }
+    }
+
+    const passwordHash = await cryptService.generateHash(newPassword)
+    const updatedUser: UserDbModel = {
+      userData: {
+        ...userToConfirm.userData,
+        passwordHash
+      },
+      confirmationData: {
+        ...userToConfirm.confirmationData,
+        isPasswordRecoveryConfirmed: true,
+      }
+    }
+
+    await authCommandRepository.updateUser({ 'userData.email': userToConfirm.userData.email }, updatedUser)
 
     return {
       status: ResultToRouterStatus.SUCCESS,

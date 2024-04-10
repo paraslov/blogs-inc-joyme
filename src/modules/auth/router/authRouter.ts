@@ -3,11 +3,18 @@ import { RequestBody } from '../../common/types'
 import { AuthInputModel } from '../model/types/AuthInputModel'
 import { authService } from '../model/services/authService'
 import { HttpStatusCode } from '../../common/enums'
-import { authCodeValidation, authPostValidation, resentEmailValidation } from '../validations/authValidations'
+import {
+  authCodeValidation,
+  authPostValidation,
+  isEmailValidation,
+  passwordRecoveryValidation,
+  resentEmailValidation,
+} from '../validations/authValidations'
 import { authQueryRepository } from '../model/repositories/authQueryRepository'
 import { jwtAuthMiddleware, rateLimitMiddleware } from '../../../app/config/middleware'
 import { UserInputModel, userInputValidation } from '../../users'
 import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'
+import { NewPasswordRecoveryInputModel } from '../model/types/NewPasswordRecoveryInputModel'
 
 export const authRouter = Router()
 
@@ -78,6 +85,23 @@ authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
 
 authRouter.post('/registration', rateLimitMiddleware, userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
   await authService.registerUser(req.body)
+
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})
+
+authRouter.post('/password-recovery', rateLimitMiddleware, isEmailValidation(), async (req: RequestBody<{ email: string }>, res: Response) => {
+
+  await authService.sendPasswordRecoveryEmail(req.body.email)
+
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})
+
+authRouter.post('/new-password', rateLimitMiddleware, passwordRecoveryValidation(), async (req: RequestBody<NewPasswordRecoveryInputModel>, res: Response) => {
+  const recoveryResult = await authService.recoverUserPassword(req.body.newPassword, req.body.recoveryCode)
+
+  if (recoveryResult.status === ResultToRouterStatus.BAD_REQUEST) {
+    return res.status(HttpStatusCode.BAD_REQUEST_400).send(recoveryResult.data)
+  }
 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })

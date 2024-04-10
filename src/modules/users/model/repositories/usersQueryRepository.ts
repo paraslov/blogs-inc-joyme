@@ -1,6 +1,5 @@
-import { ObjectId } from 'mongodb'
 import { UsersQueryModel } from '../types/UsersQueryModel'
-import { usersCollection } from '../../../../app/config/db'
+import { UsersMongooseModel } from '../../../../app/config/db'
 import { usersMappers } from '../mappers/usersMappers'
 
 export const usersQueryRepository = {
@@ -25,14 +24,13 @@ export const usersQueryRepository = {
       filter = {}
     }
 
-    const foundUsers = await usersCollection
+    const foundUsers = await UsersMongooseModel
       .find(filter)
       .sort({ [queryParams.sortBy]: queryParams.sortDirection === 'asc' ? 1 : -1 })
       .skip((queryParams.pageNumber - 1) * queryParams.pageSize)
       .limit(queryParams.pageSize)
-      .toArray()
 
-    const totalCount = await usersCollection.countDocuments(filter)
+    const totalCount = await UsersMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / queryParams.pageSize)
     const mappedUsers = foundUsers.map(usersMappers.mapUserDbToViewDTO)
 
@@ -45,7 +43,7 @@ export const usersQueryRepository = {
     }
   },
   async getUserById(userId: string) {
-    const foundUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+    const foundUser = await UsersMongooseModel.findOne({ _id: userId })
 
     return foundUser && usersMappers.mapUserDbToViewDTO(foundUser)
   },

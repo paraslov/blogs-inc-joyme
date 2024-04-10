@@ -2,9 +2,8 @@ import { RoutesList } from '../../../../app/config/routes'
 import { HttpStatusCode } from '../../../common/enums'
 import { app } from '../../../../app/app'
 import { testPostInput } from '../../mocks/postsMock'
-import { postsCollection } from '../../../../app/config/db'
+import { PostsMongooseModel } from '../../../../app/config/db'
 import { blogsTestManager } from '../../../blogs/utils/testing/blogsTestManager'
-import { ObjectId } from 'mongodb'
 import { usersTestManager } from '../../../users/utils/testing/usersTestManager'
 import { userInputMock } from '../../../users'
 
@@ -39,7 +38,7 @@ class PostsTestManager {
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
-      const post = await postsCollection.findOne({ _id: new ObjectId(result.body.id) })
+      const post = await PostsMongooseModel.findOne({ _id: result.body.id })
 
       expect(result.body.title).toBe(testPostInput.title)
       expect(result.body.blogId).toBe(createdBlog.body.id)
@@ -48,7 +47,7 @@ class PostsTestManager {
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
-      const posts = await postsCollection.find({}).toArray()
+      const posts = await PostsMongooseModel.find({})
 
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)

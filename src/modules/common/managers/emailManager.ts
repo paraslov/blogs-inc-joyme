@@ -11,4 +11,9 @@ export const emailManager = {
 
     return await emailService.sendEmail(emailTemplate)
   },
+  async sendPasswordRecoveryEmail(email: string, confirmationCode: string) {
+    const emailTemplate = mailTemplatesService.getPasswordRecoveryMailTemplate(email, confirmationCode)
+
+    return await emailService.sendEmail(emailTemplate)
+  },
 }

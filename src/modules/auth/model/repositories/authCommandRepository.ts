@@ -1,25 +1,22 @@
-import { authSessionsCollection, usersCollection } from '../../../../app/config/db'
+import { authSessionsCollection, UsersMongooseModel } from '../../../../app/config/db'
 import { UserDbModel } from '../../../users'
 import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authCommandRepository = {
   async registerUser(newUserRegistration: UserDbModel) {
-    const result = await usersCollection.insertOne(newUserRegistration)
+    const result = await UsersMongooseModel.create(newUserRegistration)
 
-    return result.insertedId.toString()
+    return result._id.toString()
   },
   async updateUser(filter: any, updateUser: UserDbModel) {
-    const result = await usersCollection.updateOne(
-      filter,
-      { $set: updateUser },
-    )
+    const result = await UsersMongooseModel.updateOne(filter, updateUser)
 
     return Boolean(result.modifiedCount === 1)
   },
   async confirmUser(confirmationCode: string) {
-    const result = await usersCollection.updateOne(
+    const result = await UsersMongooseModel.updateOne(
       { 'confirmationData.confirmationCode': confirmationCode },
-      { $set: { 'confirmationData.isConfirmed': true } },
+      { 'confirmationData.isConfirmed': true },
     )
 
     return Boolean(result.modifiedCount === 1)

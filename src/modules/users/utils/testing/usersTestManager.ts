@@ -2,7 +2,7 @@ import { RoutesList } from '../../../../app/config/routes'
 import { HttpStatusCode } from '../../../common/enums'
 import { app } from '../../../../app/app'
 import { userInputMock } from '../../mocks/usersMock'
-import { usersCollection } from '../../../../app/config/db'
+import { UsersMongooseModel } from '../../../../app/config/db'
 import { ObjectId } from 'mongodb'
 
 const supertest = require('supertest')
@@ -33,7 +33,7 @@ class UsersTestManager {
       .expect(expectedStatusCode)
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.CREATED_201) {
-      const user = await usersCollection.findOne({ _id: new ObjectId(result.body.id) })
+      const user = await UsersMongooseModel.findOne({ _id: result.body.id })
 
       expect(result.body.email).toBe(userInputMock.email)
       expect(result.body.login).toBe(userInputMock.login)
@@ -41,7 +41,7 @@ class UsersTestManager {
     }
 
     if (shouldExpect && expectedStatusCode === HttpStatusCode.BAD_REQUEST_400 && checkedData?.field) {
-      const users = await usersCollection.find({}).toArray()
+      const users = await UsersMongooseModel.find({})
 
       expect(result.body.errorsMessages.length).toBe(1)
       expect(result.body.errorsMessages[0].field).toBe(checkedData.field)

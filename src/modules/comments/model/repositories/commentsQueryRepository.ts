@@ -1,11 +1,10 @@
-import { commentsCollection } from '../../../../app/config/db'
-import { ObjectId } from 'mongodb'
+import { CommentsMongooseModel } from '../../../../app/config/db'
 import { commentsMappers } from '../mappers/commentsMappers'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 
 export const commentsQueryRepository = {
   async getCommentById(commentId: string) {
-    const comment = await commentsCollection.findOne({ _id: new ObjectId(commentId) })
+    const comment = await CommentsMongooseModel.findOne({ _id: commentId })
 
     if (!comment) {
       return {
@@ -19,7 +18,7 @@ export const commentsQueryRepository = {
     }
   },
   async getCommentDbModelById(commentId: string) {
-    const comment = await commentsCollection.findOne({ _id: new ObjectId(commentId) })
+    const comment = await CommentsMongooseModel.findOne({ _id: commentId })
 
     if (!comment) {
       return {
