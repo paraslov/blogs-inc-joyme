@@ -1,4 +1,4 @@
-import { cryptService, jwtService } from '../../../common/services'
+import { cryptService, jwtService, operationsResultService } from '../../../common/services'
 import { ConfirmationInfoModel, UserDataModel, UserDbModel, UserInputModel } from '../../../users'
 import { v4 as uuidv4 } from 'uuid'
 import { add } from 'date-fns'
@@ -11,7 +11,6 @@ import {
   errorMessagesHandleService
 } from '../../../common/services/errorMessagesHandleService'
 import { ResultToRouter } from '../../../common/types'
-import { operationsResultService } from '../../../common/services'
 import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
 export const authService = {
@@ -129,6 +128,37 @@ export const authService = {
       status: ResultToRouterStatus.SUCCESS,
       data: null,
     }
+  },
+  async sendPasswordRecoveryEmail(email: string) {
+    const user = await authQueryRepository.getUserByLoginOrEmail(email)
+
+    if (!user) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
+    }
+
+    const updateUserData: UserDbModel = {
+      ...user,
+      confirmationData: {
+        ...user.confirmationData,
+        passwordRecoveryCode: uuidv4(),
+        passwordRecoveryCodeExpirationDate: add(new Date(), {
+          hours: 1,
+          minutes: 1,
+        }),
+        isPasswordRecoveryConfirmed: false,
+      }
+    }
+
+    await authCommandRepository.updateUser({ 'userData.email': email }, updateUserData)
+
+    try {
+      const mailInfo = await emailManager.sendPasswordRecoveryEmail(email, updateUserData.confirmationData.passwordRecoveryCode!)
+      console.log('@> Information::mailInfo: ', mailInfo)
+    } catch (err) {
+      console.error('@> Error::emailManager: ', err)
+    }
+
+    return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
   async confirmUser(confirmationCode: string): Promise<ResultToRouter<ErrorMessageHandleResult | null>> {
     const userToConfirm = await authQueryRepository.getUserByConfirmationCode(confirmationCode)

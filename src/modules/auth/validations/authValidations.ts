@@ -11,11 +11,14 @@ const emailValidation = body('email')
   .isString()
   .notEmpty()
   .isEmail().withMessage('Should be a valid email')
+
+const emailResetValidation = emailValidation
   .custom(hasEmailCheck).withMessage('You have not registered yet')
 
 export const authPostValidation = () => [ loginOrEmailValidation, passwordValidation, inputValidationMiddleware ]
 export const authCodeValidation = () => [ codeValidation, inputValidationMiddleware ]
-export const resentEmailValidation = () => [ emailValidation, inputValidationMiddleware ]
+export const resentEmailValidation = () => [ emailResetValidation, inputValidationMiddleware ]
+export const isEmailValidation = () => [ emailValidation, inputValidationMiddleware ]
 
 async function hasEmailCheck(email: string) {
   const user = await UsersMongooseModel.findOne({ 'userData.email': email })

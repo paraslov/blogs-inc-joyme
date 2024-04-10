@@ -3,7 +3,12 @@ import { RequestBody } from '../../common/types'
 import { AuthInputModel } from '../model/types/AuthInputModel'
 import { authService } from '../model/services/authService'
 import { HttpStatusCode } from '../../common/enums'
-import { authCodeValidation, authPostValidation, resentEmailValidation } from '../validations/authValidations'
+import {
+  authCodeValidation,
+  authPostValidation,
+  isEmailValidation,
+  resentEmailValidation,
+} from '../validations/authValidations'
 import { authQueryRepository } from '../model/repositories/authQueryRepository'
 import { jwtAuthMiddleware, rateLimitMiddleware } from '../../../app/config/middleware'
 import { UserInputModel, userInputValidation } from '../../users'
@@ -78,6 +83,13 @@ authRouter.get('/me', jwtAuthMiddleware , async (req: Request, res) => {
 
 authRouter.post('/registration', rateLimitMiddleware, userInputValidation(), async (req: RequestBody<UserInputModel>, res: Response) => {
   await authService.registerUser(req.body)
+
+  return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+})
+
+authRouter.post('/password-recovery', rateLimitMiddleware, isEmailValidation(), async (req: RequestBody<{ email: string }>, res: Response) => {
+
+  await authService.sendPasswordRecoveryEmail(req.body.email)
 
   return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
