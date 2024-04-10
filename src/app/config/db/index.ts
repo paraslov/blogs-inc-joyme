@@ -7,10 +7,10 @@ import {
   UsersMongooseModel,
   runDbMongoose
 } from './mongoose/mongoose'
-import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
 import { AuthSessionsDbModel, RateLimitModel } from '../../../modules/auth'
+import 'dotenv/config'
 
 export let client: MongoClient
 let authSessionsCollection: Collection<AuthSessionsDbModel>

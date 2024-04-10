@@ -136,10 +136,12 @@ export const authService = {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
     }
 
+    const plainUser = user.toObject()
+
     const updateUserData: UserDbModel = {
-      ...user,
+      userData: { ...plainUser.userData },
       confirmationData: {
-        ...user.confirmationData,
+        ...plainUser.confirmationData,
         passwordRecoveryCode: uuidv4(),
         passwordRecoveryCodeExpirationDate: add(new Date(), {
           hours: 1,
@@ -182,14 +184,15 @@ export const authService = {
       }
     }
 
+    const plainUserToConfirm = userToConfirm.toObject()
     const passwordHash = await cryptService.generateHash(newPassword)
     const updatedUser: UserDbModel = {
       userData: {
-        ...userToConfirm.userData,
+        ...plainUserToConfirm.userData,
         passwordHash
       },
       confirmationData: {
-        ...userToConfirm.confirmationData,
+        ...plainUserToConfirm.confirmationData,
         isPasswordRecoveryConfirmed: true,
       }
     }

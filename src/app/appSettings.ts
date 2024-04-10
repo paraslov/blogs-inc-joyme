@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 export const AppSettings = {
   PORT: 3003,
   ACCESS_JWT_SECRET: process.env.ACCESS_JWT_SECRET,
