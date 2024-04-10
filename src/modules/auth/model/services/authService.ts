@@ -160,6 +160,47 @@ export const authService = {
 
     return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
+  async recoverUserPassword(newPassword: string, recoveryCode: string) {
+    const userToConfirm = await authQueryRepository.getUserByPasswordRecoveryConfirmationCode(recoveryCode)
+
+    if (!userToConfirm || userToConfirm.confirmationData.passwordRecoveryCode !== recoveryCode) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Incorrect verification code', field: 'recoveryCode' }),
+      }
+    }
+    if (userToConfirm.confirmationData.isPasswordRecoveryConfirmed) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Registration was already confirmed', field: 'recoveryCode' }),
+      }
+    }
+    if (userToConfirm.confirmationData.passwordRecoveryCodeExpirationDate && userToConfirm.confirmationData.passwordRecoveryCodeExpirationDate < new Date()) {
+      return {
+        status: ResultToRouterStatus.BAD_REQUEST,
+        data: errorMessagesHandleService({ message: 'Confirmation code expired', field: 'recoveryCode' }),
+      }
+    }
+
+    const passwordHash = await cryptService.generateHash(newPassword)
+    const updatedUser: UserDbModel = {
+      userData: {
+        ...userToConfirm.userData,
+        passwordHash
+      },
+      confirmationData: {
+        ...userToConfirm.confirmationData,
+        isPasswordRecoveryConfirmed: true,
+      }
+    }
+
+    await authCommandRepository.updateUser({ 'userData.email': userToConfirm.userData.email }, updatedUser)
+
+    return {
+      status: ResultToRouterStatus.SUCCESS,
+      data: null,
+    }
+  },
   async confirmUser(confirmationCode: string): Promise<ResultToRouter<ErrorMessageHandleResult | null>> {
     const userToConfirm = await authQueryRepository.getUserByConfirmationCode(confirmationCode)
 
