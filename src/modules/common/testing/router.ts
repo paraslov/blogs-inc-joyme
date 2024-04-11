@@ -5,7 +5,7 @@ import {
   BlogsMongooseModel,
   CommentsMongooseModel,
   PostsMongooseModel,
-  rateLimitCollection,
+  RateLimitMongooseModel,
   UsersMongooseModel,
 } from '../../../app/config/db'
 
@@ -17,7 +17,7 @@ testingRouter.delete('/all-data', async (req, res) => {
   await UsersMongooseModel.deleteMany({})
   await authSessionsCollection.deleteMany({})
   await CommentsMongooseModel.deleteMany({})
-  await rateLimitCollection.deleteMany({})
+  await RateLimitMongooseModel.deleteMany({})
 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })

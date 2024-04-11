@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { HttpStatusCode } from '../../../modules/common/enums'
 import { RateLimitModel } from '../../../modules/auth'
-import { rateLimitCollection } from '../db'
+import { RateLimitMongooseModel } from '../db'
 
 export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const currentTime = new Date();
@@ -10,16 +10,16 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     url: req.originalUrl,
     date: currentTime,
   }
-  await rateLimitCollection.insertOne(rateLimitData)
+  await RateLimitMongooseModel.create(rateLimitData)
 
   // Calculate the timestamp for the start of the last 10 seconds
   const tenSecondsAgo = new Date(currentTime.getTime() - 10 * 1000);
 
-  const urlSessions = await rateLimitCollection.find({
+  const urlSessions = await RateLimitMongooseModel.find({
     ip: rateLimitData.ip,
     url: rateLimitData.url,
     date: { $gte: tenSecondsAgo },
-  }).toArray()
+  })
   const urlCount = urlSessions.length
 
   if (urlCount > 5) {

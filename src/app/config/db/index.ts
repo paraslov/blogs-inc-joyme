@@ -5,6 +5,7 @@ import {
   PostsMongooseModel,
   CommentsMongooseModel,
   UsersMongooseModel,
+  RateLimitMongooseModel,
   runDbMongoose
 } from './mongoose/mongoose'
 import { AppSettings } from '../../appSettings'
@@ -14,15 +15,12 @@ import 'dotenv/config'
 
 export let client: MongoClient
 let authSessionsCollection: Collection<AuthSessionsDbModel>
-let rateLimitCollection: Collection<RateLimitModel>
 
 async function runDb() {
   const uri = AppSettings.MONGO_URI
   const dbName = AppSettings.DB_NAME
 
   if (!uri || !dbName) {
-    console.log('@> uri: ', uri)
-    console.log('@> dbName: ', dbName)
     throw new Error('!!! MONGODB_URI or DB_NAME not found')
   }
 
@@ -36,7 +34,6 @@ async function runDb() {
 
   const db = client.db(dbName)
   authSessionsCollection = db.collection<AuthSessionsDbModel>(Collections.SESSIONS)
-  rateLimitCollection = db.collection<RateLimitModel>(Collections.RATE_LIMIT)
 
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -63,9 +60,9 @@ export {
   runDb,
   runDbMongoose,
   authSessionsCollection,
-  rateLimitCollection,
   BlogsMongooseModel,
   PostsMongooseModel,
   CommentsMongooseModel,
   UsersMongooseModel,
+  RateLimitMongooseModel,
 }
