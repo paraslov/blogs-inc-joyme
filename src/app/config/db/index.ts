@@ -6,11 +6,12 @@ import {
   CommentsMongooseModel,
   UsersMongooseModel,
   RateLimitMongooseModel,
+  AuthSessionsMongooseModel,
   runDbMongoose
 } from './mongoose/mongoose'
 import { AppSettings } from '../../appSettings'
 import { Collections } from './config'
-import { AuthSessionsDbModel, RateLimitModel } from '../../../modules/auth'
+import { AuthSessionsDbModel } from '../../../modules/auth'
 import 'dotenv/config'
 
 export let client: MongoClient
@@ -65,4 +66,5 @@ export {
   CommentsMongooseModel,
   UsersMongooseModel,
   RateLimitMongooseModel,
+  AuthSessionsMongooseModel,
 }

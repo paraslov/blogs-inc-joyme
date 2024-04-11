@@ -5,7 +5,7 @@ import { PostDbModel } from '../../../../../modules/posts'
 import { CommentDbModel } from '../../../../../modules/comments'
 import { CommentatorInfoModel } from '../../../../../modules/comments/model/types/CommentatorInfoModel'
 import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../../modules/users'
-import { RateLimitModel } from '../../../../../modules/auth'
+import { AuthSessionsDbModel, RateLimitModel } from '../../../../../modules/auth'
 
 const CommentatorSchema = new mongoose.Schema<WithId<CommentatorInfoModel>>({
   userId: { type: String, required: true },
@@ -56,5 +56,13 @@ export const MongooseSchemas = {
     ip: { type: String, required: true },
     url: { type: String, required: true },
     date: { type: Date, required: true },
+  }),
+  AuthSessionsSchema: new mongoose.Schema<WithId<AuthSessionsDbModel>>({
+    ip: { type: String, required: true },
+    deviceId: { type: String, required: true },
+    deviceName: { type: String, required: true },
+    userId: { type: String, required: true },
+    iat: { type: Number },
+    exp: { type: Number },
   }),
 }

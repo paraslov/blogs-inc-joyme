@@ -7,13 +7,14 @@ import { MongooseSchemas } from './schemas/schemas'
 import { PostDbModel } from '../../../../modules/posts'
 import { CommentDbModel } from '../../../../modules/comments'
 import { UserDbModel } from '../../../../modules/users'
-import { RateLimitModel } from '../../../../modules/auth'
+import { AuthSessionsDbModel, RateLimitModel } from '../../../../modules/auth'
 
 export const BlogsMongooseModel = mongoose.model<WithId<BlogDbModel>>(Collections.BLOGS, MongooseSchemas.BlogsSchema)
 export const PostsMongooseModel = mongoose.model<WithId<PostDbModel>>(Collections.POSTS, MongooseSchemas.PostsSchema)
 export const CommentsMongooseModel = mongoose.model<WithId<CommentDbModel>>(Collections.COMMENTS, MongooseSchemas.CommentsSchema)
 export const UsersMongooseModel = mongoose.model<WithId<UserDbModel>>(Collections.USERS, MongooseSchemas.UsersSchema)
 export const RateLimitMongooseModel = mongoose.model<WithId<RateLimitModel>>(Collections.RATE_LIMIT, MongooseSchemas.RateLimitSchema)
+export const AuthSessionsMongooseModel = mongoose.model<WithId<AuthSessionsDbModel>>(Collections.SESSIONS, MongooseSchemas.AuthSessionsSchema)
 
 export async function runDbMongoose() {
   const uri = AppSettings.MONGO_URI
