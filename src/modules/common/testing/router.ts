@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { HttpStatusCode } from '../enums'
 import {
-  authSessionsCollection,
+  AuthSessionsMongooseModel,
   BlogsMongooseModel,
   CommentsMongooseModel,
   PostsMongooseModel,
-  rateLimitCollection,
+  RateLimitMongooseModel,
   UsersMongooseModel,
 } from '../../../app/config/db'
 
@@ -15,9 +15,9 @@ testingRouter.delete('/all-data', async (req, res) => {
   await BlogsMongooseModel.deleteMany({})
   await PostsMongooseModel.deleteMany({})
   await UsersMongooseModel.deleteMany({})
-  await authSessionsCollection.deleteMany({})
+  await AuthSessionsMongooseModel.deleteMany({})
   await CommentsMongooseModel.deleteMany({})
-  await rateLimitCollection.deleteMany({})
+  await RateLimitMongooseModel.deleteMany({})
 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })

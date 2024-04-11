@@ -1,8 +1,8 @@
-import { authSessionsCollection } from '../../../../app/config/db'
+import { AuthSessionsMongooseModel } from '../../../../app/config/db'
 
 export const devicesCommandRepository = {
   async deleteAllOtherSessions(userDevicesIdsWithoutCurrent: string[]) {
-    const result = await authSessionsCollection.deleteMany({
+    const result = await AuthSessionsMongooseModel.deleteMany({
       deviceId: { $in: userDevicesIdsWithoutCurrent },
     })
 
@@ -10,7 +10,7 @@ export const devicesCommandRepository = {
   },
 
   async deleteSessionByDeviceId(deviceId: string) {
-    const result = await authSessionsCollection.deleteOne({ deviceId })
+    const result = await AuthSessionsMongooseModel.deleteOne({ deviceId })
 
     return Boolean(result.deletedCount)
   },

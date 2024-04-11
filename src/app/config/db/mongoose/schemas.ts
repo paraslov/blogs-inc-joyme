@@ -1,10 +1,11 @@
 import mongoose from 'mongoose'
 import { WithId } from 'mongodb'
-import { BlogDbModel } from '../../../../../modules/blogs'
-import { PostDbModel } from '../../../../../modules/posts'
-import { CommentDbModel } from '../../../../../modules/comments'
-import { CommentatorInfoModel } from '../../../../../modules/comments/model/types/CommentatorInfoModel'
-import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../../modules/users'
+import { BlogDbModel } from '../../../../modules/blogs'
+import { PostDbModel } from '../../../../modules/posts'
+import { CommentDbModel } from '../../../../modules/comments'
+import { CommentatorInfoModel } from '../../../../modules/comments/model/types/CommentatorInfoModel'
+import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../modules/users'
+import { AuthSessionsDbModel, RateLimitModel } from '../../../../modules/auth'
 
 const CommentatorSchema = new mongoose.Schema<WithId<CommentatorInfoModel>>({
   userId: { type: String, required: true },
@@ -50,5 +51,18 @@ export const MongooseSchemas = {
   UsersSchema: new mongoose.Schema<WithId<UserDbModel>>({
     userData: UserDataSchema,
     confirmationData: ConfirmationInfoSchema,
+  }),
+  RateLimitSchema: new mongoose.Schema<WithId<RateLimitModel>>({
+    ip: { type: String, required: true },
+    url: { type: String, required: true },
+    date: { type: Date, required: true },
+  }),
+  AuthSessionsSchema: new mongoose.Schema<WithId<AuthSessionsDbModel>>({
+    ip: { type: String, required: true },
+    deviceId: { type: String, required: true },
+    deviceName: { type: String, required: true },
+    userId: { type: String, required: true },
+    iat: { type: Number },
+    exp: { type: Number },
   }),
 }

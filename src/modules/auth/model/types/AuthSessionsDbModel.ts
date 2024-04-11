@@ -5,5 +5,4 @@ export type AuthSessionsDbModel = {
   ip: string
   iat: number
   exp: number
-  refreshTokensBlackList?: string[]
 }

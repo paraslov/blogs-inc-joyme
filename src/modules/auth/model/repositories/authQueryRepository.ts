@@ -1,4 +1,4 @@
-import { authSessionsCollection, UsersMongooseModel } from '../../../../app/config/db'
+import { AuthSessionsMongooseModel, UsersMongooseModel } from '../../../../app/config/db'
 import { authMappers } from '../mappers/authMappers'
 
 export const authQueryRepository = {
@@ -28,7 +28,7 @@ export const authQueryRepository = {
     return UsersMongooseModel.findOne({ 'confirmationData.passwordRecoveryCode': recoveryCode })
   },
   async isAuthSessionExist(userId: string, deviceId: string, iat: number) {
-    const authSession = await authSessionsCollection.findOne({
+    const authSession = await AuthSessionsMongooseModel.findOne({
       userId,
       deviceId,
       iat,
