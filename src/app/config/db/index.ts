@@ -1,4 +1,4 @@
-import { Collection, MongoClient, ServerApiVersion } from 'mongodb'
+import { MongoClient, ServerApiVersion } from 'mongodb'
 import mongoose from 'mongoose'
 import {
   BlogsMongooseModel,
@@ -10,12 +10,9 @@ import {
   runDbMongoose
 } from './mongoose/mongoose'
 import { AppSettings } from '../../appSettings'
-import { Collections } from './config'
-import { AuthSessionsDbModel } from '../../../modules/auth'
 import 'dotenv/config'
 
 export let client: MongoClient
-let authSessionsCollection: Collection<AuthSessionsDbModel>
 
 async function runDb() {
   const uri = AppSettings.MONGO_URI
@@ -34,7 +31,6 @@ async function runDb() {
   });
 
   const db = client.db(dbName)
-  authSessionsCollection = db.collection<AuthSessionsDbModel>(Collections.SESSIONS)
 
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -60,7 +56,6 @@ process.on('SIGTERM', cleanup)
 export {
   runDb,
   runDbMongoose,
-  authSessionsCollection,
   BlogsMongooseModel,
   PostsMongooseModel,
   CommentsMongooseModel,

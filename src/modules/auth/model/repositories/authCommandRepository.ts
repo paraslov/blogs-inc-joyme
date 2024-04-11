@@ -1,4 +1,4 @@
-import { authSessionsCollection, UsersMongooseModel } from '../../../../app/config/db'
+import { AuthSessionsMongooseModel, UsersMongooseModel } from '../../../../app/config/db'
 import { UserDbModel } from '../../../users'
 import { AuthSessionsDbModel } from '../types/AuthSessionsDbModel'
 
@@ -22,25 +22,21 @@ export const authCommandRepository = {
     return Boolean(result.modifiedCount === 1)
   },
   async createAuthSession(authSession: AuthSessionsDbModel) {
-    const result = await authSessionsCollection.insertOne(authSession)
+    const result = await AuthSessionsMongooseModel.create(authSession)
 
-    return result.insertedId
+    return result._id
   },
   async updateAuthSession(userId: string, deviceId: string, iat: number) {
-    const result = await authSessionsCollection.updateOne({
+    const result = await AuthSessionsMongooseModel.updateOne({
       userId,
       deviceId,
     },
-      {
-        $set: {
-          iat,
-        }
-      })
+      { iat })
 
     return Boolean(result.modifiedCount)
   },
   async deleteAuthSession(userId: string, deviceId: string, iat: number) {
-    const result = await authSessionsCollection.deleteOne({
+    const result = await AuthSessionsMongooseModel.deleteOne({
       userId,
       deviceId,
       iat,
