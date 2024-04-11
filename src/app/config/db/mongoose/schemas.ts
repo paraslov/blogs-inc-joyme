@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
 import { WithId } from 'mongodb'
-import { BlogDbModel } from '../../../../../modules/blogs'
-import { PostDbModel } from '../../../../../modules/posts'
-import { CommentDbModel } from '../../../../../modules/comments'
-import { CommentatorInfoModel } from '../../../../../modules/comments/model/types/CommentatorInfoModel'
-import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../../modules/users'
-import { AuthSessionsDbModel, RateLimitModel } from '../../../../../modules/auth'
+import { BlogDbModel } from '../../../../modules/blogs'
+import { PostDbModel } from '../../../../modules/posts'
+import { CommentDbModel } from '../../../../modules/comments'
+import { CommentatorInfoModel } from '../../../../modules/comments/model/types/CommentatorInfoModel'
+import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../modules/users'
+import { AuthSessionsDbModel, RateLimitModel } from '../../../../modules/auth'
 
 const CommentatorSchema = new mongoose.Schema<WithId<CommentatorInfoModel>>({
   userId: { type: String, required: true },
