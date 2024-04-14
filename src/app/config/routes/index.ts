@@ -33,7 +33,7 @@ function initAppRoutes() {
   })
 
   app.get(RoutesList.VERSION, (req, res) => {
-    res.send('blogs-inc-joyme: v3.2.0')
+    res.send('blogs-inc-joyme: v3.3.0')
   })
 }
 
