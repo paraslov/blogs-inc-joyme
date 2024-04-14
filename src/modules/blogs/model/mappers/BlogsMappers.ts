@@ -2,7 +2,7 @@ import { WithId } from 'mongodb'
 import { BlogDbModel } from '../types/BlogDbModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 
-export const blogsMappers = {
+class BlogsMappers {
   mapBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blogFromDb._id.toString(),
@@ -14,3 +14,5 @@ export const blogsMappers = {
     }
   }
 }
+
+export const blogsMappers = new BlogsMappers()
