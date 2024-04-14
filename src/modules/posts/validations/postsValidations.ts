@@ -1,6 +1,6 @@
 import { body } from 'express-validator'
 import { isValidId, stringWithLengthValidation } from '../../common/validations'
-import { QueryBlogsRepository } from '../../blogs'
+import { queryBlogsRepository } from '../../blogs'
 import { inputValidationMiddleware } from '../../../app/config/middleware'
 import { NextFunction } from 'express'
 import { HttpStatusCode } from '../../common/enums'
@@ -16,7 +16,7 @@ const commentValidation = stringWithLengthValidation('content', { max: 300, min:
 const blogIdValidation = body('blogId')
   .isString().withMessage('Should be a string')
   .custom(async (blogId: string) => {
-    const existingBlog = await QueryBlogsRepository.getBlogById(blogId)
+    const existingBlog = await queryBlogsRepository.getBlogById(blogId)
 
     if (!existingBlog) {
       throw new Error('There is no blogs with this id')

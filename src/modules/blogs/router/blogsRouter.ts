@@ -11,7 +11,7 @@ import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogIdValidationMW, blogInputValidation } from '../validations/blogsValidations'
 import { blogsService } from '../model/services/blogsService'
-import { QueryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
+import { queryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
 import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } from '../../posts'
 
@@ -25,13 +25,13 @@ blogsRouter.get('/', async (req: RequestQuery<Partial<BlogQueryModel>>, res) => 
     pageNumber: Number(req.query.pageNumber) || 1,
     pageSize: Number(req.query.pageSize) || 10,
   }
-  const blogs = await QueryBlogsRepository.getAllBlogs(blogsQuery)
+  const blogs = await queryBlogsRepository.getAllBlogs(blogsQuery)
 
   res.status(HttpStatusCode.OK_200).send(blogs)
 })
 
 blogsRouter.get('/:blogId', blogIdValidationMW, async (req, res) => {
-  const foundBlogById = await QueryBlogsRepository.getBlogById(req.params.blogId)
+  const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
 
   if (!foundBlogById) {
     res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -43,7 +43,7 @@ blogsRouter.get('/:blogId', blogIdValidationMW, async (req, res) => {
 
 blogsRouter.get('/:blogId/posts', blogIdValidationMW,
   async (req: RequestParamsQuery<{ blogId: string }, PaginationAndSortQuery>, res: Response) => {
-  const foundBlogById = await QueryBlogsRepository.getBlogById(req.params.blogId)
+  const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
 
   if (!foundBlogById) {
     res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -62,7 +62,7 @@ blogsRouter.post('/', authMiddleware, blogInputValidation(), async (req: Request
     websiteUrl: req.body.websiteUrl,
   }
   const createdBlogId = await blogsService.createBlog(newBlogData)
-  const newBlog = await QueryBlogsRepository.getBlogById(createdBlogId)
+  const newBlog = await queryBlogsRepository.getBlogById(createdBlogId)
 
   if (!newBlog) {
     res.sendStatus(404)

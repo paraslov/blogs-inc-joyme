@@ -4,8 +4,8 @@ import { BlogQueryModel } from '../types/BlogQueryModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 import { PaginationWithItems } from '../../../common/types'
 
-export class QueryBlogsRepository {
-  static async getAllBlogs(queryParams: Required<BlogQueryModel>): Promise<PaginationWithItems<BlogViewModel[]>> {
+class QueryBlogsRepository {
+  async getAllBlogs(queryParams: Required<BlogQueryModel>): Promise<PaginationWithItems<BlogViewModel[]>> {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = queryParams
     let filter: Partial<Record<keyof BlogViewModel, any>> = {}
 
@@ -31,10 +31,12 @@ export class QueryBlogsRepository {
       items: mappedBlogs,
     }
   }
-  static async getBlogById(blogId: string) {
+  async getBlogById(blogId: string) {
     const foundBlog = await BlogsMongooseModel.findById(blogId)
     const viewModelBlog = foundBlog && blogsMappers.mapBlogToView(foundBlog)
 
     return viewModelBlog
   }
 }
+
+export const queryBlogsRepository = new QueryBlogsRepository()
