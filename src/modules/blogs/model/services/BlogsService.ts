@@ -1,10 +1,10 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { commandBlogsRepository } from '../repositories/commandBlogsRepository'
+import { commandBlogsRepository } from '../repositories/CommandBlogsRepository'
 import { PostDbModel, PostInputModel } from '../../../posts'
 import { queryBlogsRepository } from '../repositories/QueryBlogsRepository'
 
-export const blogsService = {
+class BlogsService {
   async createBlog(payload: BlogInputModel): Promise<string> {
     const newBlog: Omit<BlogViewModel, 'id'> = {
       name: payload.name,
@@ -15,7 +15,7 @@ export const blogsService = {
     }
 
     return commandBlogsRepository.createNewBlog(newBlog)
-  },
+  }
   async createPostForBlog(payload: PostInputModel) {
     const blogToAddPostIn = await queryBlogsRepository.getBlogById(payload.blogId)
     const newPostData: PostDbModel = {
@@ -30,7 +30,7 @@ export const blogsService = {
     if (!blogToAddPostIn) return null
 
     return await commandBlogsRepository.createNewPostForBlog(newPostData)
-  },
+  }
   async updateBlog(blogId: string, payload: BlogInputModel) {
     const updateData: BlogInputModel = {
       name: payload.name,
@@ -39,8 +39,10 @@ export const blogsService = {
     }
 
     return commandBlogsRepository.updateBlog(blogId, updateData)
-  },
+  }
   async deleteBlog(blogId: string) {
     return commandBlogsRepository.deleteBlog(blogId)
   }
 }
+
+export const blogsService = new BlogsService()

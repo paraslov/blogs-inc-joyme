@@ -10,7 +10,7 @@ import {
 import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogIdValidationMW, blogInputValidation } from '../validations/blogsValidations'
-import { blogsService } from '../model/services/blogsService'
+import { blogsService } from '../model/services/BlogsService'
 import { queryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
 import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } from '../../posts'
