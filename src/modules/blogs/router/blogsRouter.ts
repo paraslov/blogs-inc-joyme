@@ -10,14 +10,18 @@ import {
 import { BlogInputModel } from '../model/types/BlogInputModel'
 import { authMiddleware } from '../../../app/config/middleware'
 import { blogIdValidationMW, blogInputValidation } from '../validations/blogsValidations'
-import { blogsService } from '../model/services/BlogsService'
-import { queryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
+import { BlogsService, blogsService } from '../model/services/BlogsService'
+import { QueryBlogsRepository, queryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
 import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } from '../../posts'
 
 export const blogsRouter = Router()
 
 class BlogsController {
+  constructor(
+    protected blogsService: BlogsService,
+    protected queryBlogsRepository: QueryBlogsRepository,
+  ) {}
   async getUsers(req: RequestQuery<Partial<BlogQueryModel>>, res: Response) {
     const blogsQuery: Required<BlogQueryModel> = {
       searchNameTerm: req.query.searchNameTerm ?? null,
@@ -26,12 +30,12 @@ class BlogsController {
       pageNumber: Number(req.query.pageNumber) || 1,
       pageSize: Number(req.query.pageSize) || 10,
     }
-    const blogs = await queryBlogsRepository.getAllBlogs(blogsQuery)
+    const blogs = await this.queryBlogsRepository.getAllBlogs(blogsQuery)
 
     res.status(HttpStatusCode.OK_200).send(blogs)
   }
   async getUser(req: Request, res: Response) {
-    const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
+    const foundBlogById = await this.queryBlogsRepository.getBlogById(req.params.blogId)
 
     if (!foundBlogById) {
       res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -41,7 +45,7 @@ class BlogsController {
     res.status(HttpStatusCode.OK_200).send(foundBlogById)
   }
   async getBlogById(req: RequestParamsQuery<{ blogId: string }, PaginationAndSortQuery>, res: Response) {
-    const foundBlogById = await queryBlogsRepository.getBlogById(req.params.blogId)
+    const foundBlogById = await this.queryBlogsRepository.getBlogById(req.params.blogId)
 
     if (!foundBlogById) {
       res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -57,8 +61,8 @@ class BlogsController {
       description: req.body.description,
       websiteUrl: req.body.websiteUrl,
     }
-    const createdBlogId = await blogsService.createBlog(newBlogData)
-    const newBlog = await queryBlogsRepository.getBlogById(createdBlogId)
+    const createdBlogId = await this.blogsService.createBlog(newBlogData)
+    const newBlog = await this.queryBlogsRepository.getBlogById(createdBlogId)
 
     if (!newBlog) {
       res.sendStatus(404)
@@ -66,7 +70,7 @@ class BlogsController {
     res.status(HttpStatusCode.CREATED_201).send(newBlog)
   }
   async createPostForBlog(req: RequestParamsBody<{ blogId: string }, Omit<PostInputModel, 'blogId'>>, res: Response) {
-    const createdPostId = await blogsService.createPostForBlog({...req.body, blogId: req.params.blogId})
+    const createdPostId = await this.blogsService.createPostForBlog({...req.body, blogId: req.params.blogId})
 
     if (!createdPostId) {
       res.sendStatus(404)
@@ -78,7 +82,7 @@ class BlogsController {
     res.status(HttpStatusCode.CREATED_201).send(newPost)
   }
   async updateBlog(req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) {
-    const isBlogUpdated = await blogsService.updateBlog(req.params.blogId, req.body)
+    const isBlogUpdated = await this.blogsService.updateBlog(req.params.blogId, req.body)
 
     if (!isBlogUpdated) {
       res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -87,7 +91,7 @@ class BlogsController {
     res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   }
   async deleteBlog(req: Request, res: Response) {
-    const isDeleted = await blogsService.deleteBlog(req.params.blogId)
+    const isDeleted = await this.blogsService.deleteBlog(req.params.blogId)
 
     if (!isDeleted) {
       res.sendStatus(HttpStatusCode.NOT_FOUND_404)
@@ -96,7 +100,7 @@ class BlogsController {
     res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   }
 }
-const blogsController = new BlogsController()
+const blogsController = new BlogsController(blogsService, queryBlogsRepository)
 
 blogsRouter.get('/', blogsController.getUsers.bind(blogsController))
 blogsRouter.get('/:blogId', blogIdValidationMW, blogsController.getUser.bind(blogsController))

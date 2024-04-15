@@ -2,7 +2,7 @@ import { WithId } from 'mongodb'
 import { BlogDbModel } from '../types/BlogDbModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 
-class BlogsMappers {
+export class BlogsMappers {
   mapBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blogFromDb._id.toString(),

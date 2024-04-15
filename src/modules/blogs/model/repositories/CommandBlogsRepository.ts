@@ -3,7 +3,7 @@ import { BlogViewModel } from '../types/BlogViewModel'
 import { BlogsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
 import { PostDbModel } from '../../../posts'
 
-class CommandBlogsRepository {
+export class CommandBlogsRepository {
   async createNewBlog(newBlog: Omit<BlogViewModel, 'id'>): Promise<string> {
     const result = await BlogsMongooseModel.create(newBlog)
 

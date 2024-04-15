@@ -1,10 +1,12 @@
 import { BlogsMongooseModel } from '../../../../app/config/db'
-import { blogsMappers } from '../mappers/BlogsMappers'
+import { blogsMappers, BlogsMappers } from '../mappers/BlogsMappers'
 import { BlogQueryModel } from '../types/BlogQueryModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 import { PaginationWithItems } from '../../../common/types'
 
-class QueryBlogsRepository {
+export class QueryBlogsRepository {
+  constructor(protected blogsMappers: BlogsMappers) {}
+
   async getAllBlogs(queryParams: Required<BlogQueryModel>): Promise<PaginationWithItems<BlogViewModel[]>> {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = queryParams
     let filter: Partial<Record<keyof BlogViewModel, any>> = {}
@@ -21,7 +23,7 @@ class QueryBlogsRepository {
 
     const totalCount = await BlogsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedBlogs = foundBlogs.map(blogsMappers.mapBlogToView)
+    const mappedBlogs = foundBlogs.map(this.blogsMappers.mapBlogToView)
 
     return {
       pageSize,
@@ -33,10 +35,10 @@ class QueryBlogsRepository {
   }
   async getBlogById(blogId: string) {
     const foundBlog = await BlogsMongooseModel.findById(blogId)
-    const viewModelBlog = foundBlog && blogsMappers.mapBlogToView(foundBlog)
+    const viewModelBlog = foundBlog && this.blogsMappers.mapBlogToView(foundBlog)
 
     return viewModelBlog
   }
 }
 
-export const queryBlogsRepository = new QueryBlogsRepository()
+export const queryBlogsRepository = new QueryBlogsRepository(blogsMappers)
