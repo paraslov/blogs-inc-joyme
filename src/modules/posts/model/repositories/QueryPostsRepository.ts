@@ -3,7 +3,7 @@ import { postsMappers } from '../mappers/postsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
 
-export const queryPostsRepository = {
+export class QueryPostsRepository {
   async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy || 'createdAt'
     const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection ?? '') ? queryParams.sortDirection : 'desc'
@@ -33,7 +33,7 @@ export const queryPostsRepository = {
       page: pageNumber,
       items: mappedBlogs,
     }
-  },
+  }
   async getPostComments(postId: string, queryParams: Required<PaginationAndSortQuery>) {
     const { pageNumber, pageSize, sortBy, sortDirection} = queryParams
     const filter = { postId: postId }
@@ -55,11 +55,13 @@ export const queryPostsRepository = {
       page: pageNumber,
       items: mappedComments,
     }
-  },
+  }
   async getPostById(postId: string) {
     const foundPost = await PostsMongooseModel.findById(postId)
     const mappedPost = foundPost && postsMappers.mapDbPostsIntoView(foundPost)
 
     return mappedPost
-  },
+  }
 }
+
+export const queryPostsRepository = new QueryPostsRepository()

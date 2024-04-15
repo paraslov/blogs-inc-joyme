@@ -10,7 +10,7 @@ import {
 import { PostInputModel } from '../model/types/PostInputModel'
 import { authMiddleware, jwtAuthMiddleware, sortingAndPaginationMiddleware } from '../../../app/config/middleware'
 import { commentInputValidation, postIdValidationMW, postInputValidation } from '../validations/postsValidations'
-import { queryPostsRepository } from '../model/repositories/queryPostsRepository'
+import { queryPostsRepository } from '../model/repositories/QueryPostsRepository'
 import { postsService } from '../model/services/postsService'
 import { CommentInputModel } from '../model/types/CommentInputModel'
 import { ResultToRouterStatus } from '../../common/enums/ResultToRouterStatus'

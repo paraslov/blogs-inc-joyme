@@ -13,7 +13,7 @@ import { blogIdValidationMW, blogInputValidation } from '../validations/blogsVal
 import { BlogsService, blogsService } from '../model/services/BlogsService'
 import { QueryBlogsRepository, queryBlogsRepository } from '../model/repositories/QueryBlogsRepository'
 import { BlogQueryModel } from '../model/types/BlogQueryModel'
-import { postForBlogsInputValidation, PostInputModel, queryPostsRepository } from '../../posts'
+import { postForBlogsInputValidation, PostInputModel, QueryPostsRepository, queryPostsRepository } from '../../posts'
 
 export const blogsRouter = Router()
 
@@ -21,6 +21,7 @@ class BlogsController {
   constructor(
     protected blogsService: BlogsService,
     protected queryBlogsRepository: QueryBlogsRepository,
+    protected queryPostsRepository: QueryPostsRepository,
   ) {}
   async getUsers(req: RequestQuery<Partial<BlogQueryModel>>, res: Response) {
     const blogsQuery: Required<BlogQueryModel> = {
@@ -52,7 +53,7 @@ class BlogsController {
       return
     }
 
-    const foundPostsById = await queryPostsRepository.getPosts(req.query, req.params.blogId)
+    const foundPostsById = await this.queryPostsRepository.getPosts(req.query, req.params.blogId)
     res.status(HttpStatusCode.OK_200).send(foundPostsById)
   }
   async createBlog(req: RequestBody<BlogInputModel>, res: Response) {
@@ -78,7 +79,7 @@ class BlogsController {
       return
     }
 
-    const newPost = await queryPostsRepository.getPostById(createdPostId)
+    const newPost = await this.queryPostsRepository.getPostById(createdPostId)
     res.status(HttpStatusCode.CREATED_201).send(newPost)
   }
   async updateBlog(req: RequestParamsBody<{ blogId: string }, BlogInputModel>, res: Response) {
@@ -100,7 +101,7 @@ class BlogsController {
     res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   }
 }
-const blogsController = new BlogsController(blogsService, queryBlogsRepository)
+const blogsController = new BlogsController(blogsService, queryBlogsRepository, queryPostsRepository)
 
 blogsRouter.get('/', blogsController.getUsers.bind(blogsController))
 blogsRouter.get('/:blogId', blogIdValidationMW, blogsController.getUser.bind(blogsController))
