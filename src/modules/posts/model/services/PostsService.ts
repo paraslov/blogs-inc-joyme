@@ -1,10 +1,10 @@
-import { commandPostsRepository, CommandPostsRepository } from '../repositories/CommandPostsRepository'
+import { CommandPostsRepository } from '../repositories/CommandPostsRepository'
 import { PostInputModel } from '../types/PostInputModel'
 import { PostDbModel } from '../types/PostDbModel'
 import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { CommentDbModel } from '../../../comments'
-import { queryPostsRepository, QueryPostsRepository } from '../repositories/QueryPostsRepository'
+import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
 import { usersQueryRepository, UsersQueryRepository } from '../../../users'
 
 export class PostsService {
@@ -75,5 +75,3 @@ export class PostsService {
     return this.commandPostsRepository.deletePostById(postId)
   }
 }
-
-export const postsService = new PostsService(queryPostsRepository, commandPostsRepository, usersQueryRepository)

@@ -1,5 +1,5 @@
 import { BlogsMongooseModel, CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
-import { PostsMappers, postsMappers } from '../mappers/PostsMappers'
+import { PostsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
 
@@ -71,5 +71,3 @@ export class QueryPostsRepository {
     return viewModelBlog
   }
 }
-
-export const queryPostsRepository = new QueryPostsRepository(postsMappers)

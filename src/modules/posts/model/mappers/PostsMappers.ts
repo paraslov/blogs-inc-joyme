@@ -26,5 +26,3 @@ export class PostsMappers {
     }
   }
 }
-
-export const postsMappers = new PostsMappers()

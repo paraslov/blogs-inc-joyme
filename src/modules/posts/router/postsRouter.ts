@@ -1,13 +1,9 @@
 import { Router } from 'express'
 import { authMiddleware, jwtAuthMiddleware, sortingAndPaginationMiddleware } from '../../../app/config/middleware'
 import { commentInputValidation, postIdValidationMW, postInputValidation } from '../validations/postsValidations'
-import { PostsController } from '../model/controllers/PostsController'
-import { postsService } from '../model/services/PostsService'
-import { queryPostsRepository } from '../model/repositories/QueryPostsRepository'
+import { postsController } from '../composition-root/postsCompositionRoot'
 
 export const postsRouter = Router()
-
-const postsController = new PostsController(postsService, queryPostsRepository)
 
 postsRouter.get('/', postsController.getPosts.bind(postsController))
 postsRouter.get('/:postId', postIdValidationMW, postsController.getPostById.bind(postsController))
