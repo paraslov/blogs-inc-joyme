@@ -1,9 +1,11 @@
-import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
-import { postsMappers } from '../mappers/PostsMappers'
+import { BlogsMongooseModel, CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
+import { PostsMappers, postsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
 
 export class QueryPostsRepository {
+  constructor(protected postsMappers: PostsMappers) {}
+
   async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy || 'createdAt'
     const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection ?? '') ? queryParams.sortDirection : 'desc'
@@ -24,7 +26,7 @@ export class QueryPostsRepository {
 
     const totalCount = await PostsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedBlogs = foundPosts.map(postsMappers.mapDbPostsIntoView)
+    const mappedBlogs = foundPosts.map(this.postsMappers.mapDbPostsIntoView)
 
     return {
       pageSize,
@@ -58,10 +60,16 @@ export class QueryPostsRepository {
   }
   async getPostById(postId: string) {
     const foundPost = await PostsMongooseModel.findById(postId)
-    const mappedPost = foundPost && postsMappers.mapDbPostsIntoView(foundPost)
+    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost)
 
     return mappedPost
   }
+  async getBlogById(blogId: string) {
+    const foundBlog = await BlogsMongooseModel.findById(blogId)
+    const viewModelBlog = foundBlog && this.postsMappers.mapBlogToView(foundBlog)
+
+    return viewModelBlog
+  }
 }
 
-export const queryPostsRepository = new QueryPostsRepository()
+export const queryPostsRepository = new QueryPostsRepository(postsMappers)
