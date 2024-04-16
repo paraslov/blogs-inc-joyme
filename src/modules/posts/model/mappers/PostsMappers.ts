@@ -2,7 +2,7 @@ import { PostDbModel } from '../types/PostDbModel'
 import { WithId } from 'mongodb'
 import { PostViewModel } from '../types/PostViewModel'
 
-export const postsMappers = {
+export class PostsMappers {
   mapDbPostsIntoView(dbPosts: WithId<PostDbModel>): PostViewModel {
     return {
       id: dbPosts._id.toString(),
@@ -15,3 +15,5 @@ export const postsMappers = {
     }
   }
 }
+
+export const postsMappers = new PostsMappers()

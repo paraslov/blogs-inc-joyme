@@ -1,5 +1,5 @@
 import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
-import { postsMappers } from '../mappers/postsMappers'
+import { postsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
 

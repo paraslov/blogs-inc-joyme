@@ -1,4 +1,4 @@
-import { commandPostsRepository } from '../repositories/commandPostsRepository'
+import { commandPostsRepository } from '../repositories/CommandPostsRepository'
 import { PostInputModel } from '../types/PostInputModel'
 import { queryBlogsRepository } from '../../../blogs'
 import { PostDbModel } from '../types/PostDbModel'
@@ -8,7 +8,7 @@ import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus
 import { usersQueryRepository } from '../../../users'
 import { CommentDbModel } from '../../../comments'
 
-export const postsService = {
+export class PostsService {
   async createPost(payload: PostInputModel) {
     const blogData = await queryBlogsRepository.getBlogById(payload.blogId)
 
@@ -24,7 +24,7 @@ export const postsService = {
     }
 
     return commandPostsRepository.createPost(createdPostData)
-  },
+  }
   async createCommentToPost(postId: string, userId: string, payload: CommentInputModel) {
     const post = await queryPostsRepository.getPostById(postId)
     const user = await usersQueryRepository.getUserById(userId)
@@ -51,7 +51,7 @@ export const postsService = {
       status: ResultToRouterStatus.SUCCESS,
       data: { commentId },
     }
-  },
+  }
   async updatePost(payload: PostInputModel, postId: string) {
     const updatePostData: PostInputModel = {
       title: payload.title,
@@ -65,8 +65,10 @@ export const postsService = {
     if (!foundBlog) return false
 
     return commandPostsRepository.updatePost(updatePostData, postId)
-  },
+  }
   async deletePostById(postId: string) {
     return commandPostsRepository.deletePostById(postId)
   }
 }
+
+export const postsService = new PostsService()
