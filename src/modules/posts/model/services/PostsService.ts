@@ -5,7 +5,7 @@ import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { CommentDbModel } from '../../../comments'
 import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
-import { usersQueryRepository, UsersQueryRepository } from '../../../users'
+import { UsersQueryRepository } from '../../../users'
 
 export class PostsService {
   constructor(
@@ -15,7 +15,7 @@ export class PostsService {
   ) {}
 
   async createPost(payload: PostInputModel) {
-    const blogData = await this.queryPostsRepository.getBlogById(payload.blogId)
+    const blogData = await this.queryPostsRepository.getPostBlogById(payload.blogId)
 
     if (!blogData) return false
 
@@ -65,7 +65,7 @@ export class PostsService {
       blogId: payload.blogId,
     }
 
-    const foundBlog = await this.queryPostsRepository.getBlogById(payload.blogId)
+    const foundBlog = await this.queryPostsRepository.getPostBlogById(payload.blogId)
 
     if (!foundBlog) return false
 

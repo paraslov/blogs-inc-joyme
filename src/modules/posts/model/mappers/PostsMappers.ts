@@ -15,7 +15,7 @@ export class PostsMappers {
       createdAt: dbPosts.createdAt,
     }
   }
-  mapBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
+  mapPostBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blogFromDb._id.toString(),
       name: blogFromDb.name,

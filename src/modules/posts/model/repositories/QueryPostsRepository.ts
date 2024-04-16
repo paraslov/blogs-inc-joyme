@@ -64,9 +64,9 @@ export class QueryPostsRepository {
 
     return mappedPost
   }
-  async getBlogById(blogId: string) {
+  async getPostBlogById(blogId: string) {
     const foundBlog = await BlogsMongooseModel.findById(blogId)
-    const viewModelBlog = foundBlog && this.postsMappers.mapBlogToView(foundBlog)
+    const viewModelBlog = foundBlog && this.postsMappers.mapPostBlogToView(foundBlog)
 
     return viewModelBlog
   }
