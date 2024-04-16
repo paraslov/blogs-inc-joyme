@@ -25,5 +25,3 @@ export class CommandBlogsRepository {
     return Boolean(deleteResult.deletedCount)
   }
 }
-
-export const commandBlogsRepository = new CommandBlogsRepository()

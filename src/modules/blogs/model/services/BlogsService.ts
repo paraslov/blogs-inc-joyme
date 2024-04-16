@@ -1,8 +1,8 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { CommandBlogsRepository, commandBlogsRepository } from '../repositories/CommandBlogsRepository'
+import { CommandBlogsRepository } from '../repositories/CommandBlogsRepository'
 import { PostDbModel, PostInputModel } from '../../../posts'
-import { QueryBlogsRepository, queryBlogsRepository } from '../repositories/QueryBlogsRepository'
+import { QueryBlogsRepository } from '../repositories/QueryBlogsRepository'
 
 export class BlogsService {
   constructor(
@@ -48,5 +48,3 @@ export class BlogsService {
     return this.commandBlogsRepository.deleteBlog(blogId)
   }
 }
-
-export const blogsService = new BlogsService(queryBlogsRepository, commandBlogsRepository)

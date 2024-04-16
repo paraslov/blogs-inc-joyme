@@ -1,5 +1,5 @@
 import { BlogsMongooseModel } from '../../../../app/config/db'
-import { blogsMappers, BlogsMappers } from '../mappers/BlogsMappers'
+import { BlogsMappers } from '../mappers/BlogsMappers'
 import { BlogQueryModel } from '../types/BlogQueryModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 import { PaginationWithItems } from '../../../common/types'
@@ -40,5 +40,3 @@ export class QueryBlogsRepository {
     return viewModelBlog
   }
 }
-
-export const queryBlogsRepository = new QueryBlogsRepository(blogsMappers)

@@ -14,5 +14,3 @@ export class BlogsMappers {
     }
   }
 }
-
-export const blogsMappers = new BlogsMappers()
