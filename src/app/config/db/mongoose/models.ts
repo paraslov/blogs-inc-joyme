@@ -4,7 +4,7 @@ import { WithId } from 'mongodb'
 import { Collections } from '../config'
 import { MongooseSchemas } from './schemas'
 import { PostDbModel } from '../../../../modules/posts'
-import { CommentDbModel } from '../../../../modules/comments'
+import { CommentDbModel, LikesDbModel } from '../../../../modules/comments'
 import { UserDbModel } from '../../../../modules/users'
 import { AuthSessionsDbModel, RateLimitModel } from '../../../../modules/auth'
 
@@ -14,3 +14,4 @@ export const CommentsMongooseModel = mongoose.model<WithId<CommentDbModel>>(Coll
 export const UsersMongooseModel = mongoose.model<WithId<UserDbModel>>(Collections.USERS, MongooseSchemas.UsersSchema)
 export const RateLimitMongooseModel = mongoose.model<WithId<RateLimitModel>>(Collections.RATE_LIMIT, MongooseSchemas.RateLimitSchema)
 export const AuthSessionsMongooseModel = mongoose.model<WithId<AuthSessionsDbModel>>(Collections.SESSIONS, MongooseSchemas.AuthSessionsSchema)
+export const LikesMongooseModel = mongoose.model<WithId<LikesDbModel>>(Collections.LIKES, MongooseSchemas.LikesCommentsSchema)

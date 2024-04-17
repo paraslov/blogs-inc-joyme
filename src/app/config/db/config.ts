@@ -4,5 +4,6 @@ export const Collections = {
   USERS: 'users',
   COMMENTS: 'comments',
   SESSIONS: 'sessions',
+  LIKES: 'likes',
   RATE_LIMIT: 'rate-limit',
 }
