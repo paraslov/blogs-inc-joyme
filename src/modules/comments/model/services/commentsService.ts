@@ -40,7 +40,7 @@ export const commentsService = {
       return commentResult
     }
 
-    const currentLikeStatus = await commentsCommandRepository.getLikeStatus(userId)
+    const currentLikeStatus = await commentsQueryRepository.getLikeStatus(userId)
     let likesCountChange = 0
     let dislikesCountChange = 0
 

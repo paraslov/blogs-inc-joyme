@@ -1,6 +1,5 @@
 import { CommentsMongooseModel, LikesMongooseModel } from '../../../../app/config/db'
 import { CommentDbModel } from '../types/CommentDbModel'
-import { LikeStatuses } from '../enums/LikeStatuses'
 import { LikesDbModel } from '../types/LikesDbModel'
 
 export const commentsCommandRepository = {
@@ -16,9 +15,6 @@ export const commentsCommandRepository = {
     const result = await CommentsMongooseModel.deleteOne({ _id: commentId })
 
     return Boolean(result.deletedCount)
-  },
-  async getLikeStatus(userId: string) {
-    return LikesMongooseModel.findOne({ userId })
   },
   async createLikeStatus(createLikeStatusDto: LikesDbModel) {
     const createResult = await LikesMongooseModel.create(createLikeStatusDto)
