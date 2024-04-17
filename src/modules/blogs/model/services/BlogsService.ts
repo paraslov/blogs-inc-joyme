@@ -1,10 +1,14 @@
 import { BlogInputModel } from '../types/BlogInputModel'
 import { BlogViewModel } from '../types/BlogViewModel'
-import { commandBlogsRepository } from '../repositories/commandBlogsRepository'
+import { CommandBlogsRepository } from '../repositories/CommandBlogsRepository'
 import { PostDbModel, PostInputModel } from '../../../posts'
-import { queryBlogsRepository } from '../repositories/queryBlogsRepository'
+import { QueryBlogsRepository } from '../repositories/QueryBlogsRepository'
 
-export const blogsService = {
+export class BlogsService {
+  constructor(
+    protected queryBlogsRepository: QueryBlogsRepository,
+    protected commandBlogsRepository: CommandBlogsRepository,
+  ) {}
   async createBlog(payload: BlogInputModel): Promise<string> {
     const newBlog: Omit<BlogViewModel, 'id'> = {
       name: payload.name,
@@ -14,10 +18,10 @@ export const blogsService = {
       createdAt: new Date().toISOString(),
     }
 
-    return commandBlogsRepository.createNewBlog(newBlog)
-  },
+    return this.commandBlogsRepository.createNewBlog(newBlog)
+  }
   async createPostForBlog(payload: PostInputModel) {
-    const blogToAddPostIn = await queryBlogsRepository.getBlogById(payload.blogId)
+    const blogToAddPostIn = await this.queryBlogsRepository.getBlogById(payload.blogId)
     const newPostData: PostDbModel = {
       blogId: payload.blogId,
       title: payload.title,
@@ -29,8 +33,8 @@ export const blogsService = {
 
     if (!blogToAddPostIn) return null
 
-    return await commandBlogsRepository.createNewPostForBlog(newPostData)
-  },
+    return await this.commandBlogsRepository.createNewPostForBlog(newPostData)
+  }
   async updateBlog(blogId: string, payload: BlogInputModel) {
     const updateData: BlogInputModel = {
       name: payload.name,
@@ -38,9 +42,9 @@ export const blogsService = {
       websiteUrl: payload.websiteUrl,
     }
 
-    return commandBlogsRepository.updateBlog(blogId, updateData)
-  },
+    return this.commandBlogsRepository.updateBlog(blogId, updateData)
+  }
   async deleteBlog(blogId: string) {
-    return commandBlogsRepository.deleteBlog(blogId)
+    return this.commandBlogsRepository.deleteBlog(blogId)
   }
 }

@@ -6,6 +6,7 @@ import {
   UsersMongooseModel,
   RateLimitMongooseModel,
   AuthSessionsMongooseModel,
+  LikesMongooseModel,
 } from './mongoose/models'
 import 'dotenv/config'
 import { AppSettings } from '../../appSettings'
@@ -43,4 +44,5 @@ export {
   UsersMongooseModel,
   RateLimitMongooseModel,
   AuthSessionsMongooseModel,
+  LikesMongooseModel,
 }

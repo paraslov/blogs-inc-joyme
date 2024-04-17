@@ -2,7 +2,7 @@ import { UsersQueryModel } from '../types/UsersQueryModel'
 import { UsersMongooseModel } from '../../../../app/config/db'
 import { usersMappers } from '../mappers/usersMappers'
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
   async getUsers(payload: UsersQueryModel) {
     const queryParams: Required<UsersQueryModel> = {
       pageNumber: isNaN(Number(payload.pageNumber)) ? 1 : Number(payload.pageNumber),
@@ -41,10 +41,12 @@ export const usersQueryRepository = {
       pageSize: queryParams.pageSize,
       items: mappedUsers,
     }
-  },
+  }
   async getUserById(userId: string) {
     const foundUser = await UsersMongooseModel.findOne({ _id: userId })
 
     return foundUser && usersMappers.mapUserDbToViewDTO(foundUser)
-  },
+  }
 }
+
+export const usersQueryRepository = new UsersQueryRepository()

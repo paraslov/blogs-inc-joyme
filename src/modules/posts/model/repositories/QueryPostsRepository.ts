@@ -1,9 +1,16 @@
-import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
-import { postsMappers } from '../mappers/postsMappers'
+import {
+  BlogsMongooseModel,
+  CommentsMongooseModel,
+  LikesMongooseModel,
+  PostsMongooseModel
+} from '../../../../app/config/db'
+import { PostsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
 
-export const queryPostsRepository = {
+export class QueryPostsRepository {
+  constructor(protected postsMappers: PostsMappers) {}
+
   async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
     const sortBy = queryParams.sortBy || 'createdAt'
     const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection ?? '') ? queryParams.sortDirection : 'desc'
@@ -24,7 +31,7 @@ export const queryPostsRepository = {
 
     const totalCount = await PostsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedBlogs = foundPosts.map(postsMappers.mapDbPostsIntoView)
+    const mappedBlogs = foundPosts.map(this.postsMappers.mapDbPostsIntoView)
 
     return {
       pageSize,
@@ -33,7 +40,7 @@ export const queryPostsRepository = {
       page: pageNumber,
       items: mappedBlogs,
     }
-  },
+  }
   async getPostComments(postId: string, queryParams: Required<PaginationAndSortQuery>) {
     const { pageNumber, pageSize, sortBy, sortDirection} = queryParams
     const filter = { postId: postId }
@@ -46,7 +53,15 @@ export const queryPostsRepository = {
 
     const totalCount = await CommentsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedComments = foundComments.map(commentsMappers.mapCommentDtoToViewModel)
+
+    const mappedCommentsPromises = foundComments.map(async (comment) => {
+      const userId = comment.commentatorInfo.userId
+      const likeStatus = await LikesMongooseModel.findOne({ userId })
+
+      return commentsMappers.mapCommentDtoToViewModel(comment, likeStatus)
+    })
+
+    const mappedComments = await Promise.all(mappedCommentsPromises)
 
     return {
       pageSize,
@@ -55,11 +70,17 @@ export const queryPostsRepository = {
       page: pageNumber,
       items: mappedComments,
     }
-  },
+  }
   async getPostById(postId: string) {
     const foundPost = await PostsMongooseModel.findById(postId)
-    const mappedPost = foundPost && postsMappers.mapDbPostsIntoView(foundPost)
+    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost)
 
     return mappedPost
-  },
+  }
+  async getPostBlogById(blogId: string) {
+    const foundBlog = await BlogsMongooseModel.findById(blogId)
+    const viewModelBlog = foundBlog && this.postsMappers.mapPostBlogToView(foundBlog)
+
+    return viewModelBlog
+  }
 }

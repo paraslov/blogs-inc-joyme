@@ -1,16 +1,21 @@
-import { commandPostsRepository } from '../repositories/commandPostsRepository'
+import { CommandPostsRepository } from '../repositories/CommandPostsRepository'
 import { PostInputModel } from '../types/PostInputModel'
-import { queryBlogsRepository } from '../../../blogs'
 import { PostDbModel } from '../types/PostDbModel'
 import { CommentInputModel } from '../types/CommentInputModel'
-import { queryPostsRepository } from '../repositories/queryPostsRepository'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
-import { usersQueryRepository } from '../../../users'
 import { CommentDbModel } from '../../../comments'
+import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
+import { UsersQueryRepository } from '../../../users'
 
-export const postsService = {
+export class PostsService {
+  constructor(
+    protected queryPostsRepository: QueryPostsRepository,
+    protected commandPostsRepository: CommandPostsRepository,
+    protected usersQueryRepository: UsersQueryRepository,
+  ) {}
+
   async createPost(payload: PostInputModel) {
-    const blogData = await queryBlogsRepository.getBlogById(payload.blogId)
+    const blogData = await this.queryPostsRepository.getPostBlogById(payload.blogId)
 
     if (!blogData) return false
 
@@ -23,11 +28,11 @@ export const postsService = {
       createdAt: new Date().toISOString(),
     }
 
-    return commandPostsRepository.createPost(createdPostData)
-  },
+    return this.commandPostsRepository.createPost(createdPostData)
+  }
   async createCommentToPost(postId: string, userId: string, payload: CommentInputModel) {
-    const post = await queryPostsRepository.getPostById(postId)
-    const user = await usersQueryRepository.getUserById(userId)
+    const post = await this.queryPostsRepository.getPostById(postId)
+    const user = await this.usersQueryRepository.getUserById(userId)
 
     if (!(post && user)) {
       return {
@@ -43,15 +48,17 @@ export const postsService = {
         userLogin: user.login,
       },
       createdAt: new Date().toISOString(),
+      likesCount: 0,
+      dislikesCount: 0,
     }
 
-    const commentId = await commandPostsRepository.createCommentToPost(newComment)
+    const commentId = await this.commandPostsRepository.createCommentToPost(newComment)
 
     return {
       status: ResultToRouterStatus.SUCCESS,
       data: { commentId },
     }
-  },
+  }
   async updatePost(payload: PostInputModel, postId: string) {
     const updatePostData: PostInputModel = {
       title: payload.title,
@@ -60,13 +67,13 @@ export const postsService = {
       blogId: payload.blogId,
     }
 
-    const foundBlog = await queryBlogsRepository.getBlogById(payload.blogId)
+    const foundBlog = await this.queryPostsRepository.getPostBlogById(payload.blogId)
 
     if (!foundBlog) return false
 
-    return commandPostsRepository.updatePost(updatePostData, postId)
-  },
+    return this.commandPostsRepository.updatePost(updatePostData, postId)
+  }
   async deletePostById(postId: string) {
-    return commandPostsRepository.deletePostById(postId)
+    return this.commandPostsRepository.deletePostById(postId)
   }
 }

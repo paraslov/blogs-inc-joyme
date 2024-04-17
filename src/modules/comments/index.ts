@@ -3,6 +3,7 @@ import { commentsQueryRepository } from './model/repositories/commentsQueryRepos
 import { commentsMappers } from './model/mappers/commentsMappers'
 
 import type { CommentDbModel } from './model/types/CommentDbModel'
+import { LikesDbModel } from './model/types/LikesDbModel'
 
 export {
   commentsRouter,
@@ -12,4 +13,5 @@ export {
 
 export type {
   CommentDbModel,
+  LikesDbModel,
 }

@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import { WithId } from 'mongodb'
 import { BlogDbModel } from '../../../../modules/blogs'
 import { PostDbModel } from '../../../../modules/posts'
-import { CommentDbModel } from '../../../../modules/comments'
+import { CommentDbModel, LikesDbModel } from '../../../../modules/comments'
 import { CommentatorInfoModel } from '../../../../modules/comments/model/types/CommentatorInfoModel'
 import { ConfirmationInfoModel, UserDataModel, UserDbModel } from '../../../../modules/users'
 import { AuthSessionsDbModel, RateLimitModel } from '../../../../modules/auth'
@@ -65,4 +65,10 @@ export const MongooseSchemas = {
     iat: { type: Number },
     exp: { type: Number },
   }),
+  LikesCommentsSchema: new mongoose.Schema<WithId<LikesDbModel>>({
+    userId: { type: String, required: true },
+    parentId: { type: String, required: true },
+    status: { type: String, required: true },
+    createdAt: { type: Date, required: true },
+  })
 }
