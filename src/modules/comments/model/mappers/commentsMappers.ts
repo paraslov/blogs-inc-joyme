@@ -9,7 +9,10 @@ export const commentsMappers = {
     return {
       id: commentFromDb._id.toString(),
       content: commentFromDb.content,
-      commentatorInfo: commentFromDb.commentatorInfo,
+      commentatorInfo: {
+        userId: commentFromDb.commentatorInfo.userId,
+        userLogin: commentFromDb.commentatorInfo.userLogin,
+      },
       createdAt: commentFromDb.createdAt,
       likesInfo: {
         likesCount: commentFromDb.likesCount,

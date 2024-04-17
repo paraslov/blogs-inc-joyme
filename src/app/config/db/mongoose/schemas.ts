@@ -47,6 +47,8 @@ export const MongooseSchemas = {
     content: { type: String, required: true },
     commentatorInfo: CommentatorSchema,
     createdAt: { type: String, required: true },
+    likesCount: { type: Number, required: true },
+    dislikesCount: { type: Number, required: true },
   }),
   UsersSchema: new mongoose.Schema<WithId<UserDbModel>>({
     userData: UserDataSchema,
