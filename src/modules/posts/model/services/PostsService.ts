@@ -48,6 +48,8 @@ export class PostsService {
         userLogin: user.login,
       },
       createdAt: new Date().toISOString(),
+      likesCount: 0,
+      dislikesCount: 0,
     }
 
     const commentId = await this.commandPostsRepository.createCommentToPost(newComment)

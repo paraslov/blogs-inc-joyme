@@ -1,4 +1,9 @@
-import { BlogsMongooseModel, CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
+import {
+  BlogsMongooseModel,
+  CommentsMongooseModel,
+  LikesMongooseModel,
+  PostsMongooseModel
+} from '../../../../app/config/db'
 import { PostsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
 import { commentsMappers } from '../../../comments'
@@ -48,7 +53,12 @@ export class QueryPostsRepository {
 
     const totalCount = await CommentsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedComments = foundComments.map(commentsMappers.mapCommentDtoToViewModel)
+    const mappedComments = foundComments.map(async (comment) => {
+      const userId = comment.commentatorInfo.userId
+      const likeStatus = await LikesMongooseModel.findOne({ userId })
+
+      return commentsMappers.mapCommentDtoToViewModel(comment, likeStatus)
+    })
 
     return {
       pageSize,

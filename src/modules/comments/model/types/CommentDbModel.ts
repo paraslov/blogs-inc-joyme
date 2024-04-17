@@ -5,4 +5,6 @@ export type CommentDbModel = {
   content: string
   commentatorInfo: CommentatorInfoModel
   createdAt: string
+  likesCount: number
+  dislikesCount: number
 }
