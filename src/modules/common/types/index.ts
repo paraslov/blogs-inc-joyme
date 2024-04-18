@@ -19,7 +19,7 @@ export interface RequestQuery<Q> extends Express.Request {
   query: Q
 }
 
-export interface RequestParamsQuery<P, Q> extends Express.Request {
+export interface RequestParamsQuery<P extends core.ParamsDictionary, Q extends core.ParamsDictionary> extends Request {
   params: P
   query: Q
 }
@@ -35,17 +35,17 @@ export type PaginationWithItems<T> = Pagination & {
   items: T
 }
 
-export type PaginationQuery = {
+export type PaginationQuery<T = number> = {
   /**
    * pageNumber is number of portion that should be returned
    * Default value : 1
    */
-  pageNumber?: number
+  pageNumber?: T
   /**
    * pageSize is portion size that should be returned
    * Default value : 10
    */
-  pageSize?: number
+  pageSize?: T
 }
 
 export type SortQuery = {
@@ -60,7 +60,7 @@ export type SortQuery = {
   sortDirection?: 'asc' | 'desc'
 }
 
-export type PaginationAndSortQuery = PaginationQuery & SortQuery
+export type PaginationAndSortQuery<T = number> = PaginationQuery<T> & SortQuery
 
 export type ResultToRouter<T = null> = {
   status: ResultToRouterStatus
