@@ -10,7 +10,11 @@ import { LikeStatuses } from '../enums/LikeStatuses'
 
 export const commentsService = {
   async updateComment(commentId: string, userId: string, payload: CommentInputModel) {
-    const commentResult = await this.getCommentResult(commentId, userId)
+    const commentResult = await this.getCommentResult(commentId)
+
+    if (commentResult.data?.commentatorInfo.userId && commentResult.data.commentatorInfo.userId !== userId) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.FORBIDDEN)
+    }
 
     if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
       return commentResult
@@ -34,7 +38,7 @@ export const commentsService = {
     return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
   async updateCommentLikeStatus(commentId: string, userId: string, payload: LikeInputModel) {
-    const commentResult = await this.getCommentResult(commentId, userId)
+    const commentResult = await this.getCommentResult(commentId)
 
     if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
       return commentResult
@@ -89,7 +93,11 @@ export const commentsService = {
     return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
   async deleteComment(commentId: string, userId: string) {
-    const commentResult = await this.getCommentResult(commentId, userId)
+    const commentResult = await this.getCommentResult(commentId)
+
+    if (commentResult.data?.commentatorInfo.userId && commentResult.data.commentatorInfo.userId !== userId) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.FORBIDDEN)
+    }
 
     if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
       return commentResult
@@ -102,13 +110,11 @@ export const commentsService = {
 
     return operationsResultService.generateResponse(ResultToRouterStatus.SUCCESS)
   },
-  async getCommentResult(commentId: string, userId: string) {
+  async getCommentResult(commentId: string) {
     const commentResult = await commentsQueryRepository.getCommentDbModelById(commentId)
 
     if (commentResult.status === ResultToRouterStatus.NOT_FOUND) {
       return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
-    } else if (commentResult.data?.commentatorInfo.userId !== userId) {
-      return operationsResultService.generateResponse(ResultToRouterStatus.FORBIDDEN)
     }
 
     return commentResult
