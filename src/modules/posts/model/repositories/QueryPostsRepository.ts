@@ -55,7 +55,7 @@ export class QueryPostsRepository {
     const pagesCount = Math.ceil(totalCount / pageSize)
 
     const mappedCommentsPromises = foundComments.map(async (comment) => {
-      const likeStatus = userId ? await LikesMongooseModel.findOne({ userId }) : null
+      const likeStatus = userId ? await LikesMongooseModel.findOne({ userId, parentId: comment._id.toString() }) : null
 
       return commentsMappers.mapCommentDtoToViewModel(comment, likeStatus)
     })
