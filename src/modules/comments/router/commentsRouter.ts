@@ -9,11 +9,15 @@ import { CommentInputModel } from '../model/types/CommentInputModel'
 import { commentInputValidation, LikeInputValidation } from '../validations/commentsValidations'
 import { commentsService } from '../model/services/commentsService'
 import { LikeInputModel } from '../model/types/LikeInputModel'
+import { jwtService } from '../../common/services'
 
 export const commentsRouter = Router()
 
 commentsRouter.get('/:commentId', async (req: RequestParams<{ commentId: string }>, res) => {
-  const result = await commentsQueryRepository.getCommentById(req.params.commentId)
+  const token = req.headers.authorization?.split(' ')?.[1]
+  const userId = token && await jwtService.getUserIdByToken(token)
+
+  const result = await commentsQueryRepository.getCommentById(req.params.commentId, userId)
   if (result.status === ResultToRouterStatus.NOT_FOUND) {
     return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
   }

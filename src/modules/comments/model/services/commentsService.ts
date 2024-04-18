@@ -40,7 +40,7 @@ export const commentsService = {
       return commentResult
     }
 
-    const currentLikeStatus = await commentsQueryRepository.getLikeStatus(userId)
+    const currentLikeStatus = await commentsQueryRepository.getLikeStatus(userId, commentId)
     let likesCountChange = 0
     let dislikesCountChange = 0
 
@@ -70,13 +70,15 @@ export const commentsService = {
     }
 
     const commentData = commentResult.data!
+    const likesCount = commentData.likesCount + likesCountChange
+    const dislikesCount = commentData.dislikesCount + dislikesCountChange
     const updatedComment: CommentDbModel = {
       postId: commentData.postId,
       content: commentData.content,
       commentatorInfo: commentData.commentatorInfo,
       createdAt: commentData.createdAt,
-      likesCount: commentData.likesCount + likesCountChange,
-      dislikesCount: commentData.dislikesCount + dislikesCountChange,
+      likesCount: likesCount >= 0 ? likesCount : 0,
+      dislikesCount: dislikesCount >= 0 ? dislikesCount : 0,
     }
 
     const updateResult = await commentsCommandRepository.updateComment(commentId, updatedComment)
