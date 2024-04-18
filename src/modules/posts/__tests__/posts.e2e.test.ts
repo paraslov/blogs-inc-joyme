@@ -8,6 +8,7 @@ import { PostsMongooseModel } from '../../../app/config/db'
 import { memoryService } from '../../common/services'
 import { usersTestManager } from '../../users/utils/testing/usersTestManager'
 import { userInputMock } from '../../users'
+import { LikeStatuses } from '../../comments/model/enums/LikeStatuses'
 
 const supertest = require('supertest')
 
@@ -76,6 +77,26 @@ describe('/posts route GET tests: ', () => {
 
     expect(commentsResult.body.items?.length).toBe(1)
     expect(commentsResult.body.items[0].content).toBe(comment.content)
+    expect(commentsResult.body.items[0].likesInfo.myStatus).toBe('None')
+    expect(commentsResult.body.items[0].commentatorInfo.userId).toBe(comment.commentatorInfo.userId)
+    expect(commentsResult.body.totalCount).toBe(1)
+    expect(commentsResult.body.pageSize).toBe(10)
+  })
+
+  it('GET /posts/:id/comments with like status success', async () => {
+    const { postId, comment, accessToken } = await postsTestManager.createComment()
+    await request.put(`${RoutesList.COMMENTS}/${comment.id}/like-status`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatuses.LIKE })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    const commentsResult = await request.get(`${RoutesList.POSTS}/${postId}/comments`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(commentsResult.body.items?.length).toBe(1)
+    expect(commentsResult.body.items[0].content).toBe(comment.content)
+    expect(commentsResult.body.items[0].likesInfo.myStatus).toBe('Like')
     expect(commentsResult.body.items[0].commentatorInfo.userId).toBe(comment.commentatorInfo.userId)
     expect(commentsResult.body.totalCount).toBe(1)
     expect(commentsResult.body.pageSize).toBe(10)
