@@ -41,7 +41,7 @@ export class QueryPostsRepository {
       items: mappedBlogs,
     }
   }
-  async getPostComments(postId: string, queryParams: Required<PaginationAndSortQuery>) {
+  async getPostComments(postId: string, queryParams: Required<PaginationAndSortQuery>, userId?: string | null) {
     const { pageNumber, pageSize, sortBy, sortDirection} = queryParams
     const filter = { postId: postId }
 
@@ -55,8 +55,7 @@ export class QueryPostsRepository {
     const pagesCount = Math.ceil(totalCount / pageSize)
 
     const mappedCommentsPromises = foundComments.map(async (comment) => {
-      const userId = comment.commentatorInfo.userId
-      const likeStatus = await LikesMongooseModel.findOne({ userId })
+      const likeStatus = userId ? await LikesMongooseModel.findOne({ userId }) : null
 
       return commentsMappers.mapCommentDtoToViewModel(comment, likeStatus)
     })

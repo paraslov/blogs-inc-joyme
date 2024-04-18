@@ -52,7 +52,7 @@ export class PostsController {
       pageSize: Number(req.query.pageSize) || 10,
     }
 
-    const comments = await this.queryPostsRepository.getPostComments(req.params.postId, query)
+    const comments = await this.queryPostsRepository.getPostComments(req.params.postId, query, userId)
     return res.status(HttpStatusCode.OK_200).send(comments)
   }
   async createPost(req: RequestBody<PostInputModel>, res: Response) {
