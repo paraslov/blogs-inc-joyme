@@ -3,6 +3,7 @@ import { memoryService } from '../../common/services'
 import { RoutesList } from '../../../app/config/routes'
 import { postsTestManager } from '../../posts/utils/testing/postsTestManager'
 import { HttpStatusCode } from '../../common/enums'
+import { LikeStatuses } from '../model/enums/LikeStatuses'
 
 const supertest = require('supertest')
 
@@ -23,8 +24,12 @@ describe('/comments route tests: ', () => {
   it('GET /comments/:commentId success', async () => {
     const { comment } = await postsTestManager.createComment()
     const result = await request.get(`${RoutesList.COMMENTS}/${comment.id}`).expect(HttpStatusCode.OK_200)
+    console.log('@> result: ', result.body)
 
     expect(result.body.id).toBe(comment.id)
+    expect(result.body.likesInfo.likesCount).toBe(0)
+    expect(result.body.likesInfo.dislikesCount).toBe(0)
+    expect(result.body.likesInfo.myStatus).toBe(LikeStatuses.NONE)
   })
 
   it('GET /comments/:commentId failed:notFound', async () => {
