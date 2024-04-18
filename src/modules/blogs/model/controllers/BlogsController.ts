@@ -42,7 +42,7 @@ export class BlogsController {
 
     res.status(HttpStatusCode.OK_200).send(foundBlogById)
   }
-  async getBlogById(req: RequestParamsQuery<{ blogId: string }, PaginationAndSortQuery>, res: Response) {
+  async getBlogById(req: RequestParamsQuery<{ blogId: string }, PaginationAndSortQuery<string>>, res: Response) {
     const foundBlogById = await this.queryBlogsRepository.getBlogById(req.params.blogId)
 
     if (!foundBlogById) {
@@ -50,7 +50,14 @@ export class BlogsController {
       return
     }
 
-    const foundPostsById = await this.queryPostsRepository.getPosts(req.query, req.params.blogId)
+    const query: Required<PaginationAndSortQuery> = {
+      sortBy: req.query.sortBy ?? 'createdAt',
+      sortDirection: req.query.sortDirection ?? 'desc',
+      pageNumber: Number(req.query.pageNumber) || 1,
+      pageSize: Number(req.query.pageSize) || 10,
+    }
+
+    const foundPostsById = await this.queryPostsRepository.getPosts(query, req.params.blogId)
     res.status(HttpStatusCode.OK_200).send(foundPostsById)
   }
   async createBlog(req: RequestBody<BlogInputModel>, res: Response) {

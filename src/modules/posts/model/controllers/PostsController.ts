@@ -13,6 +13,7 @@ import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { commentsQueryRepository } from '../../../comments'
 import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
+import { jwtService } from '../../../common/services'
 
 export class PostsController {
   constructor(
@@ -34,14 +35,24 @@ export class PostsController {
 
     res.status(HttpStatusCode.OK_200).send(foundPost)
   }
-  async getPostComments(req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery>>, res: Response) {
+  async getPostComments(req: RequestParamsQuery<{ postId: string }, Required<PaginationAndSortQuery<string>>>, res: Response) {
+    const token = req.headers.authorization?.split(' ')?.[1]
+    const userId = token && await jwtService.getUserIdByToken(token)
+
     const post = await this.queryPostsRepository.getPostById(req.params.postId)
 
     if (!post) {
       return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
     }
 
-    const comments = await this.queryPostsRepository.getPostComments(req.params.postId, req.query)
+    const query: Required<PaginationAndSortQuery> = {
+      sortBy: req.query.sortBy ?? 'createdAt',
+      sortDirection: req.query.sortDirection ?? 'desc',
+      pageNumber: Number(req.query.pageNumber) || 1,
+      pageSize: Number(req.query.pageSize) || 10,
+    }
+
+    const comments = await this.queryPostsRepository.getPostComments(req.params.postId, query)
     return res.status(HttpStatusCode.OK_200).send(comments)
   }
   async createPost(req: RequestBody<PostInputModel>, res: Response) {
