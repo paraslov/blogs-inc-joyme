@@ -3,9 +3,9 @@ import { commentsMappers } from '../mappers/commentsMappers'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 
 export const commentsQueryRepository = {
-  async getCommentById(commentId: string) {
+  async getCommentById(commentId: string, userId?: string | null) {
     const comment = await CommentsMongooseModel.findOne({ _id: commentId })
-    const likeStatus = await this.getLikeStatusByCommentId(commentId)
+    const likeStatus = userId ? await this.getLikeStatus(userId, commentId) : null
 
     if (!comment) {
       return {
@@ -18,11 +18,8 @@ export const commentsQueryRepository = {
       data: commentsMappers.mapCommentDtoToViewModel(comment, likeStatus),
     }
   },
-  async getLikeStatus(userId: string) {
-    return LikesMongooseModel.findOne({ userId })
-  },
-  async getLikeStatusByCommentId(commentId: string) {
-    return LikesMongooseModel.findOne({ parentId: commentId })
+  async getLikeStatus(userId: string, commentId: string) {
+    return LikesMongooseModel.findOne({ userId, parentId: commentId })
   },
   async getCommentDbModelById(commentId: string) {
     const comment = await CommentsMongooseModel.findOne({ _id: commentId })
