@@ -82,4 +82,7 @@ export class QueryPostsRepository {
 
     return viewModelBlog
   }
+  async getLikeStatus(userId: string, commentId: string) {
+    return LikesMongooseModel.findOne({ userId, parentId: commentId })
+  }
 }
