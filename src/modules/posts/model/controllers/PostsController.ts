@@ -11,7 +11,7 @@ import { PostInputModel } from '../types/PostInputModel'
 import { PostsService } from '../services/PostsService'
 import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
-import { commentsQueryRepository } from '../../../comments'
+import { commentsQueryRepository, LikeInputModel } from '../../../comments'
 import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
 import { jwtService } from '../../../common/services'
 
@@ -88,6 +88,22 @@ export class PostsController {
     }
 
     res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+  }
+  async updatePostLikeStatus(req: RequestParamsBody<{ postId: string }, LikeInputModel>, res: Response) {
+    const userId = req.userId
+
+    const post = await this.queryPostsRepository.getPostById(req.params.postId)
+    if (!post) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    const isPostUpdated = await this.postsService.updatePostLikeStatus(req.body, post, userId)
+
+    if (!isPostUpdated) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   }
   async deletePost(req: Request, res: Response) {
     const isDeleted = await this.postsService.deletePostById(req.params.postId)
