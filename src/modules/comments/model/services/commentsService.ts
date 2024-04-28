@@ -7,6 +7,7 @@ import { operationsResultService } from '../../../common/services'
 import { LikeInputModel } from '../types/LikeInputModel'
 import { LikesDbModel } from '../types/LikesDbModel'
 import { LikeStatuses } from '../enums/LikeStatuses'
+import { usersQueryRepository } from '../../../users'
 
 export const commentsService = {
   async updateComment(commentId: string, userId: string, payload: CommentInputModel) {
@@ -39,6 +40,11 @@ export const commentsService = {
   },
   async updateCommentLikeStatus(commentId: string, userId: string, payload: LikeInputModel) {
     const commentResult = await this.getCommentResult(commentId)
+    const user = await usersQueryRepository.getUserById(userId)
+
+    if (!user) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
+    }
 
     if (commentResult.status !== ResultToRouterStatus.SUCCESS) {
       return commentResult
@@ -51,6 +57,7 @@ export const commentsService = {
     if (currentLikeStatus) {
       const updatedLikeStatusDto: LikesDbModel = {
         userId: currentLikeStatus.userId,
+        userLogin: currentLikeStatus.userLogin,
         parentId: currentLikeStatus.parentId,
         status: payload.likeStatus,
         createdAt: currentLikeStatus.createdAt,
@@ -63,6 +70,7 @@ export const commentsService = {
     } else {
       const createLikeStatusDto: LikesDbModel = {
         userId,
+        userLogin: user.login,
         parentId: commentId,
         status: payload.likeStatus,
         createdAt: new Date(),
