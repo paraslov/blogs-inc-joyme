@@ -19,8 +19,8 @@ export class CommandPostsRepository {
 
     return createResult._id.toString()
   }
-  async updateLikeStatus(updatedLikeStatusDto: LikesDbModel) {
-    const updateResult = await LikesMongooseModel.updateOne({ userId: updatedLikeStatusDto.userId }, updatedLikeStatusDto)
+  async updateLikeStatus(updatedLikeStatusDto: LikesDbModel, postId: string) {
+    const updateResult = await LikesMongooseModel.updateOne({ userId: updatedLikeStatusDto.userId, parentId: postId }, updatedLikeStatusDto)
 
     return Boolean(updateResult.matchedCount)
   }
