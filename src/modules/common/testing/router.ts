@@ -4,6 +4,7 @@ import {
   AuthSessionsMongooseModel,
   BlogsMongooseModel,
   CommentsMongooseModel,
+  LikesMongooseModel,
   PostsMongooseModel,
   RateLimitMongooseModel,
   UsersMongooseModel,
@@ -18,6 +19,7 @@ testingRouter.delete('/all-data', async (req, res) => {
   await AuthSessionsMongooseModel.deleteMany({})
   await CommentsMongooseModel.deleteMany({})
   await RateLimitMongooseModel.deleteMany({})
+  await LikesMongooseModel.deleteMany({})
 
   res.sendStatus(HttpStatusCode.NO_CONTENT_204)
 })
