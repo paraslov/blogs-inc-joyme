@@ -12,6 +12,7 @@ import { BlogQueryModel } from '../types/BlogQueryModel'
 import { Request, Response } from 'express'
 import { HttpStatusCode } from '../../../common/enums'
 import { BlogInputModel } from '../types/BlogInputModel'
+import { jwtService } from '../../../common/services'
 
 export class BlogsController {
   constructor(
@@ -43,6 +44,9 @@ export class BlogsController {
     res.status(HttpStatusCode.OK_200).send(foundBlogById)
   }
   async getBlogById(req: RequestParamsQuery<{ blogId: string }, PaginationAndSortQuery<string>>, res: Response) {
+    const token = req.headers.authorization?.split(' ')?.[1]
+    const userId = token && await jwtService.getUserIdByToken(token)
+
     const foundBlogById = await this.queryBlogsRepository.getBlogById(req.params.blogId)
 
     if (!foundBlogById) {
@@ -57,7 +61,7 @@ export class BlogsController {
       pageSize: Number(req.query.pageSize) || 10,
     }
 
-    const foundPostsById = await this.queryPostsRepository.getPosts(query, req.params.blogId)
+    const foundPostsById = await this.queryPostsRepository.getPosts(query, req.params.blogId, userId)
     res.status(HttpStatusCode.OK_200).send(foundPostsById)
   }
   async createBlog(req: RequestBody<BlogInputModel>, res: Response) {
