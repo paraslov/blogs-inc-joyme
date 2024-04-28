@@ -4,7 +4,7 @@ import { usersMappers } from '../mappers/usersMappers'
 
 export class UsersQueryRepository {
   async getUsers(payload: UsersQueryModel) {
-    const queryParams: Required<UsersQueryModel> = {
+    const queryParams = {
       pageNumber: isNaN(Number(payload.pageNumber)) ? 1 : Number(payload.pageNumber),
       pageSize: isNaN(Number(payload.pageSize)) ? 10 : Number(payload.pageSize),
       sortBy: payload.sortBy ?? 'createdAt',

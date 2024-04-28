@@ -1,12 +1,12 @@
 import { PaginationAndSortQuery } from '../../../common/types'
 
-export type UsersQueryModel = PaginationAndSortQuery & {
+export type UsersQueryModel = PaginationAndSortQuery<string> & {
   /**
    * default: null
    */
-  searchLoginTerm?: string | null
+  searchLoginTerm?: string
   /**
    * default: null
    */
-  searchEmailTerm?: string | null
+  searchEmailTerm?: string
 }
