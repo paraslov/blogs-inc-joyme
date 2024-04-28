@@ -1,6 +1,5 @@
 import { BlogsMongooseModel } from '../../../../app/config/db'
 import { BlogsMappers } from '../mappers/BlogsMappers'
-import { BlogQueryModel } from '../types/BlogQueryModel'
 import { BlogViewModel } from '../types/BlogViewModel'
 import { PaginationWithItems } from '../../../common/types'
 

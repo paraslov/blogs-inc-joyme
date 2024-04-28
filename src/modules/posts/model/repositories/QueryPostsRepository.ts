@@ -30,19 +30,7 @@ export class QueryPostsRepository {
     const mappedBlogsPromises = foundPosts.map(async (post) => {
       const likeStatus = userId ? await LikesMongooseModel.findOne({ userId, parentId: post._id.toString() }) : null
 
-      let lastThreeLikes = await LikesMongooseModel
-        .find({ parentId: post._id.toString() })
-        .sort({ 'createdAt': -1 })
-
-      const uniqueUsers: string[] = []
-      lastThreeLikes = lastThreeLikes && lastThreeLikes.filter((like) => {
-        const isUniqueLike = like.status === LikeStatuses.LIKE && !uniqueUsers.includes(like.userId) && uniqueUsers.length <= 3
-        if (isUniqueLike) {
-          uniqueUsers.push(like.userId)
-        }
-
-        return isUniqueLike
-      })
+      const lastThreeLikes = await this.getLatestThreeLikes(post._id.toString())
 
       return this.postsMappers.mapDbPostsIntoView(post, likeStatus, lastThreeLikes)
     })
@@ -86,9 +74,12 @@ export class QueryPostsRepository {
       items: mappedComments,
     }
   }
-  async getPostById(postId: string) {
+  async getPostById(postId: string, userId?: string | null) {
     const foundPost = await PostsMongooseModel.findById(postId)
-    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost, null, null)
+    const likeStatus = userId ? await this.getLikeStatus(userId, postId) : null
+    const latestThreeLikes = await this.getLatestThreeLikes(postId)
+
+    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost, likeStatus, latestThreeLikes)
 
     return mappedPost
   }
@@ -100,5 +91,22 @@ export class QueryPostsRepository {
   }
   async getLikeStatus(userId: string, postId: string) {
     return LikesMongooseModel.findOne({ userId, parentId: postId })
+  }
+  async getLatestThreeLikes(postId: string) {
+    let latestThreeLikes = await LikesMongooseModel
+      .find({ parentId: postId })
+      .sort({ 'createdAt': -1 })
+
+    const uniqueUsers: string[] = []
+    latestThreeLikes = latestThreeLikes && latestThreeLikes.filter((like) => {
+      const isUniqueLike = like.status === LikeStatuses.LIKE && !uniqueUsers.includes(like.userId) && uniqueUsers.length <= 3
+      if (isUniqueLike) {
+        uniqueUsers.push(like.userId)
+      }
+
+      return isUniqueLike
+    })
+
+    return latestThreeLikes
   }
 }
