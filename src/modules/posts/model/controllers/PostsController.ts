@@ -20,8 +20,19 @@ export class PostsController {
     protected postsService: PostsService,
     protected queryPostsRepository: QueryPostsRepository,
   ) {}
-  async getPosts(req: RequestQuery<PaginationAndSortQuery>, res: Response) {
-    const posts = await this.queryPostsRepository.getPosts(req.query)
+  async getPosts(req: RequestQuery<PaginationAndSortQuery<string>>, res: Response) {
+    const token = req.headers.authorization?.split(' ')?.[1]
+    const userId = token && await jwtService.getUserIdByToken(token)
+    console.log('#> UEWRWEROWEIUROIWEURPOIWEURPOIWERU: ', userId)
+
+    const query: Required<PaginationAndSortQuery> = {
+      sortBy: req.query.sortBy ?? 'createdAt',
+      sortDirection: req.query.sortDirection ?? 'desc',
+      pageNumber: Number(req.query.pageNumber) || 1,
+      pageSize: Number(req.query.pageSize) || 10,
+    }
+
+    const posts = await this.queryPostsRepository.getPosts(query, undefined, userId)
 
     res.status(HttpStatusCode.OK_200).send(posts)
   }
@@ -93,6 +104,7 @@ export class PostsController {
     const userId = req.userId
 
     const post = await this.queryPostsRepository.getPostById(req.params.postId)
+    console.log('@> post: ', post)
     if (!post) {
       return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
     }

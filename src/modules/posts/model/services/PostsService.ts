@@ -5,8 +5,9 @@ import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
 import { CommentDbModel, LikeInputModel, LikesDbModel, LikeStatuses } from '../../../comments'
 import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
-import { UsersQueryRepository } from '../../../users'
+import { usersQueryRepository, UsersQueryRepository } from '../../../users'
 import { PostViewModel } from '../types/PostViewModel'
+import { operationsResultService } from '../../../common/services'
 
 export class PostsService {
   constructor(
@@ -27,6 +28,8 @@ export class PostsService {
       blogId: payload.blogId,
       blogName: blogData.name,
       createdAt: new Date().toISOString(),
+      likesCount: 0,
+      dislikesCount: 0,
     }
 
     return this.commandPostsRepository.createPost(createdPostData)
@@ -75,13 +78,19 @@ export class PostsService {
     return this.commandPostsRepository.updatePost(updatePostData, postId)
   }
   async updatePostLikeStatus(payload: LikeInputModel, post: PostViewModel, userId: string) {
+    const user = await usersQueryRepository.getUserById(userId)
+    if (!user) {
+      return operationsResultService.generateResponse(ResultToRouterStatus.NOT_FOUND)
+    }
+
     const currentLikeStatus = await this.queryPostsRepository.getLikeStatus(userId, post.id)
-    let likesCountChange = 0
-    let dislikesCountChange = 0
+    let likesCountChange: number
+    let dislikesCountChange: number
 
     if (currentLikeStatus) {
       const updatedLikeStatusDto: LikesDbModel = {
         userId: currentLikeStatus.userId,
+        userLogin: currentLikeStatus.userLogin,
         parentId: currentLikeStatus.parentId,
         status: payload.likeStatus,
         createdAt: currentLikeStatus.createdAt,
@@ -94,10 +103,12 @@ export class PostsService {
     } else {
       const createLikeStatusDto: LikesDbModel = {
         userId,
+        userLogin: user.login,
         parentId: post.id,
         status: payload.likeStatus,
         createdAt: new Date(),
       }
+      console.log('@> cls: ', createLikeStatusDto)
       await this.commandPostsRepository.createLikeStatus(createLikeStatusDto)
 
       likesCountChange = payload.likeStatus === LikeStatuses.LIKE ? 1 : 0

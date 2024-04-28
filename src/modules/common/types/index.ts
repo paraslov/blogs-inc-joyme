@@ -15,7 +15,7 @@ export interface RequestParamsBody<P extends core.ParamsDictionary, B> extends R
   body: B
 }
 
-export interface RequestQuery<Q> extends Express.Request {
+export interface RequestQuery<Q extends core.ParamsDictionary> extends Request {
   query: Q
 }
 

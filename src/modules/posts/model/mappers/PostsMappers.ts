@@ -2,9 +2,10 @@ import { PostDbModel } from '../types/PostDbModel'
 import { WithId } from 'mongodb'
 import { PostViewModel } from '../types/PostViewModel'
 import { BlogDbModel, BlogViewModel } from '../../../blogs'
+import { LikesDbModel, LikeStatuses } from '../../../comments'
 
 export class PostsMappers {
-  mapDbPostsIntoView(dbPosts: WithId<PostDbModel>): PostViewModel {
+  mapDbPostsIntoView(dbPosts: WithId<PostDbModel>, likeStatus: LikesDbModel | null, lastThreeLikes: LikesDbModel[] | null): PostViewModel {
     return {
       id: dbPosts._id.toString(),
       title: dbPosts.title,
@@ -13,6 +14,14 @@ export class PostsMappers {
       blogId: dbPosts.blogId,
       blogName: dbPosts.blogName,
       createdAt: dbPosts.createdAt,
+      extendedLikesInfo: {
+        likesCount: dbPosts.likesCount,
+        dislikesCount: dbPosts.dislikesCount,
+        myStatus: likeStatus?.status ?? LikeStatuses.NONE,
+        newestLikes: lastThreeLikes
+          ? lastThreeLikes.map((like) => ({ addedAt: like.createdAt.toISOString(), userId: like.userId, login: like.userLogin }))
+          : []
+      }
     }
   }
   mapPostBlogToView(blogFromDb: WithId<BlogDbModel>): BlogViewModel {

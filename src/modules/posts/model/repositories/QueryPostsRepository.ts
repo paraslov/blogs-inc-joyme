@@ -6,17 +6,13 @@ import {
 } from '../../../../app/config/db'
 import { PostsMappers } from '../mappers/PostsMappers'
 import { PaginationAndSortQuery } from '../../../common/types'
-import { commentsMappers } from '../../../comments'
+import { commentsMappers, LikeStatuses } from '../../../comments'
 
 export class QueryPostsRepository {
   constructor(protected postsMappers: PostsMappers) {}
 
-  async getPosts(queryParams: PaginationAndSortQuery, blogId?: string, ) {
-    const sortBy = queryParams.sortBy || 'createdAt'
-    const sortDirection = ['asc', 'desc'].includes(queryParams.sortDirection ?? '') ? queryParams.sortDirection : 'desc'
-    const pageNumber = Number(queryParams.pageNumber) || 1
-    const pageSize = Number(queryParams.pageSize) || 10
-
+  async getPosts(queryParams: Required<PaginationAndSortQuery>, blogId?: string, userId?: string | null) {
+    const { sortBy, sortDirection, pageSize, pageNumber} = queryParams
     let filter: any = {}
 
     if (blogId) {
@@ -31,7 +27,27 @@ export class QueryPostsRepository {
 
     const totalCount = await PostsMongooseModel.countDocuments(filter)
     const pagesCount = Math.ceil(totalCount / pageSize)
-    const mappedBlogs = foundPosts.map(this.postsMappers.mapDbPostsIntoView)
+    const mappedBlogsPromises = foundPosts.map(async (post) => {
+      const likeStatus = userId ? await LikesMongooseModel.findOne({ userId, parentId: post._id.toString() }) : null
+
+      let lastThreeLikes = await LikesMongooseModel
+        .find({ parentId: post._id.toString() })
+        .sort({ 'createdAt': -1 })
+
+      const uniqueUsers: string[] = []
+      lastThreeLikes = lastThreeLikes && lastThreeLikes.filter((like) => {
+        const isUniqueLike = like.status === LikeStatuses.LIKE && !uniqueUsers.includes(like.userId) && uniqueUsers.length <= 3
+        if (isUniqueLike) {
+          uniqueUsers.push(like.userId)
+        }
+
+        return isUniqueLike
+      })
+
+      return this.postsMappers.mapDbPostsIntoView(post, likeStatus, lastThreeLikes)
+    })
+
+    const mappedBlogs = await Promise.all(mappedBlogsPromises)
 
     return {
       pageSize,
@@ -72,7 +88,7 @@ export class QueryPostsRepository {
   }
   async getPostById(postId: string) {
     const foundPost = await PostsMongooseModel.findById(postId)
-    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost)
+    const mappedPost = foundPost && this.postsMappers.mapDbPostsIntoView(foundPost, null, null)
 
     return mappedPost
   }
@@ -82,7 +98,7 @@ export class QueryPostsRepository {
 
     return viewModelBlog
   }
-  async getLikeStatus(userId: string, commentId: string) {
-    return LikesMongooseModel.findOne({ userId, parentId: commentId })
+  async getLikeStatus(userId: string, postId: string) {
+    return LikesMongooseModel.findOne({ userId, parentId: postId })
   }
 }

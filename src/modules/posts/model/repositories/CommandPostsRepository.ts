@@ -15,6 +15,7 @@ export class CommandPostsRepository {
     return result._id.toString()
   }
   async createLikeStatus(createLikeStatusDto: LikesDbModel) {
+    console.log('@> createLikeStatusDto: ', createLikeStatusDto)
     const createResult = await LikesMongooseModel.create(createLikeStatusDto)
 
     return createResult._id.toString()
