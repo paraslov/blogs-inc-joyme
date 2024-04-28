@@ -93,7 +93,7 @@ export class PostsService {
         userLogin: currentLikeStatus.userLogin,
         parentId: currentLikeStatus.parentId,
         status: payload.likeStatus,
-        createdAt: currentLikeStatus.createdAt,
+        createdAt: currentLikeStatus.status === payload.likeStatus ? currentLikeStatus.createdAt : new Date(),
       }
       await this.commandPostsRepository.updateLikeStatus(updatedLikeStatusDto)
 
