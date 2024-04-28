@@ -37,6 +37,25 @@ describe('/posts route GET tests: ', () => {
     expect(result.body.pageSize).toBe(10)
   })
 
+  it('GET /posts/:postId/like-status with like status success', async () => {
+    const { postId, comment, accessToken } = await postsTestManager.createComment()
+    const postLikeResult = await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatuses.LIKE })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+
+
+    const result = await request
+      .get(RoutesList.POSTS)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.items?.length).toBe(1)
+    expect(result.body.totalCount).toBe(1)
+    expect(result.body.pageSize).toBe(10)
+  })
+
   it('GET /posts success query params', async () => {
     await postsTestManager.createPost()
     const result = await request
