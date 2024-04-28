@@ -29,6 +29,8 @@ export class BlogsService {
       content: payload.content,
       blogName: blogToAddPostIn?.name ?? '',
       createdAt: new Date().toISOString(),
+      likesCount: 0,
+      dislikesCount: 0,
     }
 
     if (!blogToAddPostIn) return null

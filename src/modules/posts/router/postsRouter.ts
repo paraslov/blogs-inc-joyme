@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import { authMiddleware, jwtAuthMiddleware, sortingAndPaginationMiddleware } from '../../../app/config/middleware'
-import { commentInputValidation, postIdValidationMW, postInputValidation } from '../validations/postsValidations'
+import {
+  commentInputValidation,
+  LikeInputValidation,
+  postIdValidationMW,
+  postInputValidation
+} from '../validations/postsValidations'
 import { postsController } from '../composition-root/postsCompositionRoot'
 
 export const postsRouter = Router()
@@ -22,4 +27,5 @@ postsRouter.post(
   postsController.createCommentToPost.bind(postsController),
 )
 postsRouter.put('/:postId', authMiddleware, postIdValidationMW, postInputValidation(),  postsController.updatePost.bind(postsController))
+postsRouter.put('/:postId/like-status', jwtAuthMiddleware, postIdValidationMW, LikeInputValidation(),  postsController.updatePostLikeStatus.bind(postsController))
 postsRouter.delete('/:postId', authMiddleware, postIdValidationMW, postsController.deletePost.bind(postsController))

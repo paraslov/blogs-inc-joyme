@@ -1,7 +1,7 @@
 import { PostInputModel } from '../types/PostInputModel'
-import { CommentsMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
+import { CommentsMongooseModel, LikesMongooseModel, PostsMongooseModel } from '../../../../app/config/db'
 import { PostDbModel } from '../types/PostDbModel'
-import { CommentDbModel } from '../../../comments'
+import { CommentDbModel, LikesDbModel } from '../../../comments'
 
 export class CommandPostsRepository {
   async createPost(createdPostData: PostDbModel) {
@@ -14,8 +14,18 @@ export class CommandPostsRepository {
 
     return result._id.toString()
   }
+  async createLikeStatus(createLikeStatusDto: LikesDbModel) {
+    const createResult = await LikesMongooseModel.create(createLikeStatusDto)
+
+    return createResult._id.toString()
+  }
+  async updateLikeStatus(updatedLikeStatusDto: LikesDbModel) {
+    const updateResult = await LikesMongooseModel.updateOne({ userId: updatedLikeStatusDto.userId }, updatedLikeStatusDto)
+
+    return Boolean(updateResult.matchedCount)
+  }
   async updatePost(updatePostData: PostInputModel, postId: string) {
-    const updateResult = await PostsMongooseModel.updateOne({ _id: postId }, updatePostData)
+    const updateResult = await PostsMongooseModel.updateOne({ _id: postId }, { $set: updatePostData })
 
     return Boolean(updateResult.matchedCount)
   }

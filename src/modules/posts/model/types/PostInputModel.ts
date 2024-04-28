@@ -15,4 +15,6 @@ export type PostInputModel = {
    * should be an existing blog id
    */
   blogId: string
+  likesCount?: number
+  dislikesCount?: number
 }

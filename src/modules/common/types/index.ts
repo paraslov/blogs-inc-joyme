@@ -10,12 +10,12 @@ export interface RequestParams<P extends core.ParamsDictionary> extends Request 
   params: P
 }
 
-export interface RequestParamsBody<P, B> extends Express.Request {
+export interface RequestParamsBody<P extends core.ParamsDictionary, B> extends Request {
   params: P
   body: B
 }
 
-export interface RequestQuery<Q> extends Express.Request {
+export interface RequestQuery<Q extends core.ParamsDictionary> extends Request {
   query: Q
 }
 

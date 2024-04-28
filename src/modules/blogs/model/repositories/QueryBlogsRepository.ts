@@ -7,7 +7,7 @@ import { PaginationWithItems } from '../../../common/types'
 export class QueryBlogsRepository {
   constructor(protected blogsMappers: BlogsMappers) {}
 
-  async getAllBlogs(queryParams: Required<BlogQueryModel>): Promise<PaginationWithItems<BlogViewModel[]>> {
+  async getAllBlogs(queryParams: any): Promise<PaginationWithItems<BlogViewModel[]>> {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = queryParams
     let filter: Partial<Record<keyof BlogViewModel, any>> = {}
 

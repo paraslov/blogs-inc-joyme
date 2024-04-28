@@ -41,6 +41,8 @@ export const MongooseSchemas = {
     blogName: { type: String, required: true },
     blogId: { type: String, required: true },
     createdAt: { type: Date },
+    likesCount: { type: Number, required: true },
+    dislikesCount: { type: Number, required: true },
   }),
   CommentsSchema: new mongoose.Schema<WithId<CommentDbModel>>({
     postId: { type: String, required: true },
@@ -69,6 +71,7 @@ export const MongooseSchemas = {
   }),
   LikesCommentsSchema: new mongoose.Schema<WithId<LikesDbModel>>({
     userId: { type: String, required: true },
+    userLogin: { type: String, required: true },
     parentId: { type: String, required: true },
     status: { type: String, required: true },
     createdAt: { type: Date, required: true },

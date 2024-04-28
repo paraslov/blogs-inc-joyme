@@ -21,7 +21,7 @@ export class BlogsController {
   ) {}
 
   async getUsers(req: RequestQuery<Partial<BlogQueryModel>>, res: Response) {
-    const blogsQuery: Required<BlogQueryModel> = {
+    const blogsQuery = {
       searchNameTerm: req.query.searchNameTerm ?? null,
       sortBy: req.query.sortBy ?? 'createdAt',
       sortDirection: req.query.sortDirection ?? 'desc',

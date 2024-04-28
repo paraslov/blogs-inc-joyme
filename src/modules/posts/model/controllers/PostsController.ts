@@ -11,7 +11,7 @@ import { PostInputModel } from '../types/PostInputModel'
 import { PostsService } from '../services/PostsService'
 import { CommentInputModel } from '../types/CommentInputModel'
 import { ResultToRouterStatus } from '../../../common/enums/ResultToRouterStatus'
-import { commentsQueryRepository } from '../../../comments'
+import { commentsQueryRepository, LikeInputModel } from '../../../comments'
 import { QueryPostsRepository } from '../repositories/QueryPostsRepository'
 import { jwtService } from '../../../common/services'
 
@@ -20,8 +20,18 @@ export class PostsController {
     protected postsService: PostsService,
     protected queryPostsRepository: QueryPostsRepository,
   ) {}
-  async getPosts(req: RequestQuery<PaginationAndSortQuery>, res: Response) {
-    const posts = await this.queryPostsRepository.getPosts(req.query)
+  async getPosts(req: RequestQuery<PaginationAndSortQuery<string>>, res: Response) {
+    const token = req.headers.authorization?.split(' ')?.[1]
+    const userId = token && await jwtService.getUserIdByToken(token)
+
+    const query: Required<PaginationAndSortQuery> = {
+      sortBy: req.query.sortBy ?? 'createdAt',
+      sortDirection: req.query.sortDirection ?? 'desc',
+      pageNumber: Number(req.query.pageNumber) || 1,
+      pageSize: Number(req.query.pageSize) || 10,
+    }
+
+    const posts = await this.queryPostsRepository.getPosts(query, undefined, userId)
 
     res.status(HttpStatusCode.OK_200).send(posts)
   }
@@ -88,6 +98,22 @@ export class PostsController {
     }
 
     res.sendStatus(HttpStatusCode.NO_CONTENT_204)
+  }
+  async updatePostLikeStatus(req: RequestParamsBody<{ postId: string }, LikeInputModel>, res: Response) {
+    const userId = req.userId
+
+    const post = await this.queryPostsRepository.getPostById(req.params.postId)
+    if (!post) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    const isPostUpdated = await this.postsService.updatePostLikeStatus(req.body, post, userId)
+
+    if (!isPostUpdated) {
+      return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
+    }
+
+    return res.sendStatus(HttpStatusCode.NO_CONTENT_204)
   }
   async deletePost(req: Request, res: Response) {
     const isDeleted = await this.postsService.deletePostById(req.params.postId)
