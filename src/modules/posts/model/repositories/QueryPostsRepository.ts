@@ -94,18 +94,19 @@ export class QueryPostsRepository {
   }
   async getLatestThreeLikes(postId: string) {
     let latestThreeLikes = await LikesMongooseModel
-      .find({ parentId: postId })
+      .find({ parentId: postId, status: LikeStatuses.LIKE })
       .sort({ 'createdAt': -1 })
+      .limit(3)
 
-    const uniqueUsers: string[] = []
-    latestThreeLikes = latestThreeLikes && latestThreeLikes.filter((like) => {
-      const isUniqueLike = like.status === LikeStatuses.LIKE && !uniqueUsers.includes(like.userId) && uniqueUsers.length <= 3
-      if (isUniqueLike) {
-        uniqueUsers.push(like.userId)
-      }
-
-      return isUniqueLike
-    })
+    // const uniqueUsers: string[] = []
+    // latestThreeLikes = latestThreeLikes && latestThreeLikes.filter((like) => {
+    //   const isUniqueLike = like.status === LikeStatuses.LIKE && !uniqueUsers.includes(like.userId) && uniqueUsers.length <= 3
+    //   if (isUniqueLike) {
+    //     uniqueUsers.push(like.userId)
+    //   }
+    //
+    //   return isUniqueLike
+    // })
 
     return latestThreeLikes
   }
