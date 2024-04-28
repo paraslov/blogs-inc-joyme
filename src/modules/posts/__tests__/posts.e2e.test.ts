@@ -98,16 +98,10 @@ describe('/posts route GET tests: ', () => {
       .auth(accessToken, { type: 'bearer' })
       .send({ likeStatus: LikeStatuses.LIKE })
       .expect(HttpStatusCode.NO_CONTENT_204)
-    const result1 = await request
-      .get(`${RoutesList.POSTS}/${postId}`)
-      .auth(accessToken, { type: 'bearer' })
-      .expect(HttpStatusCode.OK_200)
-
     await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
       .auth(accessToken, { type: 'bearer' })
       .send({ likeStatus: LikeStatuses.DISLIKE })
       .expect(HttpStatusCode.NO_CONTENT_204)
-
     const result = await request
       .get(`${RoutesList.POSTS}/${postId}`)
       .auth(accessToken, { type: 'bearer' })
@@ -118,6 +112,28 @@ describe('/posts route GET tests: ', () => {
     expect(result.body.extendedLikesInfo.likesCount).toBe(0)
     expect(result.body.extendedLikesInfo.dislikesCount).toBe(1)
     expect(result.body.extendedLikesInfo.newestLikes.length).toBe(0)
+  })
+
+  it('GET /posts/:postId with double like status success', async () => {
+    const { postId, accessToken } = await postsTestManager.createComment()
+    await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatuses.LIKE })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+    await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatuses.LIKE })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+    const result = await request
+      .get(`${RoutesList.POSTS}/${postId}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.id).toStrictEqual(expect.any(String))
+    expect(result.body.extendedLikesInfo.myStatus).toBe(LikeStatuses.LIKE)
+    expect(result.body.extendedLikesInfo.likesCount).toBe(1)
+    expect(result.body.extendedLikesInfo.dislikesCount).toBe(0)
+    expect(result.body.extendedLikesInfo.newestLikes.length).toBe(1)
   })
 
   it('GET /posts success query params', async () => {
