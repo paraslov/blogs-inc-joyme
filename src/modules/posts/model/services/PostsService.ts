@@ -95,7 +95,7 @@ export class PostsService {
         status: payload.likeStatus,
         createdAt: currentLikeStatus.status === payload.likeStatus ? currentLikeStatus.createdAt : new Date(),
       }
-      await this.commandPostsRepository.updateLikeStatus(updatedLikeStatusDto)
+      await this.commandPostsRepository.updateLikeStatus(updatedLikeStatusDto, post.id)
 
       const { dislikesCount, likesCount } = this.calculateChanges(currentLikeStatus.status, payload.likeStatus)
       likesCountChange = likesCount
