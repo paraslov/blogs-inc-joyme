@@ -23,7 +23,6 @@ export class PostsController {
   async getPosts(req: RequestQuery<PaginationAndSortQuery<string>>, res: Response) {
     const token = req.headers.authorization?.split(' ')?.[1]
     const userId = token && await jwtService.getUserIdByToken(token)
-    console.log('#> UEWRWEROWEIUROIWEURPOIWEURPOIWERU: ', userId)
 
     const query: Required<PaginationAndSortQuery> = {
       sortBy: req.query.sortBy ?? 'createdAt',
@@ -104,7 +103,6 @@ export class PostsController {
     const userId = req.userId
 
     const post = await this.queryPostsRepository.getPostById(req.params.postId)
-    console.log('@> post: ', post)
     if (!post) {
       return res.sendStatus(HttpStatusCode.NOT_FOUND_404)
     }

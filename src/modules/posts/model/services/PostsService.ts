@@ -108,7 +108,6 @@ export class PostsService {
         status: payload.likeStatus,
         createdAt: new Date(),
       }
-      console.log('@> cls: ', createLikeStatusDto)
       await this.commandPostsRepository.createLikeStatus(createLikeStatusDto)
 
       likesCountChange = payload.likeStatus === LikeStatuses.LIKE ? 1 : 0

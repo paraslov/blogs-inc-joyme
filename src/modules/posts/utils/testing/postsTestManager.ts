@@ -59,7 +59,6 @@ class PostsTestManager {
   }
   async createComment() {
     const createdPost = await this.createPost()
-    console.log('@> crpostData: ', createdPost.body)
     const createUser = await usersTestManager.createUser()
     const resultLogin = await request.post(`${RoutesList.AUTH}/login`)
       .send({
