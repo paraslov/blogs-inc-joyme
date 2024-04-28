@@ -37,14 +37,12 @@ describe('/posts route GET tests: ', () => {
     expect(result.body.pageSize).toBe(10)
   })
 
-  it('GET /posts/:postId/like-status with like status success', async () => {
-    const { postId, comment, accessToken } = await postsTestManager.createComment()
-    const postLikeResult = await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
+  it('GET /posts with like status success', async () => {
+    const { postId, accessToken } = await postsTestManager.createComment()
+    await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
       .auth(accessToken, { type: 'bearer' })
       .send({ likeStatus: LikeStatuses.LIKE })
       .expect(HttpStatusCode.NO_CONTENT_204)
-
-
 
     const result = await request
       .get(RoutesList.POSTS)
@@ -54,6 +52,25 @@ describe('/posts route GET tests: ', () => {
     expect(result.body.items?.length).toBe(1)
     expect(result.body.totalCount).toBe(1)
     expect(result.body.pageSize).toBe(10)
+  })
+
+  it('GET /posts/:postId with like status success', async () => {
+    const { postId, accessToken } = await postsTestManager.createComment()
+    await request.put(`${RoutesList.POSTS}/${postId}/like-status`)
+      .auth(accessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatuses.LIKE })
+      .expect(HttpStatusCode.NO_CONTENT_204)
+
+    const result = await request
+      .get(`${RoutesList.POSTS}/${postId}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(HttpStatusCode.OK_200)
+
+    expect(result.body.id).toStrictEqual(expect.any(String))
+    expect(result.body.extendedLikesInfo.myStatus).toBe(LikeStatuses.LIKE)
+    expect(result.body.extendedLikesInfo.likesCount).toBe(1)
+    expect(result.body.extendedLikesInfo.newestLikes[0].login).toStrictEqual(expect.any(String))
+    expect(result.body.extendedLikesInfo.newestLikes[0].addedAt).toStrictEqual(expect.any(String))
   })
 
   it('GET /posts success query params', async () => {

@@ -36,7 +36,10 @@ export class PostsController {
     res.status(HttpStatusCode.OK_200).send(posts)
   }
   async getPostById(req: Request, res: Response) {
-    const foundPost = await this.queryPostsRepository.getPostById(req.params.postId)
+    const token = req.headers.authorization?.split(' ')?.[1]
+    const userId = token && await jwtService.getUserIdByToken(token)
+
+    const foundPost = await this.queryPostsRepository.getPostById(req.params.postId, userId)
 
     if (!foundPost) {
       res.sendStatus(HttpStatusCode.NOT_FOUND_404)
